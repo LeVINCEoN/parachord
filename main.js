@@ -4123,25 +4123,39 @@ ipcMain.handle('release-notes-get', async () => {
     return highlights;
   }
 
-  // Try GitHub Releases API — fetch the most recent release
+  // Try GitHub Releases API — exact version first, then latest as fallback
   try {
     const { net } = require('electron');
-    const response = await net.fetch(
-      'https://api.github.com/repos/Parachord/parachord/releases?per_page=1',
-      { signal: AbortSignal.timeout(5000), headers: { 'Accept': 'application/vnd.github+json' } }
+    const headers = { 'Accept': 'application/vnd.github+json' };
+    const fetchOpts = { signal: AbortSignal.timeout(5000), headers };
+
+    // 1) Try the release matching this app's version
+    let release = null;
+    const tagResponse = await net.fetch(
+      `https://api.github.com/repos/Parachord/parachord/releases/tags/v${currentVersion}`,
+      fetchOpts
     );
-    if (response.ok) {
-      const releases = await response.json();
-      const release = releases[0];
-      if (release?.body) {
-        console.log(`📋 Loaded release notes from GitHub: ${release.tag_name}`);
-        const highlights = parseHighlights(release.body);
-        if (highlights.length > 0) {
-          return { success: true, highlights };
-        }
-      }
+    if (tagResponse.ok) {
+      release = await tagResponse.json();
     } else {
-      console.log(`📋 GitHub releases API returned ${response.status}`);
+      // 2) Tag not found — fall back to latest release
+      console.log(`📋 No GitHub release for v${currentVersion}, trying latest`);
+      const latestResponse = await net.fetch(
+        'https://api.github.com/repos/Parachord/parachord/releases?per_page=1',
+        fetchOpts
+      );
+      if (latestResponse.ok) {
+        const releases = await latestResponse.json();
+        release = releases[0];
+      }
+    }
+
+    if (release?.body) {
+      console.log(`📋 Loaded release notes from GitHub: ${release.tag_name}`);
+      const highlights = parseHighlights(release.body);
+      if (highlights.length > 0) {
+        return { success: true, highlights };
+      }
     }
   } catch (e) {
     console.log('📋 GitHub releases fetch failed, using bundled notes:', e.message);
