@@ -20038,6 +20038,12 @@ ${trackListXml}
 
     console.log(`🔍 Resolving: ${artistName} - ${track.title}${forceRefresh ? ' (forced refresh)' : ''}`);
 
+    // Preserve existing real sources (non-noMatch) as fallbacks so that transient
+    // API errors (e.g. Spotify 502) don't wipe out previously-resolved valid sources.
+    const existingRealSources = Object.fromEntries(
+      Object.entries(persistedSources).filter(([, v]) => v && !v.noMatch)
+    );
+
     const sources = {};
 
     // Query enabled resolvers in priority order (using refs for current values)
@@ -20162,14 +20168,25 @@ ${trackListXml}
             }
           }
         } else {
-          // Store no-match sentinel so this resolver isn't re-queried on next resolution
-          sources[resolver.id] = { noMatch: true, resolvedAt: Date.now() };
-          console.log(`  ⚪ ${resolver.name}: No match found`);
+          // Only store noMatch sentinel if there's no existing real source for this resolver.
+          // This prevents transient API errors (e.g. 502) from wiping out previously-resolved
+          // valid sources (e.g. a Spotify source with spotifyUri/spotifyId).
+          if (existingRealSources[resolver.id]) {
+            sources[resolver.id] = existingRealSources[resolver.id];
+            console.log(`  ⚪ ${resolver.name}: No match found (preserving existing source)`);
+          } else {
+            sources[resolver.id] = { noMatch: true, resolvedAt: Date.now() };
+            console.log(`  ⚪ ${resolver.name}: No match found`);
+          }
         }
       } catch (error) {
         // Silently ignore abort errors
         if (error.name === 'AbortError') return;
         console.error(`  ❌ ${resolver.name} resolve error:`, error);
+        // Preserve existing source on error (don't let transient failures wipe valid sources)
+        if (existingRealSources[resolver.id]) {
+          sources[resolver.id] = existingRealSources[resolver.id];
+        }
       }
     });
 
