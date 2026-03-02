@@ -1272,7 +1272,7 @@ const FixedTooltip = ({ children, content }) => {
           zIndex: 99999,
           maxWidth: 280,
           minWidth: 180,
-          backgroundColor: '#1f2937',
+          backgroundColor: 'var(--tooltip-bg)',
           color: '#ffffff',
           borderRadius: 8,
           padding: '10px 14px',
@@ -1820,11 +1820,11 @@ const VirtualizedQueueList = React.memo(({
         : isLoading ?
           React.createElement('div', { className: 'flex items-center gap-1' },
             React.createElement('div', {
-              className: 'rounded bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 bg-[length:200%_100%] animate-shimmer',
+              className: 'rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
               style: { width: '20px', height: '20px' }
             }),
             React.createElement('div', {
-              className: 'rounded bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 bg-[length:200%_100%] animate-shimmer',
+              className: 'rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
               style: { width: '20px', height: '20px', animationDelay: '0.1s' }
             })
           )
@@ -1863,12 +1863,12 @@ const VirtualizedQueueList = React.memo(({
         :
           React.createElement('div', { className: 'flex items-center gap-1' },
             React.createElement('div', {
-              className: 'rounded bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 bg-[length:200%_100%] animate-shimmer',
+              className: 'rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
               style: { width: '20px', height: '20px' },
               title: 'Resolving track...'
             }),
             React.createElement('div', {
-              className: 'rounded bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 bg-[length:200%_100%] animate-shimmer',
+              className: 'rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
               style: { width: '20px', height: '20px', animationDelay: '0.1s' }
             })
           )
@@ -1993,7 +1993,7 @@ const ResolverCard = React.memo(({
           borderRadius: '6px',
           fontSize: '11px',
           fontWeight: '600',
-          color: '#374151',
+          color: 'var(--text-primary)',
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
         }
       }, priorityNumber),
@@ -2051,7 +2051,7 @@ const ResolverCard = React.memo(({
         marginTop: '10px',
         fontSize: '13px',
         fontWeight: '500',
-        color: isAvailable ? '#9ca3af' : '#1f2937',
+        color: isAvailable ? '#9ca3af' : 'var(--text-primary)',
         textAlign: 'center',
         width: '120px',
         overflow: 'hidden',
@@ -2120,7 +2120,7 @@ const McpSettingsSection = () => {
           padding: '12px 16px',
           fontSize: '12px',
           lineHeight: '1.6',
-          color: '#1f2937',
+          color: 'var(--text-primary)',
           overflow: 'auto',
           fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace',
           whiteSpace: 'pre-wrap',
@@ -2137,7 +2137,7 @@ const McpSettingsSection = () => {
           fontSize: '11px',
           fontWeight: '500',
           color: copied ? '#059669' : '#6b7280',
-          backgroundColor: copied ? '#ecfdf5' : '#f3f4f6',
+          backgroundColor: copied ? '#ecfdf5' : 'var(--placeholder-bg-light)',
           border: '1px solid ' + (copied ? '#a7f3d0' : '#d1d5db'),
           borderRadius: '6px',
           cursor: 'pointer',
@@ -2469,11 +2469,11 @@ const RelatedArtistCard = ({ artist, getArtistImage, onNavigate }) => {
     // Artist image square - gray bg while loading, pattern only when no image found
     React.createElement('div', {
       className: 'w-full aspect-square mb-2 relative overflow-hidden rounded-lg',
-      style: { background: imageUrl === null ? pattern.gradient : '#e5e7eb' }
+      style: { background: imageUrl === null ? pattern.gradient : 'var(--placeholder-bg)' }
     },
       // Loading shimmer (only while fetching - imageUrl is undefined)
       imageUrl === undefined && React.createElement('div', {
-        className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+        className: 'absolute inset-0 shimmer-strong animate-shimmer',
         style: { backgroundSize: '200% 100%' }
       }),
       // Image (fades in when loaded - imageUrl is a string)
@@ -2549,7 +2549,7 @@ const SearchArtistCard = ({ artist, getArtistImage, onClick, onContextMenu, onPl
     // Square image container - gray bg while loading, pattern only when no image found
     React.createElement('div', {
       className: 'aspect-square relative group/art overflow-hidden',
-      style: { background: imageUrl === null ? pattern.gradient : '#e5e7eb' }
+      style: { background: imageUrl === null ? pattern.gradient : 'var(--placeholder-bg)' }
     },
       // Initials overlay (only show when no image found - imageUrl is null)
       imageUrl === null && React.createElement('div', {
@@ -2573,7 +2573,7 @@ const SearchArtistCard = ({ artist, getArtistImage, onClick, onContextMenu, onPl
       }),
       // Shimmer loading state (only while fetching - imageUrl is undefined)
       imageUrl === undefined && React.createElement('div', {
-        className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+        className: 'absolute inset-0 shimmer-strong animate-shimmer',
         style: { backgroundSize: '200% 100%' }
       }),
       // Hover overlay with action buttons (Play, Queue)
@@ -2725,7 +2725,7 @@ const CollectionArtistCard = ({ artist, getArtistImage, onNavigate, onPlayTopTra
     // Square image container - gray bg while loading, pattern only when no image found
     React.createElement('div', {
       className: 'aspect-square relative group/art overflow-hidden',
-      style: { background: imageUrl === null ? pattern.gradient : '#e5e7eb' }
+      style: { background: imageUrl === null ? pattern.gradient : 'var(--placeholder-bg)' }
     },
       // Initials overlay (only show when no image found, not while loading)
       imageUrl === null && React.createElement('div', {
@@ -2749,7 +2749,7 @@ const CollectionArtistCard = ({ artist, getArtistImage, onNavigate, onPlayTopTra
       }),
       // Shimmer loading state (only while fetching)
       imageUrl === undefined && React.createElement('div', {
-        className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+        className: 'absolute inset-0 shimmer-strong animate-shimmer',
         style: { backgroundSize: '200% 100%' }
       }),
       // Hover overlay with action buttons (Play, Queue)
@@ -2848,8 +2848,8 @@ const CollectionAlbumCard = ({ album, getAlbumArt, onNavigate, onAddToPlaylist, 
         background: imageUrl === null
           ? 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
           : imageUrl === undefined
-            ? 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)'
-            : '#f3f4f6',
+            ? 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))'
+            : 'var(--placeholder-bg-light)',
         backgroundSize: imageUrl === undefined ? '200% 100%' : undefined
       }
     },
@@ -2938,7 +2938,7 @@ const CollectionAlbumCard = ({ album, getAlbumArt, onNavigate, onAddToPlaylist, 
       style: {
         fontWeight: '500',
         fontSize: '13px',
-        color: '#1f2937',
+        color: 'var(--text-primary)',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
@@ -3087,7 +3087,7 @@ const ReleaseCard = ({ release, currentArtist, fetchReleaseData, onContextMenu, 
 
   // Badge colors - refined palette matching app aesthetic
   const badgeStyles = {
-    album: { bg: 'rgba(17, 24, 39, 0.06)', color: '#4b5563' },
+    album: { bg: 'rgba(17, 24, 39, 0.06)', color: 'var(--nav-inactive)' },
     ep: { bg: 'rgba(233, 30, 99, 0.08)', color: '#db2777' },
     single: { bg: 'rgba(139, 92, 246, 0.08)', color: '#7c3aed' },
     live: { bg: 'rgba(245, 158, 11, 0.08)', color: '#d97706' },
@@ -3137,8 +3137,8 @@ const ReleaseCard = ({ release, currentArtist, fetchReleaseData, onContextMenu, 
         background: release.albumArt === null || imageFailed
           ? 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
           : imageLoaded
-            ? '#f3f4f6'
-            : 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)',
+            ? 'var(--placeholder-bg-light)'
+            : 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))',
         backgroundSize: (release.albumArt === null || imageFailed || imageLoaded) ? undefined : '200% 100%',
         display: 'flex',
         alignItems: 'center',
@@ -3254,7 +3254,7 @@ const ReleaseCard = ({ release, currentArtist, fetchReleaseData, onContextMenu, 
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
-        color: '#1f2937',
+        color: 'var(--text-primary)',
         letterSpacing: '0.005em',
         pointerEvents: 'none'
       },
@@ -3365,7 +3365,7 @@ const ReleasePage = ({
       const year = release.date ? release.date.split('-')[0] : '';
       // Badge colors - matching ReleaseCard palette
       const badgeStyles = {
-        album: { bg: 'rgba(17, 24, 39, 0.06)', color: '#4b5563' },
+        album: { bg: 'rgba(17, 24, 39, 0.06)', color: 'var(--nav-inactive)' },
         ep: { bg: 'rgba(233, 30, 99, 0.08)', color: '#db2777' },
         single: { bg: 'rgba(139, 92, 246, 0.08)', color: '#7c3aed' },
         live: { bg: 'rgba(245, 158, 11, 0.08)', color: '#d97706' },
@@ -3530,7 +3530,7 @@ const ReleasePage = ({
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
-              color: '#1f2937',
+              color: 'var(--text-primary)',
               letterSpacing: '0.005em',
               pointerEvents: 'none'
             },
@@ -3594,7 +3594,7 @@ const ReleasePage = ({
             ),
             shareDropdownOpen === 'album' && React.createElement('div', {
               className: 'absolute left-0 top-full mt-1 rounded-lg py-1 min-w-[160px] z-30',
-              style: { backgroundColor: '#1f2937', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)' },
+              style: { backgroundColor: 'var(--tooltip-bg)', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)' },
               onClick: (e) => e.stopPropagation()
             },
               React.createElement('button', {
@@ -3640,19 +3640,19 @@ const ReleasePage = ({
           },
             // Track number
             React.createElement('div', {
-              className: 'w-6 h-4 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+              className: 'w-6 h-4 rounded shimmer-light animate-shimmer',
               style: { backgroundSize: '200% 100%' }
             }),
             // Track title
             React.createElement('div', { className: 'flex-1' },
               React.createElement('div', {
-                className: 'h-4 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                className: 'h-4 rounded shimmer-light animate-shimmer',
                 style: { width: `${width}%`, backgroundSize: '200% 100%' }
               })
             ),
             // Duration
             React.createElement('div', {
-              className: 'w-10 h-4 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+              className: 'w-10 h-4 rounded shimmer-light animate-shimmer',
               style: { backgroundSize: '200% 100%' }
             })
           )
@@ -3781,7 +3781,7 @@ const ReleasePage = ({
                   pointerEvents: 'none',
                   fontSize: '13px',
                   fontWeight: isNowPlaying ? '500' : '400',
-                  color: isNowPlaying ? '#7c3aed' : '#374151'
+                  color: isNowPlaying ? '#7c3aed' : 'var(--text-primary)'
                 }
               }, track.title),
 
@@ -3810,11 +3810,11 @@ const ReleasePage = ({
                       className: 'flex items-center gap-1'
                     },
                       React.createElement('div', {
-                        className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                        className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                         title: 'Resolving track...'
                       }),
                       React.createElement('div', {
-                        className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                        className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                         style: { animationDelay: '0.1s' }
                       })
                     );
@@ -16256,7 +16256,7 @@ ${trackListXml}
             }
           },
             React.createElement('svg', {
-              style: { width: '14px', height: '14px', marginLeft: '2px', color: '#111827' },
+              style: { width: '14px', height: '14px', marginLeft: '2px', color: 'var(--text-primary)' },
               fill: 'currentColor',
               viewBox: '0 0 24 24'
             },
@@ -30427,7 +30427,7 @@ useEffect(() => {
             className: 'w-full flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors rounded-lg',
             style: {
               backgroundColor: 'rgba(0, 0, 0, 0.04)',
-              color: activeView === 'search' ? '#1f2937' : '#9ca3af'
+              color: activeView === 'search' ? 'var(--text-primary)' : '#9ca3af'
             },
             onClick: () => navigateTo('search')
           },
@@ -30451,7 +30451,7 @@ useEffect(() => {
             className: 'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors mb-3',
             style: {
               backgroundColor: activeView === 'home' ? 'rgba(124, 58, 237, 0.1)' : 'transparent',
-              color: activeView === 'home' ? '#7c3aed' : '#4b5563',
+              color: activeView === 'home' ? '#7c3aed' : 'var(--nav-inactive)',
               fontWeight: activeView === 'home' ? '600' : '500'
             }
           },
@@ -30479,7 +30479,7 @@ useEffect(() => {
               className: 'w-full flex items-center gap-3 px-3 py-1.5 rounded text-sm transition-colors',
               style: {
                 backgroundColor: (activeView === 'playlists' || activeView === 'playlist-view') ? 'rgba(236, 72, 153, 0.1)' : 'transparent',
-                color: (activeView === 'playlists' || activeView === 'playlist-view') ? '#ec4899' : '#4b5563',
+                color: (activeView === 'playlists' || activeView === 'playlist-view') ? '#ec4899' : 'var(--nav-inactive)',
                 fontWeight: (activeView === 'playlists' || activeView === 'playlist-view') ? '500' : '400'
               }
             },
@@ -30512,7 +30512,7 @@ useEffect(() => {
                 color: '#7c3aed'
               } : {
                 backgroundColor: activeView === 'library' ? 'rgba(147, 51, 234, 0.1)' : 'transparent',
-                color: activeView === 'library' ? '#9333ea' : '#4b5563',
+                color: activeView === 'library' ? '#9333ea' : 'var(--nav-inactive)',
                 fontWeight: activeView === 'library' ? '500' : '400'
               }
             },
@@ -30540,7 +30540,7 @@ useEffect(() => {
               className: 'w-full flex items-center gap-3 px-3 py-1.5 rounded text-sm transition-colors',
               style: {
                 backgroundColor: activeView === 'history' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
-                color: activeView === 'history' ? '#3b82f6' : '#4b5563',
+                color: activeView === 'history' ? '#3b82f6' : 'var(--nav-inactive)',
                 fontWeight: activeView === 'history' ? '500' : '400'
               }
             },
@@ -30571,7 +30571,7 @@ useEffect(() => {
               className: 'w-full flex items-center gap-3 px-3 py-1.5 rounded text-sm transition-colors',
               style: {
                 backgroundColor: activeView === 'new-releases' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
-                color: activeView === 'new-releases' ? '#10b981' : '#4b5563',
+                color: activeView === 'new-releases' ? '#10b981' : 'var(--nav-inactive)',
                 fontWeight: activeView === 'new-releases' ? '500' : '400'
               }
             },
@@ -30591,7 +30591,7 @@ useEffect(() => {
               className: 'w-full flex items-center gap-3 px-3 py-1.5 rounded text-sm transition-colors',
               style: {
                 backgroundColor: activeView === 'recommendations' ? 'rgba(168, 85, 247, 0.1)' : 'transparent',
-                color: activeView === 'recommendations' ? '#a855f7' : '#4b5563',
+                color: activeView === 'recommendations' ? '#a855f7' : 'var(--nav-inactive)',
                 fontWeight: activeView === 'recommendations' ? '500' : '400'
               }
             },
@@ -30615,7 +30615,7 @@ useEffect(() => {
               className: 'w-full flex items-center gap-3 px-3 py-1.5 rounded text-sm transition-colors',
               style: {
                 backgroundColor: activeView === 'discover' ? 'rgba(236, 72, 153, 0.1)' : 'transparent',
-                color: activeView === 'discover' ? '#ec4899' : '#4b5563',
+                color: activeView === 'discover' ? '#ec4899' : 'var(--nav-inactive)',
                 fontWeight: activeView === 'discover' ? '500' : '400'
               }
             },
@@ -30638,7 +30638,7 @@ useEffect(() => {
               className: 'w-full flex items-center gap-3 px-3 py-1.5 rounded text-sm transition-colors',
               style: {
                 backgroundColor: activeView === 'critics-picks' ? 'rgba(249, 115, 22, 0.1)' : 'transparent',
-                color: activeView === 'critics-picks' ? '#f97316' : '#4b5563',
+                color: activeView === 'critics-picks' ? '#f97316' : 'var(--nav-inactive)',
                 fontWeight: activeView === 'critics-picks' ? '500' : '400'
               }
             },
@@ -30758,7 +30758,7 @@ useEffect(() => {
               style: {
                 minHeight: '44px',
                 backgroundColor: isSelected ? 'rgba(0, 0, 0, 0.06)' : 'transparent',
-                color: isSelected ? '#1f2937' : 'inherit'
+                color: isSelected ? 'var(--text-primary)' : 'inherit'
               },
               draggable: true,
               onClick: () => navigateToFriend(friend),
@@ -30947,7 +30947,7 @@ useEffect(() => {
           React.createElement('button', {
             className: 'w-full flex items-center gap-2 cursor-pointer transition-colors',
             style: {
-              color: activeView === 'settings' ? '#1f2937' : '#6b7280',
+              color: activeView === 'settings' ? 'var(--text-primary)' : '#6b7280',
               fontWeight: activeView === 'settings' ? '500' : '400'
             },
             onClick: () => navigateTo('settings')
@@ -30973,7 +30973,7 @@ useEffect(() => {
         className: 'fixed bottom-24 left-1/2 transform -translate-x-1/2 z-50 transition-all flex items-center gap-3',
         style: {
           padding: '12px 20px',
-          backgroundColor: toast.type === 'error' ? '#dc2626' : toast.type === 'info' ? '#2563eb' : '#1f2937',
+          backgroundColor: toast.type === 'error' ? '#dc2626' : toast.type === 'info' ? '#2563eb' : 'var(--tooltip-bg)',
           color: '#ffffff',
           fontSize: '13px',
           fontWeight: '500',
@@ -31117,7 +31117,7 @@ useEffect(() => {
             style: {
               fontSize: '16px',
               fontWeight: '600',
-              color: '#1f2937',
+              color: 'var(--text-primary)',
               marginBottom: '12px'
             }
           },
@@ -31129,7 +31129,7 @@ useEffect(() => {
               style: {
                 fontSize: '14px',
                 fontWeight: '500',
-                color: '#1f2937'
+                color: 'var(--text-primary)'
               }
             }, pendingExternalTrack.title),
             React.createElement('div', {
@@ -31229,7 +31229,7 @@ useEffect(() => {
               padding: '12px 16px',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#374151',
+              color: 'var(--text-primary)',
               backgroundColor: 'rgba(0, 0, 0, 0.04)',
               border: 'none',
               borderRadius: '10px',
@@ -31299,7 +31299,7 @@ useEffect(() => {
             style: {
               fontSize: '16px',
               fontWeight: '600',
-              color: '#1f2937',
+              color: 'var(--text-primary)',
               marginBottom: '8px'
             }
           }, 'Friend Not Saved'),
@@ -31373,7 +31373,7 @@ useEffect(() => {
               padding: '12px 16px',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#374151',
+              color: 'var(--text-primary)',
               backgroundColor: 'rgba(0, 0, 0, 0.04)',
               border: 'none',
               borderRadius: '10px',
@@ -31392,7 +31392,7 @@ useEffect(() => {
       React.createElement('div', {
         className: 'loading-wordmark'
       },
-        React.createElement(ParachordWordmark, { fill: '#1f2937', height: 52 })
+        React.createElement(ParachordWordmark, { fill: 'var(--text-primary)', height: 52 })
       ),
       // Animated loading dots
       React.createElement('div', {
@@ -31803,11 +31803,11 @@ useEffect(() => {
                       // Square image container - gray while loading, pattern only when imageLoaded && no image
                       React.createElement('div', {
                         className: 'aspect-square relative group/art',
-                        style: { background: artist.imageLoaded && !artist.image ? searchArtistPattern.gradient : '#e5e7eb' }
+                        style: { background: artist.imageLoaded && !artist.image ? searchArtistPattern.gradient : 'var(--placeholder-bg)' }
                       },
                         // Shimmer while loading (imageLoaded not yet true)
                         !artist.imageLoaded && React.createElement('div', {
-                          className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+                          className: 'absolute inset-0 shimmer-strong animate-shimmer',
                           style: { backgroundSize: '200% 100%' }
                         }),
                         // Initials fallback (only show when imageLoaded && no image)
@@ -32081,7 +32081,7 @@ useEffect(() => {
                         style: {
                           fontSize: '13px',
                           fontWeight: '500',
-                          color: '#1f2937',
+                          color: 'var(--text-primary)',
                           marginTop: '6px'
                         }
                       }, album.title),
@@ -32223,7 +32223,7 @@ useEffect(() => {
                         minWidth: 0,
                         fontSize: '13px',
                         fontWeight: isNowPlaying && isPlaying ? '500' : '400',
-                        color: isNowPlaying && isPlaying ? '#7c3aed' : hasResolved ? '#374151' : '#9ca3af'
+                        color: isNowPlaying && isPlaying ? '#7c3aed' : hasResolved ? 'var(--text-primary)' : '#9ca3af'
                       }
                     }, track.title),
 
@@ -32289,11 +32289,11 @@ useEffect(() => {
                           className: 'flex items-center gap-1'
                         },
                           React.createElement('div', {
-                            className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                            className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                             title: 'Resolving track...'
                           }),
                           React.createElement('div', {
-                            className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                            className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                             style: { animationDelay: '0.1s' }
                           })
                         )
@@ -32489,7 +32489,7 @@ useEffect(() => {
                       style: {
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         marginTop: '6px'
                       }
                     }, playlist.title),
@@ -32640,12 +32640,12 @@ useEffect(() => {
                     className: 'bg-white rounded-lg overflow-hidden'
                   },
                     React.createElement('div', {
-                      className: 'aspect-square bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                      className: 'aspect-square shimmer-light animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100}ms` }
                     }),
                     React.createElement('div', { className: 'p-3' },
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 w-3/4 rounded animate-shimmer',
+                        className: 'h-4 shimmer-light w-3/4 rounded animate-shimmer',
                         style: { backgroundSize: '200% 100%', animationDelay: `${i * 100 + 50}ms` }
                       })
                     )
@@ -32665,19 +32665,19 @@ useEffect(() => {
                     style: { width: skeletonWidth }
                   },
                     React.createElement('div', {
-                      className: 'w-full aspect-square rounded-lg bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 mb-2 animate-shimmer',
+                      className: 'w-full aspect-square rounded-lg shimmer-light mb-2 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 w-3/4 mb-1 rounded animate-shimmer',
+                      className: 'h-3 shimmer-light w-3/4 mb-1 rounded animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100 + 50}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-2 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 w-1/2 rounded animate-shimmer',
+                      className: 'h-2 shimmer-light w-1/2 rounded animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100 + 100}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 w-10 mt-1 rounded animate-shimmer',
+                      className: 'h-4 shimmer-light w-10 mt-1 rounded animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100 + 150}ms` }
                     })
                   );
@@ -32696,15 +32696,15 @@ useEffect(() => {
                     style: { width: skeletonWidth }
                   },
                     React.createElement('div', {
-                      className: 'w-full aspect-square rounded-lg bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 mb-3 animate-shimmer',
+                      className: 'w-full aspect-square rounded-lg shimmer-light mb-3 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 w-3/4 mb-1 rounded animate-shimmer',
+                      className: 'h-3 shimmer-light w-3/4 mb-1 rounded animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100 + 50}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-2 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 w-1/2 rounded animate-shimmer',
+                      className: 'h-2 shimmer-light w-1/2 rounded animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100 + 100}ms` }
                     })
                   );
@@ -33024,7 +33024,7 @@ useEffect(() => {
                     style: {
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#1f2937',
+                      color: 'var(--text-primary)',
                       marginTop: '6px'
                     }
                   }, track.title),
@@ -33252,7 +33252,7 @@ useEffect(() => {
                     style: {
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#1f2937',
+                      color: 'var(--text-primary)',
                       marginTop: '6px'
                     }
                   }, album.title),
@@ -33336,7 +33336,7 @@ useEffect(() => {
                     style: {
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#1f2937'
+                      color: 'var(--text-primary)'
                     }
                   }, playlist.title),
                   // Track count
@@ -33915,7 +33915,7 @@ useEffect(() => {
         },
           // Skeleton header area with shimmer
           React.createElement('div', {
-            className: 'relative h-48 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+            className: 'relative h-48 shimmer-light animate-shimmer',
             style: { backgroundSize: '200% 100%' }
           }),
           // Skeleton content
@@ -33925,14 +33925,14 @@ useEffect(() => {
               Array.from({ length: 4 }).map((_, i) =>
                 React.createElement('div', {
                   key: `filter-skeleton-${i}`,
-                  className: 'h-10 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-full animate-shimmer',
+                  className: 'h-10 shimmer-light rounded-full animate-shimmer',
                   style: { width: `${80 + i * 15}px`, backgroundSize: '200% 100%', animationDelay: `${i * 100}ms` }
                 })
               )
             ),
             // Skeleton release count
             React.createElement('div', {
-              className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-24 mb-6 animate-shimmer',
+              className: 'h-4 shimmer-light rounded w-24 mb-6 animate-shimmer',
               style: { backgroundSize: '200% 100%' }
             }),
             // Skeleton album grid
@@ -33942,15 +33942,15 @@ useEffect(() => {
               Array.from({ length: 10 }).map((_, i) =>
                 React.createElement('div', { key: `album-skeleton-${i}` },
                   React.createElement('div', {
-                    className: 'aspect-square bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-lg mb-3 animate-shimmer',
+                    className: 'aspect-square shimmer-light rounded-lg mb-3 animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                   }),
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-3/4 mb-2 animate-shimmer',
+                    className: 'h-4 shimmer-light rounded w-3/4 mb-2 animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                   }),
                   React.createElement('div', {
-                    className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/2 animate-shimmer',
+                    className: 'h-3 shimmer-light rounded w-1/2 animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                   })
                 )
@@ -34008,7 +34008,7 @@ useEffect(() => {
                     fontSize: '13px',
                     fontWeight: '500',
                     backgroundColor: isActive ? '#7c3aed' : 'rgba(0, 0, 0, 0.04)',
-                    color: isActive ? '#ffffff' : '#4b5563',
+                    color: isActive ? '#ffffff' : 'var(--nav-inactive)',
                     border: 'none',
                     cursor: 'pointer',
                     boxShadow: isActive ? '0 2px 8px rgba(124, 58, 237, 0.3)' : 'none'
@@ -34092,7 +34092,7 @@ useEffect(() => {
                     style: {
                       width: '150px',
                       fontSize: '13px',
-                      color: '#374151'
+                      color: 'var(--text-primary)'
                     }
                   }),
                   artistSearch && React.createElement('button', {
@@ -34409,19 +34409,19 @@ useEffect(() => {
                 loadingExtendedInfo && React.createElement('div', { className: 'space-y-4' },
                   // Section skeleton
                   React.createElement('div', { className: 'space-y-2' },
-                    React.createElement('div', { className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-16', style: { backgroundSize: '200% 100%' } }),
-                    React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-24', style: { backgroundSize: '200% 100%', animationDelay: '50ms' } })
+                    React.createElement('div', { className: 'h-3 shimmer-light rounded animate-shimmer w-16', style: { backgroundSize: '200% 100%' } }),
+                    React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-24', style: { backgroundSize: '200% 100%', animationDelay: '50ms' } })
                   ),
                   React.createElement('div', { className: 'space-y-2' },
-                    React.createElement('div', { className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-20', style: { backgroundSize: '200% 100%', animationDelay: '100ms' } }),
-                    React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-28', style: { backgroundSize: '200% 100%', animationDelay: '150ms' } })
+                    React.createElement('div', { className: 'h-3 shimmer-light rounded animate-shimmer w-20', style: { backgroundSize: '200% 100%', animationDelay: '100ms' } }),
+                    React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-28', style: { backgroundSize: '200% 100%', animationDelay: '150ms' } })
                   ),
                   React.createElement('div', { className: 'space-y-2' },
-                    React.createElement('div', { className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-14', style: { backgroundSize: '200% 100%', animationDelay: '200ms' } }),
+                    React.createElement('div', { className: 'h-3 shimmer-light rounded animate-shimmer w-14', style: { backgroundSize: '200% 100%', animationDelay: '200ms' } }),
                     React.createElement('div', { className: 'flex gap-2' },
-                      React.createElement('div', { className: 'h-6 w-6 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer', style: { backgroundSize: '200% 100%', animationDelay: '250ms' } }),
-                      React.createElement('div', { className: 'h-6 w-6 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer', style: { backgroundSize: '200% 100%', animationDelay: '300ms' } }),
-                      React.createElement('div', { className: 'h-6 w-6 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer', style: { backgroundSize: '200% 100%', animationDelay: '350ms' } })
+                      React.createElement('div', { className: 'h-6 w-6 shimmer-light rounded animate-shimmer', style: { backgroundSize: '200% 100%', animationDelay: '250ms' } }),
+                      React.createElement('div', { className: 'h-6 w-6 shimmer-light rounded animate-shimmer', style: { backgroundSize: '200% 100%', animationDelay: '300ms' } }),
+                      React.createElement('div', { className: 'h-6 w-6 shimmer-light rounded animate-shimmer', style: { backgroundSize: '200% 100%', animationDelay: '350ms' } })
                     )
                   )
                 ),
@@ -34444,7 +34444,7 @@ useEffect(() => {
                       style: {
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         lineHeight: '1.35'
                       }
                     },
@@ -34479,7 +34479,7 @@ useEffect(() => {
                       style: {
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         lineHeight: '1.35'
                       }
                     }, artistExtendedInfo.foundedIn)
@@ -34561,17 +34561,17 @@ useEffect(() => {
                           width: '28px',
                           height: '28px',
                           borderRadius: '6px',
-                          backgroundColor: '#f3f4f6',
+                          backgroundColor: 'var(--placeholder-bg-light)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           transition: 'background-color 150ms ease'
                         },
                         title: 'Twitter/X',
-                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = '#e5e7eb',
-                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = '#f3f4f6'
+                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg)',
+                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg-light)'
                       },
-                        React.createElement('svg', { style: { width: '14px', height: '14px', color: '#4b5563' }, viewBox: '0 0 24 24', fill: 'currentColor' },
+                        React.createElement('svg', { style: { width: '14px', height: '14px', color: 'var(--nav-inactive)' }, viewBox: '0 0 24 24', fill: 'currentColor' },
                           React.createElement('path', { d: 'M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z' })
                         )
                       ),
@@ -34584,17 +34584,17 @@ useEffect(() => {
                           width: '28px',
                           height: '28px',
                           borderRadius: '6px',
-                          backgroundColor: '#f3f4f6',
+                          backgroundColor: 'var(--placeholder-bg-light)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           transition: 'background-color 150ms ease'
                         },
                         title: 'Instagram',
-                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = '#e5e7eb',
-                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = '#f3f4f6'
+                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg)',
+                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg-light)'
                       },
-                        React.createElement('svg', { style: { width: '14px', height: '14px', color: '#4b5563' }, viewBox: '0 0 24 24', fill: 'currentColor' },
+                        React.createElement('svg', { style: { width: '14px', height: '14px', color: 'var(--nav-inactive)' }, viewBox: '0 0 24 24', fill: 'currentColor' },
                           React.createElement('path', { d: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z' })
                         )
                       ),
@@ -34607,17 +34607,17 @@ useEffect(() => {
                           width: '28px',
                           height: '28px',
                           borderRadius: '6px',
-                          backgroundColor: '#f3f4f6',
+                          backgroundColor: 'var(--placeholder-bg-light)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           transition: 'background-color 150ms ease'
                         },
                         title: 'Facebook',
-                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = '#e5e7eb',
-                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = '#f3f4f6'
+                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg)',
+                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg-light)'
                       },
-                        React.createElement('svg', { style: { width: '14px', height: '14px', color: '#4b5563' }, viewBox: '0 0 24 24', fill: 'currentColor' },
+                        React.createElement('svg', { style: { width: '14px', height: '14px', color: 'var(--nav-inactive)' }, viewBox: '0 0 24 24', fill: 'currentColor' },
                           React.createElement('path', { d: 'M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' })
                         )
                       ),
@@ -34630,17 +34630,17 @@ useEffect(() => {
                           width: '28px',
                           height: '28px',
                           borderRadius: '6px',
-                          backgroundColor: '#f3f4f6',
+                          backgroundColor: 'var(--placeholder-bg-light)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           transition: 'background-color 150ms ease'
                         },
                         title: 'YouTube',
-                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = '#e5e7eb',
-                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = '#f3f4f6'
+                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg)',
+                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg-light)'
                       },
-                        React.createElement('svg', { style: { width: '14px', height: '14px', color: '#4b5563' }, viewBox: '0 0 24 24', fill: 'currentColor' },
+                        React.createElement('svg', { style: { width: '14px', height: '14px', color: 'var(--nav-inactive)' }, viewBox: '0 0 24 24', fill: 'currentColor' },
                           React.createElement('path', { d: 'M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z' })
                         )
                       )
@@ -34674,7 +34674,7 @@ useEffect(() => {
                             style: {
                               fontSize: '12px',
                               fontWeight: '500',
-                              color: '#374151',
+                              color: 'var(--text-primary)',
                               lineHeight: '1.4'
                             }
                           },
@@ -34748,21 +34748,21 @@ useEffect(() => {
               loadingBio && React.createElement('div', { className: 'space-y-4' },
                 // First paragraph skeleton (longer)
                 React.createElement('div', { className: 'space-y-2' },
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%' } }),
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '50ms' } }),
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-11/12', style: { backgroundSize: '200% 100%', animationDelay: '100ms' } }),
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-4/5', style: { backgroundSize: '200% 100%', animationDelay: '150ms' } })
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%' } }),
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '50ms' } }),
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-11/12', style: { backgroundSize: '200% 100%', animationDelay: '100ms' } }),
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-4/5', style: { backgroundSize: '200% 100%', animationDelay: '150ms' } })
                 ),
                 // Second paragraph skeleton
                 React.createElement('div', { className: 'space-y-2' },
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '200ms' } }),
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '250ms' } }),
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-3/4', style: { backgroundSize: '200% 100%', animationDelay: '300ms' } })
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '200ms' } }),
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '250ms' } }),
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-3/4', style: { backgroundSize: '200% 100%', animationDelay: '300ms' } })
                 ),
                 // Third paragraph skeleton (shorter)
                 React.createElement('div', { className: 'space-y-2' },
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '350ms' } }),
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-2/3', style: { backgroundSize: '200% 100%', animationDelay: '400ms' } })
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '350ms' } }),
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-2/3', style: { backgroundSize: '200% 100%', animationDelay: '400ms' } })
                 )
               ),
               // Bio content (artistBio is an object when bio exists)
@@ -34880,11 +34880,11 @@ useEffect(() => {
                       // Square image container - gray while loading, pattern only when imageLoaded && no image
                       React.createElement('div', {
                         className: 'aspect-square relative group/art',
-                        style: { background: artist.imageLoaded && !artist.image ? relatedPattern.gradient : '#e5e7eb' }
+                        style: { background: artist.imageLoaded && !artist.image ? relatedPattern.gradient : 'var(--placeholder-bg)' }
                       },
                         // Shimmer while loading (imageLoaded not yet true)
                         !artist.imageLoaded && React.createElement('div', {
-                          className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+                          className: 'absolute inset-0 shimmer-strong animate-shimmer',
                           style: { backgroundSize: '200% 100%' }
                         }),
                         // Initials fallback (only show when imageLoaded && no image)
@@ -35094,7 +35094,7 @@ useEffect(() => {
                 Array.from({ length: 4 }).map((_, i) =>
                   React.createElement('div', {
                     key: `cover-skeleton-${i}`,
-                    className: 'aspect-square bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                    className: 'aspect-square shimmer-light animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                   })
                 )
@@ -35102,15 +35102,15 @@ useEffect(() => {
               // Skeleton metadata
               React.createElement('div', { className: 'mt-4 space-y-2' },
                 React.createElement('div', {
-                  className: 'h-5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-40 animate-shimmer',
+                  className: 'h-5 shimmer-light rounded w-40 animate-shimmer',
                   style: { backgroundSize: '200% 100%' }
                 }),
                 React.createElement('div', {
-                  className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-32 animate-shimmer',
+                  className: 'h-4 shimmer-light rounded w-32 animate-shimmer',
                   style: { backgroundSize: '200% 100%', animationDelay: '100ms' }
                 }),
                 React.createElement('div', {
-                  className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-24 animate-shimmer',
+                  className: 'h-4 shimmer-light rounded w-24 animate-shimmer',
                   style: { backgroundSize: '200% 100%', animationDelay: '200ms' }
                 })
               )
@@ -35123,20 +35123,20 @@ useEffect(() => {
                   className: 'flex items-center gap-4 py-2 px-3'
                 },
                   React.createElement('div', {
-                    className: 'w-8 h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'w-8 h-4 shimmer-light rounded animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 30}ms` }
                   }),
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'h-4 shimmer-light rounded animate-shimmer',
                     style: { width: '200px', backgroundSize: '200% 100%', animationDelay: `${i * 30 + 15}ms` }
                   }),
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'h-4 shimmer-light rounded animate-shimmer',
                     style: { width: '120px', backgroundSize: '200% 100%', animationDelay: `${i * 30 + 30}ms` }
                   }),
                   React.createElement('div', { className: 'flex-1' }),
                   React.createElement('div', {
-                    className: 'w-10 h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'w-10 h-4 shimmer-light rounded animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 30 + 45}ms` }
                   })
                 )
@@ -35715,7 +35715,7 @@ useEffect(() => {
                     style: {
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#1f2937',
+                      color: 'var(--text-primary)',
                       marginTop: '10px',
                       letterSpacing: '0.005em'
                     },
@@ -35724,7 +35724,7 @@ useEffect(() => {
                   // Track count - matching grid typography (11px)
                   playlistTracks.length === 0 && selectedPlaylist?.isEphemeral ?
                     React.createElement('div', {
-                      className: 'h-4 w-20 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                      className: 'h-4 w-20 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                       style: { marginTop: '2px' }
                     }) :
                     React.createElement('div', {
@@ -35853,7 +35853,7 @@ useEffect(() => {
                 ),
                 shareDropdownOpen === 'playlist' && React.createElement('div', {
                   className: 'absolute left-0 top-full mt-1 rounded-lg py-1 min-w-[160px] z-30',
-                  style: { backgroundColor: '#1f2937', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)' },
+                  style: { backgroundColor: 'var(--tooltip-bg)', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)' },
                   onClick: (e) => e.stopPropagation()
                 },
                   React.createElement('button', {
@@ -36035,7 +36035,7 @@ useEffect(() => {
                           minWidth: 0,
                           fontSize: '13px',
                           fontWeight: isNowPlaying && isPlaying ? '500' : '400',
-                          color: isNowPlaying && isPlaying ? '#7c3aed' : hasResolved ? '#374151' : '#9ca3af'
+                          color: isNowPlaying && isPlaying ? '#7c3aed' : hasResolved ? 'var(--text-primary)' : '#9ca3af'
                         }
                       }, track.title),
 
@@ -36075,11 +36075,11 @@ useEffect(() => {
                             className: 'flex items-center gap-1'
                           },
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                               title: 'Resolving track...'
                             }),
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                               style: { animationDelay: '0.1s' }
                             })
                           )
@@ -36129,11 +36129,11 @@ useEffect(() => {
                             className: 'flex items-center gap-1'
                           },
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                               title: 'Resolving track...'
                             }),
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                               style: { animationDelay: '0.1s' }
                             })
                           )
@@ -36152,32 +36152,32 @@ useEffect(() => {
                     },
                       // Track number skeleton
                       React.createElement('div', {
-                        className: 'w-6 h-4 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                        className: 'w-6 h-4 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                         style: { width: '32px', animationDelay: `${index * 50}ms` }
                       }),
                       // Track title skeleton - flexible
                       React.createElement('div', {
-                        className: 'h-4 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                        className: 'h-4 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                         style: { flex: '1 1 0', minWidth: 0, animationDelay: `${index * 50 + 25}ms` }
                       }),
                       // Artist name skeleton - flexible
                       React.createElement('div', {
-                        className: 'h-4 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                        className: 'h-4 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                         style: { flex: '0.7 1 0', minWidth: 0, animationDelay: `${index * 50 + 50}ms` }
                       }),
                       // Duration skeleton
                       React.createElement('div', {
-                        className: 'h-4 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer flex-shrink-0',
+                        className: 'h-4 rounded shimmer-light bg-[length:200%_100%] animate-shimmer flex-shrink-0',
                         style: { width: '40px', animationDelay: `${index * 50 + 75}ms` }
                       }),
                       // Resolver icons skeleton
                       React.createElement('div', { className: 'flex items-center gap-1', style: { width: '140px', flexShrink: 0 } },
                         React.createElement('div', {
-                          className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                          className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                           style: { animationDelay: `${index * 50 + 100}ms` }
                         }),
                         React.createElement('div', {
-                          className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                          className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                           style: { animationDelay: `${index * 50 + 125}ms` }
                         })
                       )
@@ -36441,7 +36441,7 @@ useEffect(() => {
                         [0, 1, 2, 3].map(idx =>
                           React.createElement('div', {
                             key: idx,
-                            className: 'bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                            className: 'shimmer-light animate-shimmer',
                             style: { backgroundSize: '200% 100%', animationDelay: `${(i * 4 + idx) * 30}ms` }
                           })
                         )
@@ -36449,12 +36449,12 @@ useEffect(() => {
                     ),
                     // Skeleton title
                     React.createElement('div', {
-                      className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-3/4 mb-2 animate-shimmer',
+                      className: 'h-4 shimmer-light rounded w-3/4 mb-2 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                     }),
                     // Skeleton creator
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/2 animate-shimmer',
+                      className: 'h-3 shimmer-light rounded w-1/2 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                     })
                   )
@@ -36699,7 +36699,7 @@ useEffect(() => {
                       style: {
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         marginTop: '6px'
                       }
                     }, playlist.title),
@@ -36726,7 +36726,7 @@ useEffect(() => {
                         [0, 1, 2, 3].map(idx =>
                           React.createElement('div', {
                             key: idx,
-                            className: 'bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                            className: 'shimmer-light animate-shimmer',
                             style: { backgroundSize: '200% 100%', animationDelay: `${(i * 4 + idx) * 30}ms` }
                           })
                         )
@@ -36734,12 +36734,12 @@ useEffect(() => {
                     ),
                     // Skeleton title
                     React.createElement('div', {
-                      className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-3/4 mb-2 animate-shimmer',
+                      className: 'h-4 shimmer-light rounded w-3/4 mb-2 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                     }),
                     // Skeleton creator
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/2 animate-shimmer',
+                      className: 'h-3 shimmer-light rounded w-1/2 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                     })
                   )
@@ -36896,23 +36896,23 @@ useEffect(() => {
                 },
                   // Skeleton thumbnail
                   React.createElement('div', {
-                    className: 'w-12 h-12 rounded overflow-hidden flex-shrink-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                    className: 'w-12 h-12 rounded overflow-hidden flex-shrink-0 shimmer-light animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                   }),
                   // Skeleton title/creator
                   React.createElement('div', { className: 'flex-1 min-w-0' },
                     React.createElement('div', {
-                      className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-48 mb-2 animate-shimmer',
+                      className: 'h-4 shimmer-light rounded w-48 mb-2 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-24 animate-shimmer',
+                      className: 'h-3 shimmer-light rounded w-24 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                     })
                   ),
                   // Skeleton track count
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-16 flex-shrink-0 animate-shimmer',
+                    className: 'h-4 shimmer-light rounded w-16 flex-shrink-0 animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                   })
                 )
@@ -37326,15 +37326,15 @@ useEffect(() => {
                     },
                       React.createElement('div', {
                         className: 'aspect-square rounded-md mb-2',
-                        style: { backgroundColor: '#e5e7eb' }
+                        style: { backgroundColor: 'var(--placeholder-bg)' }
                       }),
                       React.createElement('div', {
                         className: 'h-4 rounded mb-2',
-                        style: { backgroundColor: '#e5e7eb', width: '80%' }
+                        style: { backgroundColor: 'var(--placeholder-bg)', width: '80%' }
                       }),
                       React.createElement('div', {
                         className: 'h-3 rounded',
-                        style: { backgroundColor: '#e5e7eb', width: '60%' }
+                        style: { backgroundColor: 'var(--placeholder-bg)', width: '60%' }
                       })
                     )
                   ),
@@ -37539,7 +37539,7 @@ useEffect(() => {
                               style: {
                                 background: weeklyJamCovers[jam.id]
                                   ? 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
-                                  : 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)',
+                                  : 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))',
                                 backgroundSize: !weeklyJamCovers[jam.id] ? '200% 100%' : undefined
                               }
                             },
@@ -37711,7 +37711,7 @@ useEffect(() => {
                                 style: {
                                   background: allPlaylistCovers[playlist.id]
                                     ? 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
-                                    : 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)',
+                                    : 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))',
                                   backgroundSize: !allPlaylistCovers[playlist.id] ? '200% 100%' : undefined
                                 }
                               },
@@ -37831,7 +37831,7 @@ useEffect(() => {
                             // Track info - click to play, right-click for context menu
                             track && React.createElement('p', {
                               className: 'text-xs truncate mt-0.5 cursor-pointer hover:underline',
-                              style: { color: onAir ? '#4b5563' : '#9ca3af' },
+                              style: { color: onAir ? 'var(--nav-inactive)' : '#9ca3af' },
                               onClick: (e) => {
                                 e.stopPropagation();
                                 const cacheKey = `${track.artist.toLowerCase()}|${track.name.toLowerCase()}`;
@@ -38306,7 +38306,7 @@ useEffect(() => {
                                 overflow: 'hidden',
                                 position: 'relative',
                                 background: album.art
-                                  ? '#f3f4f6'
+                                  ? 'var(--placeholder-bg-light)'
                                   : 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
                               }
                             },
@@ -38432,7 +38432,7 @@ useEffect(() => {
                                   style: {
                                     fontWeight: '500',
                                     fontSize: '13px',
-                                    color: '#1f2937',
+                                    color: 'var(--text-primary)',
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
                                     whiteSpace: 'nowrap',
@@ -38459,10 +38459,10 @@ useEffect(() => {
                           },
                             React.createElement('div', {
                               className: 'aspect-square rounded-md mb-2 animate-shimmer',
-                              style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)' }
+                              style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))' }
                             }),
-                            React.createElement('div', { className: 'h-4 rounded mb-2 animate-shimmer', style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', width: '80%' } }),
-                            React.createElement('div', { className: 'h-3 rounded animate-shimmer', style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', width: '60%' } })
+                            React.createElement('div', { className: 'h-4 rounded mb-2 animate-shimmer', style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', width: '80%' } }),
+                            React.createElement('div', { className: 'h-3 rounded animate-shimmer', style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', width: '60%' } })
                           )
                         ) : [])
                       )
@@ -38496,11 +38496,11 @@ useEffect(() => {
                           },
                             React.createElement('div', {
                               className: 'aspect-square relative group/art overflow-hidden',
-                              style: { background: artist.image === null ? generateArtistPattern(artist.name).gradient : '#e5e7eb' }
+                              style: { background: artist.image === null ? generateArtistPattern(artist.name).gradient : 'var(--placeholder-bg)' }
                             },
                               // Loading shimmer
                               artist.image === undefined && React.createElement('div', {
-                                className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+                                className: 'absolute inset-0 shimmer-strong animate-shimmer',
                                 style: { backgroundSize: '200% 100%' }
                               }),
                               // Artist image
@@ -38615,10 +38615,10 @@ useEffect(() => {
                         },
                           React.createElement('div', {
                             className: 'aspect-square rounded-md mb-2 animate-shimmer',
-                            style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)' }
+                            style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))' }
                           }),
-                          React.createElement('div', { className: 'h-4 rounded mb-2 animate-shimmer', style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', width: '80%' } }),
-                          React.createElement('div', { className: 'h-3 rounded animate-shimmer', style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', width: '60%' } })
+                          React.createElement('div', { className: 'h-4 rounded mb-2 animate-shimmer', style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', width: '80%' } }),
+                          React.createElement('div', { className: 'h-3 rounded animate-shimmer', style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', width: '60%' } })
                         )
                       )
                     ),
@@ -38642,9 +38642,9 @@ useEffect(() => {
                         },
                           React.createElement('div', {
                             className: 'aspect-square rounded-lg mb-2 animate-shimmer',
-                            style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)' }
+                            style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))' }
                           }),
-                          React.createElement('div', { className: 'h-4 rounded animate-shimmer', style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', width: '70%' } })
+                          React.createElement('div', { className: 'h-4 rounded animate-shimmer', style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', width: '70%' } })
                         )
                       )
                     )
@@ -39037,7 +39037,7 @@ useEffect(() => {
                   onClick: () => setSyncMenuOpen(!syncMenuOpen),
                   className: 'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5',
                   style: {
-                    backgroundColor: Object.values(resolverSyncSettings).some(s => s?.enabled) ? '#22c55e' : '#4b5563',
+                    backgroundColor: Object.values(resolverSyncSettings).some(s => s?.enabled) ? '#22c55e' : 'var(--nav-inactive)',
                     color: '#ffffff',
                     border: 'none',
                     cursor: 'pointer'
@@ -39080,7 +39080,7 @@ useEffect(() => {
                         padding: '10px 14px',
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
@@ -39299,27 +39299,27 @@ useEffect(() => {
                     },
                       // Track number skeleton
                       React.createElement('div', {
-                        className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                        className: 'h-3 shimmer-light rounded animate-shimmer',
                         style: { width: '24px', flexShrink: 0 }
                       }),
                       // Title skeleton - flexible
                       React.createElement('div', {
-                        className: 'h-3.5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                        className: 'h-3.5 shimmer-light rounded animate-shimmer',
                         style: { flex: '1 1 0', minWidth: 0, animationDelay: '0.1s' }
                       }),
                       // Artist skeleton - flexible
                       React.createElement('div', {
-                        className: 'h-3.5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                        className: 'h-3.5 shimmer-light rounded animate-shimmer',
                         style: { flex: '0.7 1 0', minWidth: 0, animationDelay: '0.2s' }
                       }),
                       // Album skeleton - flexible
                       React.createElement('div', {
-                        className: 'h-3.5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                        className: 'h-3.5 shimmer-light rounded animate-shimmer',
                         style: { flex: '0.5 1 0', minWidth: 0, animationDelay: '0.3s' }
                       }),
                       // Duration skeleton
                       React.createElement('div', {
-                        className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer flex-shrink-0',
+                        className: 'h-3 shimmer-light rounded animate-shimmer flex-shrink-0',
                         style: { width: '50px', marginRight: '16px', animationDelay: '0.4s' }
                       }),
                       // Resolver icons skeleton
@@ -39328,11 +39328,11 @@ useEffect(() => {
                         style: { width: '140px', flexShrink: 0 }
                       },
                         React.createElement('div', {
-                          className: 'w-5 h-5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                          className: 'w-5 h-5 shimmer-light rounded animate-shimmer',
                           style: { animationDelay: '0.5s' }
                         }),
                         React.createElement('div', {
-                          className: 'w-5 h-5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                          className: 'w-5 h-5 shimmer-light rounded animate-shimmer',
                           style: { animationDelay: '0.6s' }
                         })
                       )
@@ -39470,7 +39470,7 @@ useEffect(() => {
                         minWidth: 0,
                         fontSize: '13px',
                         fontWeight: isNowPlaying && isPlaying ? '500' : '400',
-                        color: isNowPlaying && isPlaying ? '#7c3aed' : '#374151'
+                        color: isNowPlaying && isPlaying ? '#7c3aed' : 'var(--text-primary)'
                       }
                     }, track.title),
 
@@ -39611,11 +39611,11 @@ useEffect(() => {
                             }, React.createElement(ResolverIcon, { resolverId: 'localfiles', size: 12 })),
                             // Shimmer skeletons
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                               title: 'Resolving...'
                             }),
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                               style: { animationDelay: '0.1s' }
                             })
                           );
@@ -39853,7 +39853,7 @@ useEffect(() => {
                           style: {
                             fontSize: '13px',
                             fontWeight: '500',
-                            color: '#1f2937',
+                            color: 'var(--text-primary)',
                             textAlign: 'center',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
@@ -40252,16 +40252,16 @@ useEffect(() => {
               Array.from({ length: 15 }).map((_, i) =>
                 React.createElement('div', { key: `skeleton-${i}` },
                   React.createElement('div', {
-                    className: 'aspect-square rounded-lg mb-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                    className: 'aspect-square rounded-lg mb-3 shimmer-light animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                   }),
                   React.createElement('div', { className: 'space-y-2' },
                     React.createElement('div', {
-                      className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-3/4 animate-shimmer',
+                      className: 'h-4 shimmer-light rounded w-3/4 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/2 animate-shimmer',
+                      className: 'h-3 shimmer-light rounded w-1/2 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                     })
                   )
@@ -40334,8 +40334,8 @@ useEffect(() => {
                       background: item.albumArt === null
                         ? 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
                         : item.albumArt === undefined
-                          ? 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)'
-                          : '#f3f4f6',
+                          ? 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))'
+                          : 'var(--placeholder-bg-light)',
                       backgroundSize: item.albumArt === undefined ? '200% 100%' : undefined
                     }
                   },
@@ -40475,7 +40475,7 @@ useEffect(() => {
                       style: {
                         fontWeight: '500',
                         fontSize: '13px',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
@@ -40521,27 +40521,27 @@ useEffect(() => {
                 },
                   // Track number skeleton
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'h-4 shimmer-light rounded animate-shimmer',
                     style: { width: '32px', backgroundSize: '200% 100%', animationDelay: `${i * 30}ms`, flexShrink: 0 }
                   }),
                   // Title skeleton - flexible
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'h-4 shimmer-light rounded animate-shimmer',
                     style: { flex: '1 1 0', minWidth: 0, backgroundSize: '200% 100%', animationDelay: `${i * 30 + 15}ms` }
                   }),
                   // Artist skeleton - flexible
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'h-4 shimmer-light rounded animate-shimmer',
                     style: { flex: '0.7 1 0', minWidth: 0, backgroundSize: '200% 100%', animationDelay: `${i * 30 + 30}ms` }
                   }),
                   // Listeners skeleton
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'h-4 shimmer-light rounded animate-shimmer',
                     style: { width: '80px', backgroundSize: '200% 100%', animationDelay: `${i * 30 + 45}ms`, flexShrink: 0 }
                   }),
                   // Badge skeleton
                   React.createElement('div', {
-                    className: 'h-5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'h-5 shimmer-light rounded animate-shimmer',
                     style: { width: '50px', backgroundSize: '200% 100%', animationDelay: `${i * 30 + 60}ms`, flexShrink: 0 }
                   })
                 )
@@ -40645,7 +40645,7 @@ useEffect(() => {
                         minWidth: 0,
                         fontSize: '13px',
                         fontWeight: isNowPlaying ? '500' : '400',
-                        color: isNowPlaying ? '#7c3aed' : hasResolved ? '#374151' : '#9ca3af'
+                        color: isNowPlaying ? '#7c3aed' : hasResolved ? 'var(--text-primary)' : '#9ca3af'
                       }
                     }, track.title),
 
@@ -40683,11 +40683,11 @@ useEffect(() => {
                       isResolving ?
                         React.createElement('div', { className: 'flex items-center gap-1' },
                           React.createElement('div', {
-                            className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                            className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                             title: 'Resolving track...'
                           }),
                           React.createElement('div', {
-                            className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                            className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                             style: { animationDelay: '0.1s' }
                           })
                         )
@@ -40957,15 +40957,15 @@ useEffect(() => {
                 },
                   React.createElement('div', {
                     className: 'animate-shimmer',
-                    style: { aspectRatio: '1', borderRadius: '6px', marginBottom: '10px', background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
+                    style: { aspectRatio: '1', borderRadius: '6px', marginBottom: '10px', background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                   }),
                   React.createElement('div', {
                     className: 'h-4 rounded animate-shimmer',
-                    style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', backgroundSize: '200% 100%', width: '80%', marginBottom: '6px', animationDelay: `${i * 50 + 25}ms` }
+                    style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', backgroundSize: '200% 100%', width: '80%', marginBottom: '6px', animationDelay: `${i * 50 + 25}ms` }
                   }),
                   React.createElement('div', {
                     className: 'h-3 rounded animate-shimmer',
-                    style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', backgroundSize: '200% 100%', width: '60%', animationDelay: `${i * 50 + 50}ms` }
+                    style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', backgroundSize: '200% 100%', width: '60%', animationDelay: `${i * 50 + 50}ms` }
                   })
                 )
               )
@@ -41198,7 +41198,7 @@ useEffect(() => {
                             style: {
                               fontWeight: '500',
                               fontSize: '13px',
-                              color: '#1f2937',
+                              color: 'var(--text-primary)',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap',
@@ -41434,26 +41434,26 @@ useEffect(() => {
               },
                 // Skeleton album art
                 React.createElement('div', {
-                  className: 'w-28 h-28 flex-shrink-0 rounded-lg bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                  className: 'w-28 h-28 flex-shrink-0 rounded-lg shimmer-light animate-shimmer',
                   style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                 }),
                 // Skeleton content
                 React.createElement('div', { className: 'flex-1 space-y-3 py-1' },
                   React.createElement('div', {
-                    className: 'h-5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-2/5 animate-shimmer',
+                    className: 'h-5 shimmer-light rounded w-2/5 animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                   }),
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/4 animate-shimmer',
+                    className: 'h-4 shimmer-light rounded w-1/4 animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                   }),
                   React.createElement('div', { className: 'space-y-2 pt-2' },
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-full animate-shimmer',
+                      className: 'h-3 shimmer-light rounded w-full animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 75}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-4/5 animate-shimmer',
+                      className: 'h-3 shimmer-light rounded w-4/5 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 100}ms` }
                     })
                   )
@@ -41546,8 +41546,8 @@ useEffect(() => {
                     background: album.albumArt === null
                       ? 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
                       : album.albumArt === undefined
-                        ? 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)'
-                        : '#f3f4f6',
+                        ? 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))'
+                        : 'var(--placeholder-bg-light)',
                     backgroundSize: album.albumArt === undefined ? '200% 100%' : undefined
                   }
                 },
@@ -41676,7 +41676,7 @@ useEffect(() => {
                     style: {
                       fontWeight: '500',
                       fontSize: '15px',
-                      color: '#1f2937',
+                      color: 'var(--text-primary)',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -41915,19 +41915,19 @@ useEffect(() => {
                       className: 'flex items-center gap-4 py-2 px-3 border-b border-gray-100'
                     },
                       React.createElement('div', {
-                        className: 'w-8 h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer flex-shrink-0',
+                        className: 'w-8 h-4 shimmer-light animate-shimmer flex-shrink-0',
                         style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        className: 'h-4 shimmer-light animate-shimmer',
                         style: { flex: '1 1 0', minWidth: 0, backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        className: 'h-4 shimmer-light animate-shimmer',
                         style: { flex: '0.7 1 0', minWidth: 0, backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer flex-shrink-0',
+                        className: 'h-4 shimmer-light animate-shimmer flex-shrink-0',
                         style: { width: '50px', backgroundSize: '200% 100%', animationDelay: `${i * 50 + 75}ms` }
                       }),
                       React.createElement('div', {
@@ -41935,11 +41935,11 @@ useEffect(() => {
                         style: { width: '140px' }
                       },
                         React.createElement('div', {
-                          className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                          className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                           style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 100}ms` }
                         }),
                         React.createElement('div', {
-                          className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                          className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                           style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 125}ms` }
                         })
                       )
@@ -42043,11 +42043,11 @@ useEffect(() => {
                       // Square image container - gray while loading, pattern only when imageLoaded && no image
                       React.createElement('div', {
                         className: 'aspect-square relative group/art',
-                        style: { background: artist.imageLoaded && !artist.image ? recsArtistPattern.gradient : '#e5e7eb' }
+                        style: { background: artist.imageLoaded && !artist.image ? recsArtistPattern.gradient : 'var(--placeholder-bg)' }
                       },
                         // Shimmer while loading (imageLoaded not yet true)
                         !artist.imageLoaded && React.createElement('div', {
-                          className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+                          className: 'absolute inset-0 shimmer-strong animate-shimmer',
                           style: { backgroundSize: '200% 100%' }
                         }),
                         // Initials fallback (only show when imageLoaded && no image)
@@ -42201,7 +42201,7 @@ useEffect(() => {
                         // Track title - flexible column
                         React.createElement('span', {
                           className: 'truncate transition-colors',
-                          style: { pointerEvents: 'none', flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: '400', color: hasResolved ? '#374151' : '#9ca3af' }
+                          style: { pointerEvents: 'none', flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: '400', color: hasResolved ? 'var(--text-primary)' : '#9ca3af' }
                         }, track.title),
 
                         // Artist name - flexible column, clickable
@@ -42236,11 +42236,11 @@ useEffect(() => {
                               className: 'flex items-center gap-1'
                             },
                               React.createElement('div', {
-                                className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                                className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                                 title: 'Resolving track...'
                               }),
                               React.createElement('div', {
-                                className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                                className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                                 style: { animationDelay: '0.1s' }
                               })
                             )
@@ -42290,11 +42290,11 @@ useEffect(() => {
                               className: 'flex items-center gap-1'
                             },
                               React.createElement('div', {
-                                className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                                className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                                 title: 'Resolving track...'
                               }),
                               React.createElement('div', {
-                                className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                                className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                                 style: { animationDelay: '0.1s' }
                               })
                             )
@@ -42581,19 +42581,19 @@ useEffect(() => {
                       className: 'flex items-center gap-4 py-2 px-3 border-b border-gray-100'
                     },
                       React.createElement('div', {
-                        className: 'w-8 h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer flex-shrink-0',
+                        className: 'w-8 h-4 shimmer-light animate-shimmer flex-shrink-0',
                         style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        className: 'h-4 shimmer-light animate-shimmer',
                         style: { flex: '1 1 0', minWidth: 0, backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        className: 'h-4 shimmer-light animate-shimmer',
                         style: { flex: '0.7 1 0', minWidth: 0, backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer flex-shrink-0',
+                        className: 'h-4 shimmer-light animate-shimmer flex-shrink-0',
                         style: { width: '80px', backgroundSize: '200% 100%', animationDelay: `${i * 50 + 75}ms` }
                       }),
                       React.createElement('div', {
@@ -42601,11 +42601,11 @@ useEffect(() => {
                         style: { width: '140px' }
                       },
                         React.createElement('div', {
-                          className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                          className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                           style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 100}ms` }
                         }),
                         React.createElement('div', {
-                          className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                          className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                           style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 125}ms` }
                         })
                       )
@@ -42686,7 +42686,7 @@ useEffect(() => {
                         }, track.nowPlaying ? '▶' : String(index + 1).padStart(2, '0')),
                         React.createElement('span', {
                           className: 'truncate transition-colors',
-                          style: { pointerEvents: 'none', flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: track.nowPlaying ? '500' : '400', color: track.nowPlaying ? '#7c3aed' : hasResolved ? '#374151' : '#9ca3af' }
+                          style: { pointerEvents: 'none', flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: track.nowPlaying ? '500' : '400', color: track.nowPlaying ? '#7c3aed' : hasResolved ? 'var(--text-primary)' : '#9ca3af' }
                         }, track.title),
                         React.createElement('span', {
                           className: 'truncate hover:text-purple-600 hover:underline cursor-pointer transition-colors',
@@ -42707,8 +42707,8 @@ useEffect(() => {
                         },
                           isResolving ?
                             React.createElement('div', { className: 'flex items-center gap-1' },
-                              React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                              React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
                             )
                           : hasResolved ?
                             Object.entries(resolvedSources).filter(([resolverId]) => activeResolvers.includes(resolverId)).sort(([aId], [bId]) => resolverOrder.indexOf(aId) - resolverOrder.indexOf(bId)).map(([resolverId, source]) => {
@@ -42726,8 +42726,8 @@ useEffect(() => {
                             })
                           :
                             React.createElement('div', { className: 'flex items-center gap-1' },
-                              React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                              React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
                             )
                         )
                       );
@@ -42745,10 +42745,10 @@ useEffect(() => {
                       key: `top-track-skeleton-${i}`,
                       className: 'flex items-center gap-4 py-2 px-3 border-b border-gray-100'
                     },
-                      React.createElement('div', { className: 'w-8 h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer flex-shrink-0', style: { backgroundSize: '200% 100%' } }),
-                      React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer', style: { flex: '1 1 0', minWidth: 0, backgroundSize: '200% 100%' } }),
-                      React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer', style: { flex: '0.7 1 0', minWidth: 0, backgroundSize: '200% 100%' } }),
-                      React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer flex-shrink-0', style: { width: '80px', backgroundSize: '200% 100%' } })
+                      React.createElement('div', { className: 'w-8 h-4 shimmer-light animate-shimmer flex-shrink-0', style: { backgroundSize: '200% 100%' } }),
+                      React.createElement('div', { className: 'h-4 shimmer-light animate-shimmer', style: { flex: '1 1 0', minWidth: 0, backgroundSize: '200% 100%' } }),
+                      React.createElement('div', { className: 'h-4 shimmer-light animate-shimmer', style: { flex: '0.7 1 0', minWidth: 0, backgroundSize: '200% 100%' } }),
+                      React.createElement('div', { className: 'h-4 shimmer-light animate-shimmer flex-shrink-0', style: { width: '80px', backgroundSize: '200% 100%' } })
                     )
                   )
                 )
@@ -42802,7 +42802,7 @@ useEffect(() => {
                         onContextMenu: (e) => { e.preventDefault(); if (window.electron?.contextMenu?.showTrackMenu) window.electron.contextMenu.showTrackMenu({ type: 'track', track }); }
                       },
                         React.createElement('span', { className: 'flex-shrink-0 text-right', style: { width: '32px', fontSize: '12px', fontWeight: '500', color: '#9ca3af' } }, `#${track.rank}`),
-                        React.createElement('span', { className: 'truncate transition-colors', style: { flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: '400', color: hasResolved ? '#374151' : '#9ca3af' } }, track.title),
+                        React.createElement('span', { className: 'truncate transition-colors', style: { flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: '400', color: hasResolved ? 'var(--text-primary)' : '#9ca3af' } }, track.title),
                         React.createElement('span', {
                           className: 'truncate hover:text-purple-600 hover:underline cursor-pointer transition-colors',
                           style: { flex: '0.7 1 0', minWidth: 0, fontSize: '12px', color: '#6b7280' },
@@ -42830,8 +42830,8 @@ useEffect(() => {
                             })
                           :
                             React.createElement('div', { className: 'flex items-center gap-1' },
-                              React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer' }),
-                              React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer' }),
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
                             )
                         )
                       );
@@ -42854,16 +42854,16 @@ useEffect(() => {
                       className: 'bg-white rounded-lg overflow-hidden'
                     },
                       React.createElement('div', {
-                        className: 'aspect-square bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        className: 'aspect-square shimmer-light animate-shimmer',
                         style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                       }),
                       React.createElement('div', { className: 'p-3' },
                         React.createElement('div', {
-                          className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-3/4 mb-2 animate-shimmer',
+                          className: 'h-4 shimmer-light rounded w-3/4 mb-2 animate-shimmer',
                           style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                         }),
                         React.createElement('div', {
-                          className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/2 animate-shimmer',
+                          className: 'h-3 shimmer-light rounded w-1/2 animate-shimmer',
                           style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                         })
                       )
@@ -42923,11 +42923,11 @@ useEffect(() => {
                       // Square image container - gray while loading, pattern only when imageLoaded && no image
                       React.createElement('div', {
                         className: 'aspect-square relative group/art',
-                        style: { background: artist.imageLoaded && !artist.image ? topArtistPattern.gradient : '#e5e7eb' }
+                        style: { background: artist.imageLoaded && !artist.image ? topArtistPattern.gradient : 'var(--placeholder-bg)' }
                       },
                         // Shimmer while loading (imageLoaded not yet true)
                         !artist.imageLoaded && React.createElement('div', {
-                          className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+                          className: 'absolute inset-0 shimmer-strong animate-shimmer',
                           style: { backgroundSize: '200% 100%' }
                         }),
                         // Initials fallback (only show when imageLoaded && no image)
@@ -43037,7 +43037,7 @@ useEffect(() => {
                       }
                     },
                       React.createElement('div', {
-                        className: 'bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        className: 'shimmer-light animate-shimmer',
                         style: {
                           aspectRatio: '1',
                           borderRadius: '6px',
@@ -43047,15 +43047,15 @@ useEffect(() => {
                         }
                       }),
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-3/4 mb-2 animate-shimmer',
+                        className: 'h-4 shimmer-light rounded w-3/4 mb-2 animate-shimmer',
                         style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/2 mb-1 animate-shimmer',
+                        className: 'h-3 shimmer-light rounded w-1/2 mb-1 animate-shimmer',
                         style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/3 animate-shimmer',
+                        className: 'h-3 shimmer-light rounded w-1/3 animate-shimmer',
                         style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 75}ms` }
                       })
                     )
@@ -43119,8 +43119,8 @@ useEffect(() => {
                           background: album.image === null || album.image === ''
                             ? 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
                             : !album.image
-                              ? 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)'
-                              : '#f3f4f6',
+                              ? 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))'
+                              : 'var(--placeholder-bg-light)',
                           backgroundSize: !album.image && album.image !== null && album.image !== '' ? '200% 100%' : undefined
                         }
                       },
@@ -43269,7 +43269,7 @@ useEffect(() => {
                           style: {
                             fontWeight: '500',
                             fontSize: '13px',
-                            color: '#1f2937',
+                            color: 'var(--text-primary)',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
@@ -43662,7 +43662,7 @@ useEffect(() => {
                           }, track.nowPlaying ? '▶' : String(index + 1).padStart(2, '0')),
                           React.createElement('span', {
                             className: 'truncate transition-colors',
-                            style: { pointerEvents: 'none', flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: track.nowPlaying ? '500' : '400', color: track.nowPlaying ? '#7c3aed' : hasResolved ? '#374151' : '#9ca3af' }
+                            style: { pointerEvents: 'none', flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: track.nowPlaying ? '500' : '400', color: track.nowPlaying ? '#7c3aed' : hasResolved ? 'var(--text-primary)' : '#9ca3af' }
                           }, track.title),
                           React.createElement('span', {
                             className: 'truncate hover:text-purple-600 hover:underline cursor-pointer transition-colors',
@@ -43683,8 +43683,8 @@ useEffect(() => {
                           },
                             isResolving ?
                               React.createElement('div', { className: 'flex items-center gap-1' },
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
                               )
                             : hasResolved ?
                               Object.entries(resolvedSources).filter(([resolverId]) => activeResolvers.includes(resolverId)).sort(([aId], [bId]) => resolverOrder.indexOf(aId) - resolverOrder.indexOf(bId)).map(([resolverId, source]) => {
@@ -43702,8 +43702,8 @@ useEffect(() => {
                               })
                             :
                               React.createElement('div', { className: 'flex items-center gap-1' },
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
                               )
                           )
                       );
@@ -43763,7 +43763,7 @@ useEffect(() => {
                           }, `#${track.rank || index + 1}`),
                           React.createElement('span', {
                             className: 'truncate transition-colors',
-                            style: { flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: '400', color: hasResolved ? '#374151' : '#9ca3af' }
+                            style: { flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: '400', color: hasResolved ? 'var(--text-primary)' : '#9ca3af' }
                           }, track.title),
                           React.createElement('span', {
                             className: 'truncate hover:text-purple-600 hover:underline cursor-pointer transition-colors',
@@ -43784,8 +43784,8 @@ useEffect(() => {
                           },
                             isResolving ?
                               React.createElement('div', { className: 'flex items-center gap-1' },
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
                               )
                             : hasResolved ?
                               Object.entries(resolvedSources).filter(([resolverId]) => activeResolvers.includes(resolverId)).sort(([aId], [bId]) => resolverOrder.indexOf(aId) - resolverOrder.indexOf(bId)).map(([resolverId, source]) => {
@@ -43803,8 +43803,8 @@ useEffect(() => {
                               })
                             :
                               React.createElement('div', { className: 'flex items-center gap-1' },
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
                               )
                           )
                         );
@@ -43843,11 +43843,11 @@ useEffect(() => {
                         },
                           React.createElement('div', {
                             className: 'aspect-square relative group/art',
-                            style: { background: album.imageLoaded && !album.image ? albumPattern.gradient : '#e5e7eb' }
+                            style: { background: album.imageLoaded && !album.image ? albumPattern.gradient : 'var(--placeholder-bg)' }
                           },
                             // Shimmer while loading (imageLoaded not yet true)
                             !album.imageLoaded && React.createElement('div', {
-                              className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+                              className: 'absolute inset-0 shimmer-strong animate-shimmer',
                               style: { backgroundSize: '200% 100%' }
                             }),
                             // Initials fallback (only show when imageLoaded && no image)
@@ -43985,11 +43985,11 @@ useEffect(() => {
                         },
                           React.createElement('div', {
                             className: 'aspect-square relative group/art',
-                            style: { background: artist.imageLoaded && !artist.image ? artistPattern.gradient : '#e5e7eb' }
+                            style: { background: artist.imageLoaded && !artist.image ? artistPattern.gradient : 'var(--placeholder-bg)' }
                           },
                             // Shimmer while loading (imageLoaded not yet true)
                             !artist.imageLoaded && React.createElement('div', {
-                              className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+                              className: 'absolute inset-0 shimmer-strong animate-shimmer',
                               style: { backgroundSize: '200% 100%' }
                             }),
                             // Initials fallback (only show when imageLoaded && no image)
@@ -44135,7 +44135,7 @@ useEffect(() => {
                   marginBottom: '4px',
                   fontSize: '13px',
                   fontWeight: settingsTab === 'plugins' ? '500' : '400',
-                  color: settingsTab === 'plugins' ? '#1f2937' : '#6b7280',
+                  color: settingsTab === 'plugins' ? 'var(--text-primary)' : '#6b7280',
                   backgroundColor: settingsTab === 'plugins' ? 'rgba(124, 58, 237, 0.08)' : 'transparent',
                   borderRadius: '8px',
                   border: 'none',
@@ -44152,7 +44152,7 @@ useEffect(() => {
                   marginBottom: '4px',
                   fontSize: '13px',
                   fontWeight: settingsTab === 'general' ? '500' : '400',
-                  color: settingsTab === 'general' ? '#1f2937' : '#6b7280',
+                  color: settingsTab === 'general' ? 'var(--text-primary)' : '#6b7280',
                   backgroundColor: settingsTab === 'general' ? 'rgba(124, 58, 237, 0.08)' : 'transparent',
                   borderRadius: '8px',
                   border: 'none',
@@ -44169,7 +44169,7 @@ useEffect(() => {
                   marginBottom: '4px',
                   fontSize: '13px',
                   fontWeight: settingsTab === 'about' ? '500' : '400',
-                  color: settingsTab === 'about' ? '#1f2937' : '#6b7280',
+                  color: settingsTab === 'about' ? 'var(--text-primary)' : '#6b7280',
                   backgroundColor: settingsTab === 'about' ? 'rgba(124, 58, 237, 0.08)' : 'transparent',
                   borderRadius: '8px',
                   border: 'none',
@@ -44196,7 +44196,7 @@ useEffect(() => {
                     style: {
                       fontSize: '20px',
                       fontWeight: '600',
-                      color: '#1f2937',
+                      color: 'var(--text-primary)',
                       marginBottom: '6px'
                     }
                   }, 'Plug-Ins'),
@@ -44217,7 +44217,7 @@ useEffect(() => {
                     padding: '10px 16px',
                     fontSize: '13px',
                     fontWeight: '500',
-                    color: '#374151',
+                    color: 'var(--text-primary)',
                     backgroundColor: '#ffffff',
                     border: '1px solid rgba(0, 0, 0, 0.1)',
                     borderRadius: '8px',
@@ -44706,7 +44706,7 @@ useEffect(() => {
                         marginTop: '10px',
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         textAlign: 'center',
                         width: '120px'
                       }
@@ -44760,7 +44760,7 @@ useEffect(() => {
                         marginTop: '10px',
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         textAlign: 'center',
                         width: '120px'
                       }
@@ -44778,7 +44778,7 @@ useEffect(() => {
                   style: {
                     fontSize: '20px',
                     fontWeight: '600',
-                    color: '#1f2937',
+                    color: 'var(--text-primary)',
                     marginBottom: '6px'
                   }
                 }, 'General'),
@@ -44931,7 +44931,7 @@ useEffect(() => {
                               width: '100px',
                               fontSize: '13px',
                               fontWeight: '500',
-                              color: isVolumeDisabled ? '#9ca3af' : '#374151'
+                              color: isVolumeDisabled ? '#9ca3af' : 'var(--text-primary)'
                             }
                           }, resolver.name),
                           React.createElement('input', {
@@ -44981,7 +44981,7 @@ useEffect(() => {
                         padding: '10px 16px',
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#374151',
+                        color: 'var(--text-primary)',
                         backgroundColor: '#ffffff',
                         border: '1px solid rgba(0, 0, 0, 0.1)',
                         borderRadius: '8px',
@@ -45027,7 +45027,7 @@ useEffect(() => {
                   // Skip external prompt toggle - refined
                   React.createElement('div', { className: 'flex items-center justify-between', style: { padding: '12px 0' } },
                     React.createElement('div', null,
-                      React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: '#374151' } },
+                      React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)' } },
                         'Auto-open external tracks'
                       ),
                       React.createElement('p', { style: { fontSize: '12px', color: '#9ca3af', marginTop: '2px' } },
@@ -45117,7 +45117,7 @@ useEffect(() => {
                         style: { marginTop: '2px', accentColor: '#7c3aed' }
                       }),
                       React.createElement('div', null,
-                        React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: '#374151' } }, 'Always capture'),
+                        React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)' } }, 'Always capture'),
                         React.createElement('p', { style: { fontSize: '12px', color: '#9ca3af', marginTop: '2px' } },
                           'Parachord always handles media keys. May conflict with Spotify.'
                         )
@@ -45155,7 +45155,7 @@ useEffect(() => {
                         style: { marginTop: '2px', accentColor: '#7c3aed' }
                       }),
                       React.createElement('div', null,
-                        React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: '#374151' } }, 'Only when not using Spotify'),
+                        React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)' } }, 'Only when not using Spotify'),
                         React.createElement('p', { style: { fontSize: '12px', color: '#9ca3af', marginTop: '2px' } },
                           'Let Spotify handle media keys when playing via Spotify Connect. Parachord handles them for other sources.'
                         )
@@ -45189,7 +45189,7 @@ useEffect(() => {
                         style: { marginTop: '2px', accentColor: '#7c3aed' }
                       }),
                       React.createElement('div', null,
-                        React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: '#374151' } }, 'Never capture'),
+                        React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)' } }, 'Never capture'),
                         React.createElement('p', { style: { fontSize: '12px', color: '#9ca3af', marginTop: '2px' } },
                           'Parachord never handles media keys. Use this if you prefer Spotify or other apps to control playback.'
                         )
@@ -45562,7 +45562,7 @@ useEffect(() => {
                   style: {
                     fontSize: '14px',
                     fontWeight: '500',
-                    color: '#374151',
+                    color: 'var(--text-primary)',
                     marginBottom: '8px'
                   }
                 }, appVersion ? `Version ${appVersion}` : 'Version'),
@@ -46266,24 +46266,24 @@ useEffect(() => {
           ] : React.createElement(React.Fragment, null,
             // Skeleton album art
             React.createElement('div', {
-              className: `flex-shrink-0 rounded ${trackLoading ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-shimmer' : 'bg-gray-700'}`,
+              className: `flex-shrink-0 rounded ${trackLoading ? 'shimmer-light animate-shimmer' : 'bg-gray-700'}`,
               style: { width: '61px', height: '61px', ...(trackLoading ? { backgroundSize: '200% 100%' } : {}) }
             }),
             // Skeleton track info - matches actual track info layout
             React.createElement('div', { className: 'min-w-0' },
               // Track title skeleton (text-sm = 14px, but skeleton slightly smaller)
               React.createElement('div', {
-                className: `h-3.5 rounded ${trackLoading ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-shimmer' : 'bg-gray-700'}`,
+                className: `h-3.5 rounded ${trackLoading ? 'shimmer-light animate-shimmer' : 'bg-gray-700'}`,
                 style: { width: '200px', ...(trackLoading ? { backgroundSize: '200% 100%' } : {}) }
               }),
               // Artist skeleton (text-xs = 12px)
               React.createElement('div', {
-                className: `h-3 rounded mt-1 ${trackLoading ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-shimmer' : 'bg-gray-700'}`,
+                className: `h-3 rounded mt-1 ${trackLoading ? 'shimmer-light animate-shimmer' : 'bg-gray-700'}`,
                 style: { width: '140px', ...(trackLoading ? { backgroundSize: '200% 100%' } : {}) }
               }),
               // Source skeleton (text-xs with mt-0.5)
               React.createElement('div', {
-                className: `h-3 rounded mt-1 ${trackLoading ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-shimmer' : 'bg-gray-700'}`,
+                className: `h-3 rounded mt-1 ${trackLoading ? 'shimmer-light animate-shimmer' : 'bg-gray-700'}`,
                 style: { width: '80px', ...(trackLoading ? { backgroundSize: '200% 100%' } : {}) }
               })
             )
@@ -46952,7 +46952,7 @@ useEffect(() => {
                         top: '100%',
                         right: 0,
                         marginTop: '4px',
-                        backgroundColor: '#1f2937',
+                        backgroundColor: 'var(--tooltip-bg)',
                         border: '1px solid rgba(255, 255, 255, 0.1)',
                         borderRadius: '6px',
                         overflow: 'hidden',
@@ -47603,7 +47603,7 @@ useEffect(() => {
           style: { padding: '20px 24px 16px', borderBottom: '1px solid rgba(0, 0, 0, 0.06)' }
         },
           React.createElement('h3', {
-            style: { fontSize: '17px', fontWeight: '600', color: '#1f2937' }
+            style: { fontSize: '17px', fontWeight: '600', color: 'var(--text-primary)' }
           }, 'Import Playlist'),
           React.createElement('button', {
             onClick: () => {
@@ -47658,7 +47658,7 @@ useEffect(() => {
               // Text
               React.createElement('div', { style: { flex: 1 } },
                 React.createElement('h4', {
-                  style: { fontSize: '14px', fontWeight: '600', color: '#1f2937', marginBottom: '4px' }
+                  style: { fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '4px' }
                 }, 'Import from URL'),
                 React.createElement('p', {
                   style: { fontSize: '13px', color: '#6b7280', lineHeight: '1.4' }
@@ -47703,7 +47703,7 @@ useEffect(() => {
                   flex: 1,
                   padding: '10px 14px',
                   fontSize: '14px',
-                  color: '#1f2937',
+                  color: 'var(--text-primary)',
                   backgroundColor: '#ffffff',
                   border: '1px solid #d8b4fe',
                   borderRadius: '8px',
@@ -47789,7 +47789,7 @@ useEffect(() => {
               textAlign: 'center'
             },
             onMouseEnter: (e) => {
-              e.currentTarget.style.backgroundColor = '#f3f4f6';
+              e.currentTarget.style.backgroundColor = 'var(--placeholder-bg-light)';
               e.currentTarget.style.borderColor = '#9ca3af';
             },
             onMouseLeave: (e) => {
@@ -47805,7 +47805,7 @@ useEffect(() => {
                   width: '40px',
                   height: '40px',
                   borderRadius: '10px',
-                  backgroundColor: '#e5e7eb',
+                  backgroundColor: 'var(--placeholder-bg)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
@@ -47817,7 +47817,7 @@ useEffect(() => {
               ),
               React.createElement('div', null,
                 React.createElement('p', {
-                  style: { fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '2px' }
+                  style: { fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)', marginBottom: '2px' }
                 }, 'Load from File'),
                 React.createElement('p', {
                   style: { fontSize: '12px', color: '#9ca3af' }
@@ -47855,7 +47855,7 @@ useEffect(() => {
           style: { padding: '20px 24px 16px', borderBottom: '1px solid rgba(0, 0, 0, 0.06)' }
         },
           React.createElement('h3', {
-            style: { fontSize: '17px', fontWeight: '600', color: '#1f2937' }
+            style: { fontSize: '17px', fontWeight: '600', color: 'var(--text-primary)' }
           }, 'Add Friend'),
           React.createElement('button', {
             onClick: () => {
@@ -47879,7 +47879,7 @@ useEffect(() => {
         // Body
         React.createElement('div', { style: { padding: '20px 24px' } },
           React.createElement('p', {
-            style: { fontSize: '14px', color: '#4b5563', marginBottom: '16px', lineHeight: '1.5' }
+            style: { fontSize: '14px', color: 'var(--nav-inactive)', marginBottom: '16px', lineHeight: '1.5' }
           },
             'Enter a Last.fm or ListenBrainz username, or paste a profile URL.'
           ),
@@ -47899,7 +47899,7 @@ useEffect(() => {
               width: '100%',
               padding: '12px 16px',
               fontSize: '14px',
-              color: '#1f2937',
+              color: 'var(--text-primary)',
               backgroundColor: '#ffffff',
               border: '1px solid #e5e7eb',
               borderRadius: '10px',
@@ -47907,7 +47907,7 @@ useEffect(() => {
               transition: 'border-color 150ms ease, box-shadow 150ms ease'
             },
             onFocus: (e) => { e.target.style.borderColor = '#9ca3af'; e.target.style.boxShadow = '0 0 0 3px rgba(156, 163, 175, 0.1)'; },
-            onBlur: (e) => { e.target.style.borderColor = '#e5e7eb'; e.target.style.boxShadow = 'none'; },
+            onBlur: (e) => { e.target.style.borderColor = 'var(--placeholder-bg)'; e.target.style.boxShadow = 'none'; },
             autoFocus: true
           }),
           // Example hints
@@ -47936,7 +47936,7 @@ useEffect(() => {
               color: '#6b7280',
               borderRadius: '10px'
             },
-            onMouseEnter: (e) => { e.currentTarget.style.color = '#374151'; e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.05)'; },
+            onMouseEnter: (e) => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.05)'; },
             onMouseLeave: (e) => { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.backgroundColor = 'transparent'; }
           }, 'Cancel'),
           React.createElement('button', {
@@ -48122,7 +48122,7 @@ useEffect(() => {
                 style: {
                   fontSize: '13px',
                   fontWeight: '500',
-                  color: '#1f2937'
+                  color: 'var(--text-primary)'
                 }
               }, 'Enable Resolver'),
               React.createElement('p', {
@@ -48162,7 +48162,7 @@ useEffect(() => {
                   style: {
                     fontSize: '13px',
                     fontWeight: '500',
-                    color: '#1f2937'
+                    color: 'var(--text-primary)'
                   }
                 }, 'Spotify Account'),
                 React.createElement('p', {
@@ -48274,7 +48274,7 @@ useEffect(() => {
                     width: '100%',
                     padding: '8px 10px',
                     fontSize: '12px',
-                    color: '#1f2937',
+                    color: 'var(--text-primary)',
                     backgroundColor: '#ffffff',
                     border: '1px solid rgba(0, 0, 0, 0.1)',
                     borderRadius: '6px',
@@ -48391,7 +48391,7 @@ useEffect(() => {
                   onChange: (e) => setSpotifyClientIdInput(e.target.value),
                   placeholder: 'Your Spotify Client ID',
                   style: {
-                    width: '100%', padding: '8px 10px', fontSize: '12px', color: '#1f2937',
+                    width: '100%', padding: '8px 10px', fontSize: '12px', color: 'var(--text-primary)',
                     backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)',
                     borderRadius: '6px', outline: 'none'
                   }
@@ -48458,7 +48458,7 @@ useEffect(() => {
                       style: { color: '#6b7280' }
                     }, 'Last synced'),
                     React.createElement('span', {
-                      style: { color: '#1f2937' }
+                      style: { color: 'var(--text-primary)' }
                     },
                       resolverSyncSettings[selectedResolver.id]?.lastSyncAt
                         ? new Date(resolverSyncSettings[selectedResolver.id].lastSyncAt).toLocaleString()
@@ -48474,7 +48474,7 @@ useEffect(() => {
                       style: {
                         padding: '8px 14px',
                         backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         fontSize: '13px',
                         fontWeight: '500',
                         borderRadius: '8px',
@@ -48543,7 +48543,7 @@ useEffect(() => {
             }, 'Startup'),
             React.createElement('div', { className: 'flex items-center justify-between' },
               React.createElement('div', null,
-                React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: '#374151' } },
+                React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)' } },
                   'Auto-launch Spotify'
                 ),
                 React.createElement('p', { style: { fontSize: '12px', color: '#6b7280', marginTop: '2px', lineHeight: '1.5' } },
@@ -48588,7 +48588,7 @@ useEffect(() => {
                     style: {
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#1f2937'
+                      color: 'var(--text-primary)'
                     }
                   }, 'SoundCloud Account'),
                   React.createElement('p', {
@@ -48704,7 +48704,7 @@ useEffect(() => {
                         display: 'block',
                         fontSize: '11px',
                         fontWeight: '500',
-                        color: '#374151',
+                        color: 'var(--text-primary)',
                         marginBottom: '4px'
                       }
                     }, 'Client ID'),
@@ -48717,7 +48717,7 @@ useEffect(() => {
                         width: '100%',
                         padding: '8px 10px',
                         fontSize: '12px',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         backgroundColor: '#ffffff',
                         border: '1px solid rgba(0, 0, 0, 0.1)',
                         borderRadius: '6px',
@@ -48731,7 +48731,7 @@ useEffect(() => {
                         display: 'block',
                         fontSize: '11px',
                         fontWeight: '500',
-                        color: '#374151',
+                        color: 'var(--text-primary)',
                         marginBottom: '4px'
                       }
                     }, 'Client Secret'),
@@ -48744,7 +48744,7 @@ useEffect(() => {
                         width: '100%',
                         padding: '8px 10px',
                         fontSize: '12px',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         backgroundColor: '#ffffff',
                         border: '1px solid rgba(0, 0, 0, 0.1)',
                         borderRadius: '6px',
@@ -48866,7 +48866,7 @@ useEffect(() => {
                 style: {
                   fontSize: '13px',
                   fontWeight: '500',
-                  color: '#1f2937'
+                  color: 'var(--text-primary)'
                 }
               }, 'Qobuz Streaming'),
               React.createElement('p', {
@@ -48924,7 +48924,7 @@ useEffect(() => {
                   style: {
                     fontSize: '13px',
                     fontWeight: '500',
-                    color: '#1f2937'
+                    color: 'var(--text-primary)'
                   }
                 }, 'Apple Music Account'),
                 React.createElement('p', {
@@ -49042,7 +49042,7 @@ useEffect(() => {
                       width: '100%',
                       padding: '8px 10px',
                       fontSize: '12px',
-                      color: '#1f2937',
+                      color: 'var(--text-primary)',
                       backgroundColor: '#ffffff',
                       border: '1px solid rgba(0, 0, 0, 0.1)',
                       borderRadius: '6px',
@@ -49091,7 +49091,7 @@ useEffect(() => {
                         style: {
                           fontSize: '13px',
                           fontWeight: '500',
-                          color: '#1f2937'
+                          color: 'var(--text-primary)'
                         }
                       }, 'Last.fm Account'),
                       React.createElement('p', {
@@ -49175,7 +49175,7 @@ useEffect(() => {
                             display: 'block',
                             fontSize: '11px',
                             fontWeight: '500',
-                            color: '#374151',
+                            color: 'var(--text-primary)',
                             marginBottom: '4px'
                           }
                         }, 'API Key'),
@@ -49188,7 +49188,7 @@ useEffect(() => {
                             width: '100%',
                             padding: '8px 10px',
                             fontSize: '12px',
-                            color: '#1f2937',
+                            color: 'var(--text-primary)',
                             backgroundColor: '#ffffff',
                             border: '1px solid rgba(0, 0, 0, 0.1)',
                             borderRadius: '6px',
@@ -49202,7 +49202,7 @@ useEffect(() => {
                             display: 'block',
                             fontSize: '11px',
                             fontWeight: '500',
-                            color: '#374151',
+                            color: 'var(--text-primary)',
                             marginBottom: '4px'
                           }
                         }, 'API Secret'),
@@ -49215,7 +49215,7 @@ useEffect(() => {
                             width: '100%',
                             padding: '8px 10px',
                             fontSize: '12px',
-                            color: '#1f2937',
+                            color: 'var(--text-primary)',
                             backgroundColor: '#ffffff',
                             border: '1px solid rgba(0, 0, 0, 0.1)',
                             borderRadius: '6px',
@@ -49289,7 +49289,7 @@ useEffect(() => {
                           style: {
                             fontSize: '13px',
                             fontWeight: '500',
-                            color: '#1f2937'
+                            color: 'var(--text-primary)'
                           }
                         }, 'Scrobbling'),
                         React.createElement('p', {
@@ -49320,7 +49320,7 @@ useEffect(() => {
                     style: {
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#1f2937'
+                      color: 'var(--text-primary)'
                     }
                   }, 'Last.fm Account'),
                   React.createElement('p', {
@@ -49341,7 +49341,7 @@ useEffect(() => {
                         display: 'block',
                         fontSize: '12px',
                         fontWeight: '500',
-                        color: '#374151',
+                        color: 'var(--text-primary)',
                         marginBottom: '6px'
                       }
                     }, 'Username'),
@@ -49354,7 +49354,7 @@ useEffect(() => {
                         width: '100%',
                         padding: '10px 12px',
                         fontSize: '13px',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         backgroundColor: '#ffffff',
                         border: '1px solid rgba(0, 0, 0, 0.1)',
                         borderRadius: '8px',
@@ -49405,7 +49405,7 @@ useEffect(() => {
                             display: 'block',
                             fontSize: '11px',
                             fontWeight: '500',
-                            color: '#374151',
+                            color: 'var(--text-primary)',
                             marginBottom: '4px'
                           }
                         }, 'API Key'),
@@ -49418,7 +49418,7 @@ useEffect(() => {
                             width: '100%',
                             padding: '8px 10px',
                             fontSize: '12px',
-                            color: '#1f2937',
+                            color: 'var(--text-primary)',
                             backgroundColor: '#ffffff',
                             border: '1px solid rgba(0, 0, 0, 0.1)',
                             borderRadius: '6px',
@@ -49432,7 +49432,7 @@ useEffect(() => {
                             display: 'block',
                             fontSize: '11px',
                             fontWeight: '500',
-                            color: '#374151',
+                            color: 'var(--text-primary)',
                             marginBottom: '4px'
                           }
                         }, 'API Secret'),
@@ -49445,7 +49445,7 @@ useEffect(() => {
                             width: '100%',
                             padding: '8px 10px',
                             fontSize: '12px',
-                            color: '#1f2937',
+                            color: 'var(--text-primary)',
                             backgroundColor: '#ffffff',
                             border: '1px solid rgba(0, 0, 0, 0.1)',
                             borderRadius: '6px',
@@ -49492,7 +49492,7 @@ useEffect(() => {
                         style: {
                           fontSize: '13px',
                           fontWeight: '500',
-                          color: '#1f2937'
+                          color: 'var(--text-primary)'
                         }
                       }, 'ListenBrainz Account'),
                       React.createElement('p', {
@@ -49542,7 +49542,7 @@ useEffect(() => {
                         display: 'block',
                         fontSize: '11px',
                         fontWeight: '500',
-                        color: '#374151',
+                        color: 'var(--text-primary)',
                         marginBottom: '4px'
                       }
                     }, 'User Token'),
@@ -49554,7 +49554,7 @@ useEffect(() => {
                         width: '100%',
                         padding: '8px 10px',
                         fontSize: '12px',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         backgroundColor: '#f9fafb',
                         border: '1px solid rgba(0, 0, 0, 0.1)',
                         borderRadius: '6px',
@@ -49577,7 +49577,7 @@ useEffect(() => {
                           style: {
                             fontSize: '13px',
                             fontWeight: '500',
-                            color: '#1f2937'
+                            color: 'var(--text-primary)'
                           }
                         }, 'Scrobbling'),
                         React.createElement('p', {
@@ -49608,7 +49608,7 @@ useEffect(() => {
                     style: {
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#1f2937'
+                      color: 'var(--text-primary)'
                     }
                   }, 'ListenBrainz Account'),
                   React.createElement('p', {
@@ -49629,7 +49629,7 @@ useEffect(() => {
                         display: 'block',
                         fontSize: '12px',
                         fontWeight: '500',
-                        color: '#374151',
+                        color: 'var(--text-primary)',
                         marginBottom: '6px'
                       }
                     }, 'Username'),
@@ -49642,7 +49642,7 @@ useEffect(() => {
                         width: '100%',
                         padding: '10px 12px',
                         fontSize: '13px',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         backgroundColor: '#ffffff',
                         border: '1px solid rgba(0, 0, 0, 0.1)',
                         borderRadius: '8px',
@@ -49693,7 +49693,7 @@ useEffect(() => {
                             display: 'block',
                             fontSize: '11px',
                             fontWeight: '500',
-                            color: '#374151',
+                            color: 'var(--text-primary)',
                             marginBottom: '4px'
                           }
                         }, 'User Token'),
@@ -49706,7 +49706,7 @@ useEffect(() => {
                             width: '100%',
                             padding: '8px 10px',
                             fontSize: '12px',
-                            color: '#1f2937',
+                            color: 'var(--text-primary)',
                             backgroundColor: '#ffffff',
                             border: '1px solid rgba(0, 0, 0, 0.1)',
                             borderRadius: '6px',
@@ -49750,7 +49750,7 @@ useEffect(() => {
               style: {
                 fontSize: '13px',
                 fontWeight: '500',
-                color: '#1f2937'
+                color: 'var(--text-primary)'
               }
             }, 'API Configuration'),
             React.createElement('p', {
@@ -49769,7 +49769,7 @@ useEffect(() => {
                   display: 'block',
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: '#374151',
+                  color: 'var(--text-primary)',
                   marginBottom: '6px'
                 }
               }, selectedResolver.settings?.configurable?.apiKey?.label || 'API Key'),
@@ -49788,7 +49788,7 @@ useEffect(() => {
                   width: '100%',
                   padding: '10px 12px',
                   fontSize: '13px',
-                  color: '#1f2937',
+                  color: 'var(--text-primary)',
                   backgroundColor: '#ffffff',
                   border: '1px solid rgba(0, 0, 0, 0.1)',
                   borderRadius: '8px',
@@ -49823,7 +49823,7 @@ useEffect(() => {
                   display: 'block',
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: '#374151',
+                  color: 'var(--text-primary)',
                   marginBottom: '6px'
                 }
               }, selectedResolver.settings?.configurable?.model?.label || 'Model'),
@@ -49839,7 +49839,7 @@ useEffect(() => {
                   width: '100%',
                   padding: '10px 12px',
                   fontSize: '13px',
-                  color: '#1f2937',
+                  color: 'var(--text-primary)',
                   backgroundColor: '#ffffff',
                   border: '1px solid rgba(0, 0, 0, 0.1)',
                   borderRadius: '8px',
@@ -49882,7 +49882,7 @@ useEffect(() => {
               style: {
                 fontSize: '13px',
                 fontWeight: '500',
-                color: '#1f2937'
+                color: 'var(--text-primary)'
               }
             }, 'Ollama Configuration'),
             React.createElement('p', {
@@ -49905,7 +49905,7 @@ useEffect(() => {
               }
             },
               React.createElement('p', {
-                style: { fontSize: '12px', fontWeight: '500', color: '#374151', marginBottom: '6px' }
+                style: { fontSize: '12px', fontWeight: '500', color: 'var(--text-primary)', marginBottom: '6px' }
               }, 'Ollama must be installed separately'),
               React.createElement('p', {
                 style: { fontSize: '11px', color: '#6b7280', lineHeight: '1.5', marginBottom: '8px' }
@@ -49933,7 +49933,7 @@ useEffect(() => {
                   display: 'block',
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: '#374151',
+                  color: 'var(--text-primary)',
                   marginBottom: '6px'
                 }
               }, 'Ollama URL'),
@@ -49952,7 +49952,7 @@ useEffect(() => {
                   width: '100%',
                   padding: '10px 12px',
                   fontSize: '13px',
-                  color: '#1f2937',
+                  color: 'var(--text-primary)',
                   backgroundColor: '#ffffff',
                   border: '1px solid rgba(0, 0, 0, 0.1)',
                   borderRadius: '8px',
@@ -49967,7 +49967,7 @@ useEffect(() => {
                   display: 'block',
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: '#374151',
+                  color: 'var(--text-primary)',
                   marginBottom: '6px'
                 }
               }, 'Model'),
@@ -49983,7 +49983,7 @@ useEffect(() => {
                   width: '100%',
                   padding: '10px 12px',
                   fontSize: '13px',
-                  color: '#1f2937',
+                  color: 'var(--text-primary)',
                   backgroundColor: '#ffffff',
                   border: '1px solid rgba(0, 0, 0, 0.1)',
                   borderRadius: '8px',
@@ -50002,7 +50002,7 @@ useEffect(() => {
             ),
             // Enable toggle
             React.createElement('div', { className: 'flex items-center justify-between' },
-              React.createElement('span', { style: { fontSize: '13px', color: '#374151' } }, 'Enable Ollama'),
+              React.createElement('span', { style: { fontSize: '13px', color: 'var(--text-primary)' } }, 'Enable Ollama'),
               React.createElement('label', { className: 'relative inline-block w-10 h-5 cursor-pointer' },
                 React.createElement('input', {
                   type: 'checkbox',
@@ -50090,7 +50090,7 @@ useEffect(() => {
               style: {
                 fontSize: '13px',
                 fontWeight: '500',
-                color: '#1f2937',
+                color: 'var(--text-primary)',
                 marginBottom: '8px'
               }
             }, 'Watch Folders'),
@@ -50132,7 +50132,7 @@ useEffect(() => {
                           style: {
                             fontSize: '13px',
                             fontWeight: '500',
-                            color: '#1f2937'
+                            color: 'var(--text-primary)'
                           }
                         }, folder.path),
                         React.createElement('p', {
@@ -50283,7 +50283,7 @@ useEffect(() => {
                     style: {
                       fontSize: '14px',
                       fontWeight: '500',
-                      color: '#1f2937',
+                      color: 'var(--text-primary)',
                       marginTop: '2px'
                     }
                   }, localFilesStats.totalTracks.toLocaleString())
@@ -50299,7 +50299,7 @@ useEffect(() => {
                     style: {
                       fontSize: '14px',
                       fontWeight: '500',
-                      color: '#1f2937',
+                      color: 'var(--text-primary)',
                       marginTop: '2px'
                     }
                   },
@@ -50442,7 +50442,7 @@ useEffect(() => {
                   padding: '8px 16px',
                   fontSize: '13px',
                   fontWeight: '500',
-                  color: showEnable ? '#ffffff' : '#374151',
+                  color: showEnable ? '#ffffff' : 'var(--text-primary)',
                   backgroundColor: showEnable ? '#7c3aed' : 'rgba(0, 0, 0, 0.04)',
                   border: 'none',
                   borderRadius: '8px',
@@ -50736,7 +50736,7 @@ useEffect(() => {
                       padding: '8px 16px',
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#374151',
+                      color: 'var(--text-primary)',
                       backgroundColor: 'rgba(0, 0, 0, 0.04)',
                       border: 'none',
                       borderRadius: '8px',
@@ -50776,7 +50776,7 @@ useEffect(() => {
                       padding: '8px 16px',
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#374151',
+                      color: 'var(--text-primary)',
                       backgroundColor: 'rgba(0, 0, 0, 0.04)',
                       border: 'none',
                       borderRadius: '8px',
@@ -50870,7 +50870,7 @@ useEffect(() => {
           style: { padding: '24px', maxHeight: '50vh', overflowY: 'auto' }
         },
           React.createElement('p', {
-            style: { fontSize: '14px', color: '#4b5563', lineHeight: '1.6', marginBottom: '20px' }
+            style: { fontSize: '14px', color: 'var(--nav-inactive)', lineHeight: '1.6', marginBottom: '20px' }
           }, 'The Parachord browser extension lets you add tracks and albums to your library directly from music websites like Spotify, Bandcamp, SoundCloud, and more.'),
 
           // Features
@@ -50888,7 +50888,7 @@ useEffect(() => {
                 style: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }
               },
                 React.createElement('span', { style: { fontSize: '16px' } }, item.icon),
-                React.createElement('span', { style: { fontSize: '13px', color: '#374151' } }, item.text)
+                React.createElement('span', { style: { fontSize: '13px', color: 'var(--text-primary)' } }, item.text)
               )
             )
           ),
@@ -50932,7 +50932,7 @@ useEffect(() => {
                       flexShrink: 0
                     }
                   }, item.step),
-                  React.createElement('span', { style: { fontSize: '13px', color: '#374151', lineHeight: '22px' } }, item.text)
+                  React.createElement('span', { style: { fontSize: '13px', color: 'var(--text-primary)', lineHeight: '22px' } }, item.text)
                 )
               )
             ),
@@ -50980,7 +50980,7 @@ useEffect(() => {
               padding: '10px 16px',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#374151',
+              color: 'var(--text-primary)',
               backgroundColor: 'rgba(0, 0, 0, 0.04)',
               border: 'none',
               borderRadius: '8px',
@@ -51068,7 +51068,7 @@ useEffect(() => {
           style: { padding: '24px', maxHeight: '50vh', overflowY: 'auto' }
         },
           React.createElement('p', {
-            style: { fontSize: '14px', color: '#4b5563', lineHeight: '1.6', marginBottom: '20px' }
+            style: { fontSize: '14px', color: 'var(--nav-inactive)', lineHeight: '1.6', marginBottom: '20px' }
           },
             'The Parachord ',
             React.createElement('a', {
@@ -51111,7 +51111,7 @@ useEffect(() => {
                 },
                   React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: item.iconPath })
                 ),
-                React.createElement('span', { style: { fontSize: '13px', color: '#374151' } }, item.text)
+                React.createElement('span', { style: { fontSize: '13px', color: 'var(--text-primary)' } }, item.text)
               )
             )
           ),
@@ -51153,7 +51153,7 @@ useEffect(() => {
                       flexShrink: 0
                     }
                   }, item.step),
-                  React.createElement('span', { style: { fontSize: '13px', color: '#374151', lineHeight: '22px' } }, item.text)
+                  React.createElement('span', { style: { fontSize: '13px', color: 'var(--text-primary)', lineHeight: '22px' } }, item.text)
                 )
               )
             ),
@@ -51201,7 +51201,7 @@ useEffect(() => {
               padding: '10px 16px',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#374151',
+              color: 'var(--text-primary)',
               backgroundColor: 'rgba(0, 0, 0, 0.04)',
               border: 'none',
               borderRadius: '8px',
@@ -51330,7 +51330,7 @@ useEffect(() => {
               ),
               React.createElement('div', { style: { flex: 1 } },
                 React.createElement('p', {
-                  style: { fontSize: '13px', fontWeight: '600', color: '#111827', marginBottom: '2px' }
+                  style: { fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '2px' }
                 }, item.title),
                 React.createElement('p', {
                   style: { fontSize: '12px', color: '#6b7280', lineHeight: '1.4' }
@@ -51385,7 +51385,7 @@ useEffect(() => {
               padding: '10px 16px',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#374151',
+              color: 'var(--text-primary)',
               backgroundColor: 'rgba(0, 0, 0, 0.04)',
               border: 'none',
               borderRadius: '8px',
@@ -51518,7 +51518,7 @@ useEffect(() => {
               }
             },
               // Placeholder always rendered behind
-              React.createElement(Music, { size: 20, style: { color: '#4b5563' } }),
+              React.createElement(Music, { size: 20, style: { color: 'var(--nav-inactive)' } }),
               addToPlaylistPanel.tracks[0]?.albumArt && React.createElement('img', {
                 src: addToPlaylistPanel.tracks[0].albumArt,
                 className: 'absolute inset-0 w-full h-full object-cover',
@@ -51535,7 +51535,7 @@ useEffect(() => {
                 style: {
                   fontSize: '13px',
                   fontWeight: '500',
-                  color: '#1f2937'
+                  color: 'var(--text-primary)'
                 }
               }, addToPlaylistPanel.sourceName),
               React.createElement('p', {
@@ -52131,7 +52131,7 @@ useEffect(() => {
                 display: 'block',
                 fontSize: '12px',
                 fontWeight: '500',
-                color: '#374151',
+                color: 'var(--text-primary)',
                 marginBottom: '6px'
               }
             }, 'Title'),
@@ -52144,7 +52144,7 @@ useEffect(() => {
                 width: '100%',
                 padding: '10px 12px',
                 fontSize: '13px',
-                color: '#1f2937',
+                color: 'var(--text-primary)',
                 backgroundColor: '#ffffff',
                 border: '1px solid rgba(0, 0, 0, 0.1)',
                 borderRadius: '8px',
@@ -52159,7 +52159,7 @@ useEffect(() => {
                 display: 'block',
                 fontSize: '12px',
                 fontWeight: '500',
-                color: '#374151',
+                color: 'var(--text-primary)',
                 marginBottom: '6px'
               }
             }, 'Artist'),
@@ -52172,7 +52172,7 @@ useEffect(() => {
                 width: '100%',
                 padding: '10px 12px',
                 fontSize: '13px',
-                color: '#1f2937',
+                color: 'var(--text-primary)',
                 backgroundColor: '#ffffff',
                 border: '1px solid rgba(0, 0, 0, 0.1)',
                 borderRadius: '8px',
@@ -52187,7 +52187,7 @@ useEffect(() => {
                 display: 'block',
                 fontSize: '12px',
                 fontWeight: '500',
-                color: '#374151',
+                color: 'var(--text-primary)',
                 marginBottom: '6px'
               }
             }, 'Album'),
@@ -52200,7 +52200,7 @@ useEffect(() => {
                 width: '100%',
                 padding: '10px 12px',
                 fontSize: '13px',
-                color: '#1f2937',
+                color: 'var(--text-primary)',
                 backgroundColor: '#ffffff',
                 border: '1px solid rgba(0, 0, 0, 0.1)',
                 borderRadius: '8px',
@@ -52217,7 +52217,7 @@ useEffect(() => {
                   display: 'block',
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: '#374151',
+                  color: 'var(--text-primary)',
                   marginBottom: '6px'
                 }
               }, 'Track #'),
@@ -52230,7 +52230,7 @@ useEffect(() => {
                   width: '100%',
                   padding: '10px 12px',
                   fontSize: '13px',
-                  color: '#1f2937',
+                  color: 'var(--text-primary)',
                   backgroundColor: '#ffffff',
                   border: '1px solid rgba(0, 0, 0, 0.1)',
                   borderRadius: '8px',
@@ -52245,7 +52245,7 @@ useEffect(() => {
                   display: 'block',
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: '#374151',
+                  color: 'var(--text-primary)',
                   marginBottom: '6px'
                 }
               }, 'Year'),
@@ -52258,7 +52258,7 @@ useEffect(() => {
                   width: '100%',
                   padding: '10px 12px',
                   fontSize: '13px',
-                  color: '#1f2937',
+                  color: 'var(--text-primary)',
                   backgroundColor: '#ffffff',
                   border: '1px solid rgba(0, 0, 0, 0.1)',
                   borderRadius: '8px',
@@ -52280,7 +52280,7 @@ useEffect(() => {
                 style: {
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: '#374151'
+                  color: 'var(--text-primary)'
                 }
               }, 'Album Art'),
               id3ArtLoading && React.createElement('span', {
@@ -52426,7 +52426,7 @@ useEffect(() => {
               padding: '10px 16px',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#374151',
+              color: 'var(--text-primary)',
               backgroundColor: '#ffffff',
               border: '1px solid rgba(0, 0, 0, 0.1)',
               borderRadius: '8px',
@@ -52532,7 +52532,7 @@ useEffect(() => {
           fontSize: '12px',
           fontWeight: '500',
           color: '#ffffff',
-          backgroundColor: '#1f2937',
+          backgroundColor: 'var(--tooltip-bg)',
           borderRadius: '8px',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
           whiteSpace: 'nowrap',
@@ -52540,8 +52540,8 @@ useEffect(() => {
           userSelect: 'none',
           zIndex: 9999
         },
-        onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = '#374151'; },
-        onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = '#1f2937'; }
+        onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = 'var(--tooltip-bg)'; },
+        onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = 'var(--tooltip-bg)'; }
       },
         React.createElement('span', { style: { display: 'flex', alignItems: 'center', gap: '8px' } },
           React.createElement('svg', {
@@ -52615,7 +52615,7 @@ useEffect(() => {
               fontWeight: '600',
               color: confirmDialog.type === 'success' ? '#166534' :
                 confirmDialog.type === 'error' ? '#991b1b' :
-                '#1f2937',
+                'var(--text-primary)',
               marginBottom: '8px'
             }
           }, confirmDialog.title),
@@ -52694,7 +52694,7 @@ useEffect(() => {
             }, '✕')
           ),
           React.createElement('h3', {
-            style: { fontSize: '16px', fontWeight: '600', color: '#1f2937', marginBottom: '8px' }
+            style: { fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }
           }, `Delete "${syncDeleteDialog.playlist?.title}"?`),
           React.createElement('p', {
             style: { fontSize: '13px', color: '#6b7280', lineHeight: '1.5' }
@@ -52788,7 +52788,7 @@ useEffect(() => {
             ),
             React.createElement('div', null,
               React.createElement('h2', {
-                style: { fontSize: '17px', fontWeight: '600', color: '#1f2937' }
+                style: { fontSize: '17px', fontWeight: '600', color: 'var(--text-primary)' }
               }, syncSetupModal.step === 'complete' ? 'Sync Complete' : `Sync Your ${syncProviderConfig[syncSetupModal.providerId]?.name || 'Music'} Library`),
               React.createElement('p', {
                 style: { fontSize: '13px', color: '#6b7280', marginTop: '2px' }
@@ -52871,7 +52871,7 @@ useEffect(() => {
                     }
                   }),
                   React.createElement('div', null,
-                    React.createElement('div', { style: { fontSize: '14px', fontWeight: '500', color: '#1f2937' } }, option.label),
+                    React.createElement('div', { style: { fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)' } }, option.label),
                     React.createElement('div', { style: { fontSize: '12px', color: '#6b7280', marginTop: '2px' } }, option.desc)
                   )
                 )
@@ -52941,7 +52941,7 @@ useEffect(() => {
                           padding: '8px 12px',
                           fontSize: '13px',
                           fontWeight: '500',
-                          color: syncSetupModal.playlistFilter === filter.key ? '#1f2937' : '#6b7280',
+                          color: syncSetupModal.playlistFilter === filter.key ? 'var(--text-primary)' : '#6b7280',
                           backgroundColor: syncSetupModal.playlistFilter === filter.key ? '#ffffff' : 'transparent',
                           border: 'none',
                           borderRadius: '8px',
@@ -53038,7 +53038,7 @@ useEffect(() => {
                             alt: ''
                           }),
                           React.createElement('div', { style: { flex: 1, minWidth: 0 } },
-                            React.createElement('div', { style: { fontSize: '14px', color: '#1f2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, playlist.name),
+                            React.createElement('div', { style: { fontSize: '14px', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, playlist.name),
                             React.createElement('div', { style: { fontSize: '12px', color: '#9ca3af' } },
                               `${playlist.trackCount} tracks`,
                               !playlist.isOwnedByUser && ' · Following'
@@ -53085,7 +53085,7 @@ useEffect(() => {
               )
             ),
             React.createElement('div', {
-              style: { fontSize: '15px', fontWeight: '500', color: '#1f2937' }
+              style: { fontSize: '15px', fontWeight: '500', color: 'var(--text-primary)' }
             }, syncSetupModal.progress.message),
             syncSetupModal.progress.total > 0 && React.createElement('div', {
               style: { fontSize: '13px', color: '#6b7280', marginTop: '4px' }
@@ -53137,7 +53137,7 @@ useEffect(() => {
                 style: { display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '10px 14px', backgroundColor: 'rgba(0, 0, 0, 0.02)', borderRadius: '8px' }
               },
                 React.createElement('span', { style: { color: '#6b7280' } }, 'Tracks'),
-                React.createElement('span', { style: { color: '#1f2937', fontWeight: '500' } },
+                React.createElement('span', { style: { color: 'var(--text-primary)', fontWeight: '500' } },
                   `+${syncSetupModal.results.tracks.added} added, -${syncSetupModal.results.tracks.removed} removed`
                 )
               ),
@@ -53145,7 +53145,7 @@ useEffect(() => {
                 style: { display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '10px 14px', backgroundColor: 'rgba(0, 0, 0, 0.02)', borderRadius: '8px' }
               },
                 React.createElement('span', { style: { color: '#6b7280' } }, 'Albums'),
-                React.createElement('span', { style: { color: '#1f2937', fontWeight: '500' } },
+                React.createElement('span', { style: { color: 'var(--text-primary)', fontWeight: '500' } },
                   `+${syncSetupModal.results.albums.added} added, -${syncSetupModal.results.albums.removed} removed`
                 )
               ),
@@ -53153,7 +53153,7 @@ useEffect(() => {
                 style: { display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '10px 14px', backgroundColor: 'rgba(0, 0, 0, 0.02)', borderRadius: '8px' }
               },
                 React.createElement('span', { style: { color: '#6b7280' } }, 'Artists'),
-                React.createElement('span', { style: { color: '#1f2937', fontWeight: '500' } },
+                React.createElement('span', { style: { color: 'var(--text-primary)', fontWeight: '500' } },
                   `+${syncSetupModal.results.artists.added} added, -${syncSetupModal.results.artists.removed} removed`
                 )
               ),
@@ -53161,7 +53161,7 @@ useEffect(() => {
                 style: { display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '10px 14px', backgroundColor: 'rgba(0, 0, 0, 0.02)', borderRadius: '8px' }
               },
                 React.createElement('span', { style: { color: '#6b7280' } }, 'Playlists'),
-                React.createElement('span', { style: { color: '#1f2937', fontWeight: '500' } },
+                React.createElement('span', { style: { color: 'var(--text-primary)', fontWeight: '500' } },
                   `+${syncSetupModal.results.playlists.added} added` +
                   (syncSetupModal.results.playlists.updated > 0 ? `, ${syncSetupModal.results.playlists.updated} with updates` : '')
                 )
@@ -53189,7 +53189,7 @@ useEffect(() => {
                 borderRadius: '10px',
                 cursor: 'pointer'
               },
-              onMouseEnter: (e) => e.currentTarget.style.color = '#1f2937',
+              onMouseEnter: (e) => e.currentTarget.style.color = 'var(--text-primary)',
               onMouseLeave: (e) => e.currentTarget.style.color = '#6b7280'
             }, 'Cancel'),
             React.createElement('button', {
@@ -53246,7 +53246,7 @@ useEffect(() => {
                 borderRadius: '10px',
                 cursor: 'pointer'
               },
-              onMouseEnter: (e) => e.currentTarget.style.color = '#1f2937',
+              onMouseEnter: (e) => e.currentTarget.style.color = 'var(--text-primary)',
               onMouseLeave: (e) => e.currentTarget.style.color = '#6b7280'
             }, 'Back'),
             React.createElement('button', {
@@ -53310,7 +53310,7 @@ useEffect(() => {
           style: { padding: '20px 24px 16px', borderBottom: '1px solid rgba(0, 0, 0, 0.06)' }
         },
           React.createElement('h2', {
-            style: { fontSize: '17px', fontWeight: '600', color: '#1f2937' }
+            style: { fontSize: '17px', fontWeight: '600', color: 'var(--text-primary)' }
           }, 'Library Sync'),
           React.createElement('button', {
             onClick: () => setSyncStatusModal({ open: false }),
@@ -53363,7 +53363,7 @@ useEffect(() => {
                     }),
                     React.createElement('div', { style: { flex: 1 } },
                       React.createElement('div', {
-                        style: { fontSize: '14px', fontWeight: '500', color: '#1f2937' }
+                        style: { fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)' }
                       }, syncProviderConfig[providerId]?.name || providerId),
                       React.createElement('div', {
                         style: { fontSize: '12px', color: '#6b7280', marginTop: '2px' }
@@ -53434,7 +53434,7 @@ useEffect(() => {
               border: 'none',
               cursor: 'pointer'
             },
-            onMouseEnter: (e) => e.currentTarget.style.color = '#1f2937',
+            onMouseEnter: (e) => e.currentTarget.style.color = 'var(--text-primary)',
             onMouseLeave: (e) => e.currentTarget.style.color = '#6b7280'
           }, 'Manage settings'),
           React.createElement('button', {
@@ -53518,7 +53518,7 @@ useEffect(() => {
           style: { padding: '24px' }
         },
           React.createElement('h2', {
-            style: { fontSize: '17px', fontWeight: '600', color: '#1f2937', marginBottom: '8px' }
+            style: { fontSize: '17px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }
           }, 'Stop Syncing?'),
           React.createElement('p', {
             style: { fontSize: '14px', color: '#6b7280', marginBottom: '20px', lineHeight: '1.5' }
@@ -53545,7 +53545,7 @@ useEffect(() => {
               onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.02)'; e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.06)'; }
             },
               React.createElement('div', {
-                style: { fontSize: '14px', fontWeight: '500', color: '#1f2937' }
+                style: { fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)' }
               }, 'Keep imported items'),
               React.createElement('div', {
                 style: { fontSize: '12px', color: '#6b7280', marginTop: '4px' }
@@ -53592,7 +53592,7 @@ useEffect(() => {
               cursor: 'pointer',
               padding: '8px 16px'
             },
-            onMouseEnter: (e) => e.currentTarget.style.color = '#1f2937',
+            onMouseEnter: (e) => e.currentTarget.style.color = 'var(--text-primary)',
             onMouseLeave: (e) => e.currentTarget.style.color = '#6b7280'
           }, 'Cancel')
         )
@@ -53635,7 +53635,7 @@ useEffect(() => {
             React.createElement('div', {
               style: { marginBottom: '12px', display: 'flex', justifyContent: 'center' }
             },
-              React.createElement(ParachordWordmark, { fill: '#1f2937', height: 44 })
+              React.createElement(ParachordWordmark, { fill: 'var(--text-primary)', height: 44 })
             ),
             React.createElement('p', {
               style: { fontSize: '15px', color: '#6b7280', lineHeight: '1.5' }
@@ -53646,7 +53646,7 @@ useEffect(() => {
             style: { padding: '24px 32px' }
           },
             React.createElement('p', {
-              style: { fontSize: '14px', color: '#4b5563', lineHeight: '1.7', marginBottom: '20px' }
+              style: { fontSize: '14px', color: 'var(--nav-inactive)', lineHeight: '1.7', marginBottom: '20px' }
             }, 'Parachord brings all your music together in one place. Search across multiple services, build unified playlists, and enjoy your music from wherever it lives.'),
             // Feature highlights with SVG icons
             React.createElement('div', {
@@ -53683,7 +53683,7 @@ useEffect(() => {
                     style: { width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'rgba(124, 58, 237, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }
                   }, item.icon),
                   React.createElement('span', {
-                    style: { fontSize: '13px', color: '#374151' }
+                    style: { fontSize: '13px', color: 'var(--text-primary)' }
                   }, item.text)
                 )
               )
@@ -53714,7 +53714,7 @@ useEffect(() => {
                 padding: '10px 16px',
                 borderRadius: '10px'
               },
-              onMouseEnter: (e) => e.currentTarget.style.color = '#1f2937',
+              onMouseEnter: (e) => e.currentTarget.style.color = 'var(--text-primary)',
               onMouseLeave: (e) => e.currentTarget.style.color = '#6b7280'
             }, 'Skip tutorial'),
             React.createElement('button', {
@@ -53750,7 +53750,7 @@ useEffect(() => {
             }
           },
             React.createElement('h2', {
-              style: { fontSize: '18px', fontWeight: '600', color: '#1f2937', marginBottom: '4px' }
+              style: { fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '4px' }
             }, 'Enable Your Music Sources'),
             React.createElement('p', {
               style: { fontSize: '14px', color: '#6b7280' }
@@ -53806,7 +53806,7 @@ useEffect(() => {
                   ),
                   // Name
                   React.createElement('span', {
-                    style: { fontSize: '12px', fontWeight: '500', color: '#374151', textAlign: 'center' }
+                    style: { fontSize: '12px', fontWeight: '500', color: 'var(--text-primary)', textAlign: 'center' }
                   }, resolver.name)
                 );
               })
@@ -53841,7 +53841,7 @@ useEffect(() => {
                 alignItems: 'center',
                 gap: '6px'
               },
-              onMouseEnter: (e) => e.currentTarget.style.color = '#1f2937',
+              onMouseEnter: (e) => e.currentTarget.style.color = 'var(--text-primary)',
               onMouseLeave: (e) => e.currentTarget.style.color = '#6b7280'
             },
               React.createElement('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
@@ -53908,7 +53908,7 @@ useEffect(() => {
               )
             ),
             React.createElement('h1', {
-              style: { fontSize: '20px', fontWeight: '600', color: '#1f2937', marginBottom: '6px' }
+              style: { fontSize: '20px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '6px' }
             }, 'You\'re All Set!'),
             React.createElement('p', {
               style: { fontSize: '14px', color: '#6b7280' }
@@ -53971,7 +53971,7 @@ useEffect(() => {
                 cursor: 'pointer',
                 transition: 'all 150ms ease'
               },
-              onMouseEnter: (e) => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.2)'; e.currentTarget.style.color = '#1f2937'; },
+              onMouseEnter: (e) => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.2)'; e.currentTarget.style.color = 'var(--text-primary)'; },
               onMouseLeave: (e) => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)'; e.currentTarget.style.color = '#6b7280'; }
             }, 'Back'),
             React.createElement('button', {
