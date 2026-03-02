@@ -242,17 +242,23 @@ const SpotifySyncProvider = {
   /**
    * Fetch all liked/saved tracks from Spotify.
    * If localSyncedCount is provided, does a quick count check first and
-   * returns null when the remote total matches (no changes → skip full fetch).
+   * returns null when the remote total matches AND the most recent track
+   * is the same (no changes → skip full fetch).
    */
-  async fetchTracks(token, onProgress, refreshToken, { localSyncedCount } = {}) {
-    // Quick count check: 1 API call to see if the library size changed
+  async fetchTracks(token, onProgress, refreshToken, { localSyncedCount, localLatestExternalId } = {}) {
+    // Quick check: 1 API call to see if the library size or most recent track changed
     if (localSyncedCount !== undefined) {
       const probe = await spotifyRequest('/me/tracks?limit=1', token, { refreshToken });
-      if (probe.total === localSyncedCount) {
-        console.log(`[Spotify] Track count unchanged (${probe.total}) — skipping full fetch`);
+      const remoteLatestId = probe.items?.[0]?.track?.id || null;
+      if (probe.total === localSyncedCount && remoteLatestId === localLatestExternalId) {
+        console.log(`[Spotify] Track count unchanged (${probe.total}) and latest track matches — skipping full fetch`);
         return null; // Signal: no changes detected
       }
-      console.log(`[Spotify] Track count changed: remote ${probe.total} vs local ${localSyncedCount}`);
+      if (probe.total !== localSyncedCount) {
+        console.log(`[Spotify] Track count changed: remote ${probe.total} vs local ${localSyncedCount}`);
+      } else {
+        console.log(`[Spotify] Track count same (${probe.total}) but latest track differs: remote ${remoteLatestId} vs local ${localLatestExternalId}`);
+      }
     }
     const items = await spotifyFetch('/me/tracks?limit=50', token, [], onProgress, refreshToken);
     return items.map(item => transformTrack(item, item.added_at));
@@ -260,16 +266,21 @@ const SpotifySyncProvider = {
 
   /**
    * Fetch all saved albums from Spotify.
-   * Returns null when remote count matches localSyncedCount (no changes).
+   * Returns null when remote count and latest album match (no changes).
    */
-  async fetchAlbums(token, onProgress, refreshToken, { localSyncedCount } = {}) {
+  async fetchAlbums(token, onProgress, refreshToken, { localSyncedCount, localLatestExternalId } = {}) {
     if (localSyncedCount !== undefined) {
       const probe = await spotifyRequest('/me/albums?limit=1', token, { refreshToken });
-      if (probe.total === localSyncedCount) {
-        console.log(`[Spotify] Album count unchanged (${probe.total}) — skipping full fetch`);
+      const remoteLatestId = probe.items?.[0]?.album?.id || null;
+      if (probe.total === localSyncedCount && remoteLatestId === localLatestExternalId) {
+        console.log(`[Spotify] Album count unchanged (${probe.total}) and latest album matches — skipping full fetch`);
         return null;
       }
-      console.log(`[Spotify] Album count changed: remote ${probe.total} vs local ${localSyncedCount}`);
+      if (probe.total !== localSyncedCount) {
+        console.log(`[Spotify] Album count changed: remote ${probe.total} vs local ${localSyncedCount}`);
+      } else {
+        console.log(`[Spotify] Album count same (${probe.total}) but latest album differs: remote ${remoteLatestId} vs local ${localLatestExternalId}`);
+      }
     }
     const items = await spotifyFetch('/me/albums?limit=50', token, [], onProgress, refreshToken);
     return items.map(transformAlbum);
@@ -277,9 +288,9 @@ const SpotifySyncProvider = {
 
   /**
    * Fetch all followed artists from Spotify.
-   * Returns null when remote count matches localSyncedCount (no changes).
+   * Returns null when remote count and latest artist match (no changes).
    */
-  async fetchArtists(token, onProgress, refreshToken, { localSyncedCount } = {}) {
+  async fetchArtists(token, onProgress, refreshToken, { localSyncedCount, localLatestExternalId } = {}) {
     // Quick count check for artists (first page includes total)
     if (localSyncedCount !== undefined) {
       const probeResponse = await fetch(`${SPOTIFY_API_BASE}/me/following?type=artist&limit=1`, {
@@ -288,11 +299,12 @@ const SpotifySyncProvider = {
       if (probeResponse.ok) {
         const probeData = await probeResponse.json();
         const remoteTotal = probeData.artists?.total;
-        if (remoteTotal !== undefined && remoteTotal === localSyncedCount) {
-          console.log(`[Spotify] Artist count unchanged (${remoteTotal}) — skipping full fetch`);
+        const remoteLatestId = probeData.artists?.items?.[0]?.id || null;
+        if (remoteTotal !== undefined && remoteTotal === localSyncedCount && remoteLatestId === localLatestExternalId) {
+          console.log(`[Spotify] Artist count unchanged (${remoteTotal}) and latest artist matches — skipping full fetch`);
           return null;
         }
-        if (remoteTotal !== undefined) {
+        if (remoteTotal !== undefined && remoteTotal !== localSyncedCount) {
           console.log(`[Spotify] Artist count changed: remote ${remoteTotal} vs local ${localSyncedCount}`);
         }
       }

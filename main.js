@@ -4977,107 +4977,114 @@ ipcMain.handle('sync:start', async (event, providerId, options = {}) => {
 
       let playlistsAdded = 0;
       let playlistsUpdated = 0;
+      let playlistsFailed = 0;
 
       for (let i = 0; i < selectedRemote.length; i++) {
         const remotePlaylist = selectedRemote[i];
         sendProgress({ phase: 'playlists', current: i + 1, total: selectedRemote.length, providerId });
 
-        // Check for existing playlist by syncedFrom.externalId OR by matching ID pattern
-        // This handles both new sync structure and older playlists that may have been synced before
-        const localPlaylist = currentPlaylists.find(p =>
-          p.syncedFrom?.externalId === remotePlaylist.externalId ||
-          p.id === remotePlaylist.id ||
-          p.id === `${providerId}-${remotePlaylist.externalId}`
-        );
+        try {
+          // Check for existing playlist by syncedFrom.externalId OR by matching ID pattern
+          // This handles both new sync structure and older playlists that may have been synced before
+          const localPlaylist = currentPlaylists.find(p =>
+            p.syncedFrom?.externalId === remotePlaylist.externalId ||
+            p.id === remotePlaylist.id ||
+            p.id === `${providerId}-${remotePlaylist.externalId}`
+          );
 
-        if (!localPlaylist) {
-          // New playlist - fetch tracks and add
-          console.log(`[Sync] Importing playlist: ${remotePlaylist.name}`);
-          const tracks = await provider.fetchPlaylistTracks(remotePlaylist.externalId, token, null, refreshToken);
+          if (!localPlaylist) {
+            // New playlist - fetch tracks and add
+            console.log(`[Sync] Importing playlist: ${remotePlaylist.name}`);
+            const tracks = await provider.fetchPlaylistTracks(remotePlaylist.externalId, token, null, refreshToken);
 
-          // Use earliest track addedAt as playlist creation estimate (Spotify doesn't provide playlist follow date)
-          const earliestTrackDate = tracks.length > 0
-            ? Math.min(...tracks.map(t => t.addedAt || Date.now()).filter(Boolean))
-            : Date.now();
+            // Use earliest track addedAt as playlist creation estimate (Spotify doesn't provide playlist follow date)
+            const earliestTrackDate = tracks.length > 0
+              ? Math.min(...tracks.map(t => t.addedAt || Date.now()).filter(Boolean))
+              : Date.now();
 
-          const newPlaylist = {
-            id: remotePlaylist.id,
-            title: remotePlaylist.name,
-            description: remotePlaylist.description,
-            tracks: tracks,
-            creator: remotePlaylist.ownerName || null,
-            source: remotePlaylist.isOwnedByUser ? `${providerId}-sync` : `${providerId}-import`,
-            syncedFrom: {
-              resolver: providerId,
-              externalId: remotePlaylist.externalId,
-              snapshotId: remotePlaylist.snapshotId,
-              ownerId: remotePlaylist.ownerId
-            },
-            hasUpdates: false,
-            locallyModified: false,
-            syncSources: {
-              [providerId]: { addedAt: earliestTrackDate, syncedAt: Date.now() }
-            },
-            createdAt: earliestTrackDate,
-            addedAt: Date.now()  // When it was added to Parachord
-          };
-
-          currentPlaylists.push(newPlaylist);
-          playlistsAdded++;
-        } else {
-          // Existing playlist - update metadata and check for track updates
-          const idx = currentPlaylists.findIndex(p => p.id === localPlaylist.id);
-          if (idx >= 0) {
-            const hasTrackUpdates = localPlaylist.syncedFrom?.snapshotId !== remotePlaylist.snapshotId;
-            if (hasTrackUpdates) {
-              console.log(`[Sync] Playlist has updates: ${remotePlaylist.name}`);
-            }
-
-            // Recalculate createdAt from existing tracks if available
-            const existingTracks = currentPlaylists[idx].tracks || [];
-            let recalculatedCreatedAt = currentPlaylists[idx].createdAt;
-            if (existingTracks.length > 0) {
-              const trackDates = existingTracks.map(t => t.addedAt || t.syncSources?.spotify?.addedAt).filter(Boolean);
-              if (trackDates.length > 0) {
-                recalculatedCreatedAt = Math.min(...trackDates);
-              }
-            }
-
-            // Always update/backfill metadata fields (creator, source, syncedFrom, createdAt)
-            currentPlaylists[idx] = {
-              ...currentPlaylists[idx],
-              // Backfill creator if not set
-              creator: currentPlaylists[idx].creator || remotePlaylist.ownerName || null,
-              // Backfill source if not set
-              source: currentPlaylists[idx].source || (remotePlaylist.isOwnedByUser ? `${providerId}-sync` : `${providerId}-import`),
-              // Update createdAt from track data
-              createdAt: recalculatedCreatedAt,
-              // Update/backfill syncedFrom structure
+            const newPlaylist = {
+              id: remotePlaylist.id,
+              title: remotePlaylist.name,
+              description: remotePlaylist.description,
+              tracks: tracks,
+              creator: remotePlaylist.ownerName || null,
+              source: remotePlaylist.isOwnedByUser ? `${providerId}-sync` : `${providerId}-import`,
               syncedFrom: {
-                ...currentPlaylists[idx].syncedFrom,
                 resolver: providerId,
                 externalId: remotePlaylist.externalId,
-                snapshotId: hasTrackUpdates ? currentPlaylists[idx].syncedFrom?.snapshotId : remotePlaylist.snapshotId,
+                snapshotId: remotePlaylist.snapshotId,
                 ownerId: remotePlaylist.ownerId
               },
-              hasUpdates: hasTrackUpdates ? true : currentPlaylists[idx].hasUpdates,
+              hasUpdates: false,
+              locallyModified: false,
               syncSources: {
-                ...currentPlaylists[idx].syncSources,
-                [providerId]: { ...currentPlaylists[idx].syncSources?.[providerId], syncedAt: Date.now() }
-              }
+                [providerId]: { addedAt: earliestTrackDate, syncedAt: Date.now() }
+              },
+              createdAt: earliestTrackDate,
+              addedAt: Date.now()  // When it was added to Parachord
             };
 
-            if (hasTrackUpdates) {
-              playlistsUpdated++;
+            currentPlaylists.push(newPlaylist);
+            playlistsAdded++;
+          } else {
+            // Existing playlist - update metadata and check for track updates
+            const idx = currentPlaylists.findIndex(p => p.id === localPlaylist.id);
+            if (idx >= 0) {
+              const hasTrackUpdates = localPlaylist.syncedFrom?.snapshotId !== remotePlaylist.snapshotId;
+              if (hasTrackUpdates) {
+                console.log(`[Sync] Playlist has updates: ${remotePlaylist.name}`);
+              }
+
+              // Recalculate createdAt from existing tracks if available
+              const existingTracks = currentPlaylists[idx].tracks || [];
+              let recalculatedCreatedAt = currentPlaylists[idx].createdAt;
+              if (existingTracks.length > 0) {
+                const trackDates = existingTracks.map(t => t.addedAt || t.syncSources?.spotify?.addedAt).filter(Boolean);
+                if (trackDates.length > 0) {
+                  recalculatedCreatedAt = Math.min(...trackDates);
+                }
+              }
+
+              // Always update/backfill metadata fields (creator, source, syncedFrom, createdAt)
+              currentPlaylists[idx] = {
+                ...currentPlaylists[idx],
+                // Backfill creator if not set
+                creator: currentPlaylists[idx].creator || remotePlaylist.ownerName || null,
+                // Backfill source if not set
+                source: currentPlaylists[idx].source || (remotePlaylist.isOwnedByUser ? `${providerId}-sync` : `${providerId}-import`),
+                // Update createdAt from track data
+                createdAt: recalculatedCreatedAt,
+                // Update/backfill syncedFrom structure
+                syncedFrom: {
+                  ...currentPlaylists[idx].syncedFrom,
+                  resolver: providerId,
+                  externalId: remotePlaylist.externalId,
+                  snapshotId: hasTrackUpdates ? currentPlaylists[idx].syncedFrom?.snapshotId : remotePlaylist.snapshotId,
+                  ownerId: remotePlaylist.ownerId
+                },
+                hasUpdates: hasTrackUpdates ? true : currentPlaylists[idx].hasUpdates,
+                syncSources: {
+                  ...currentPlaylists[idx].syncSources,
+                  [providerId]: { ...currentPlaylists[idx].syncSources?.[providerId], syncedAt: Date.now() }
+                }
+              };
+
+              if (hasTrackUpdates) {
+                playlistsUpdated++;
+              }
             }
           }
+        } catch (playlistError) {
+          playlistsFailed++;
+          console.error(`[Sync] Failed to sync playlist "${remotePlaylist.name}": ${playlistError.message}`);
+          // Continue with remaining playlists instead of aborting the entire sync
         }
       }
 
-      // Save playlists
+      // Save playlists (including any that succeeded before a failure)
       store.set('local_playlists', currentPlaylists);
-      results.playlists = { added: playlistsAdded, updated: playlistsUpdated };
-      console.log(`[Sync] Playlists synced: ${playlistsAdded} added, ${playlistsUpdated} with updates`);
+      results.playlists = { added: playlistsAdded, updated: playlistsUpdated, failed: playlistsFailed };
+      console.log(`[Sync] Playlists synced: ${playlistsAdded} added, ${playlistsUpdated} with updates${playlistsFailed > 0 ? `, ${playlistsFailed} failed` : ''}`);
     }
 
     // Save collection
@@ -5129,8 +5136,14 @@ ipcMain.handle('sync:fetch-playlists', async (event, providerId) => {
   }
 
   let token;
+  let refreshTokenCb = null;
   if (providerId === 'spotify') {
-    token = store.get('spotify_token');
+    token = await ensureValidSpotifyToken();
+    refreshTokenCb = async () => {
+      const newToken = await ensureValidSpotifyToken(true);
+      if (newToken) token = newToken;
+      return newToken;
+    };
   } else if (providerId === 'applemusic') {
     if (!generatedMusicKitToken) {
       await musicKitTokenReady;
@@ -5147,7 +5160,7 @@ ipcMain.handle('sync:fetch-playlists', async (event, providerId) => {
   }
 
   try {
-    const { playlists, folders } = await provider.fetchPlaylists(token);
+    const { playlists, folders } = await provider.fetchPlaylists(token, null, refreshTokenCb);
     return { success: true, playlists, folders };
   } catch (error) {
     return { success: false, error: error.message };
@@ -5161,8 +5174,14 @@ ipcMain.handle('sync:fetch-playlist-tracks', async (event, providerId, playlistE
   }
 
   let token;
+  let refreshTokenCb = null;
   if (providerId === 'spotify') {
-    token = store.get('spotify_token');
+    token = await ensureValidSpotifyToken();
+    refreshTokenCb = async () => {
+      const newToken = await ensureValidSpotifyToken(true);
+      if (newToken) token = newToken;
+      return newToken;
+    };
   } else if (providerId === 'applemusic') {
     if (!generatedMusicKitToken) {
       await musicKitTokenReady;
@@ -5179,7 +5198,7 @@ ipcMain.handle('sync:fetch-playlist-tracks', async (event, providerId, playlistE
   }
 
   try {
-    const tracks = await provider.fetchPlaylistTracks(playlistExternalId, token);
+    const tracks = await provider.fetchPlaylistTracks(playlistExternalId, token, null, refreshTokenCb);
     // Also fetch the current snapshot ID
     const snapshotId = await provider.getPlaylistSnapshot?.(playlistExternalId, token);
     return { success: true, tracks, snapshotId };

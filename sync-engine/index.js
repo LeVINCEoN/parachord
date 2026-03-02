@@ -157,8 +157,15 @@ const applyDiff = (collectionItems, diff) => {
  */
 const syncDataType = async (provider, token, dataType, localData, onProgress, refreshToken) => {
   // Count how many local items came from this provider (for incremental check)
-  const localSyncedCount = localData.filter(item => item.syncSources?.[provider.id]).length;
-  const fetchOptions = { localSyncedCount };
+  const syncedItems = localData.filter(item => item.syncSources?.[provider.id]);
+  const localSyncedCount = syncedItems.length;
+  // Find the most recently added synced item (by addedAt) to detect swapped content
+  const mostRecentItem = syncedItems.reduce((latest, item) => {
+    const itemDate = item.addedAt || item.syncSources?.[provider.id]?.addedAt || 0;
+    const latestDate = latest ? (latest.addedAt || latest.syncSources?.[provider.id]?.addedAt || 0) : 0;
+    return itemDate > latestDate ? item : latest;
+  }, null);
+  const fetchOptions = { localSyncedCount, localLatestExternalId: mostRecentItem?.externalId || null };
 
   // Fetch remote data
   let remoteData;
