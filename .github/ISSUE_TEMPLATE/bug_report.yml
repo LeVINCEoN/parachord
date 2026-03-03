@@ -86,16 +86,26 @@ body:
       description: |
         Paste any relevant log output here. You can collect logs from two sources:
 
-        **DevTools Console (renderer process):**
-        1. Open Parachord
-        2. Go to **View > Toggle Developer Tools** (or press `Cmd+Option+I` on macOS / `Ctrl+Shift+I` on Windows/Linux)
-        3. Click the **Console** tab
-        4. Reproduce the issue, then copy any errors or warnings shown in red/yellow
+        **1. DevTools Console (renderer logs)**
+        Open Parachord, then open Developer Tools using one of the shortcuts below:
+        - **macOS**: `Cmd+Option+I` (or menu bar: **View > Toggle Developer Tools**)
+        - **Windows / Linux**: `Ctrl+Shift+I` or `F12` (or menu bar: **View > Toggle Developer Tools**)
 
-        **Terminal Output (main process):**
-        1. Start Parachord from a terminal with `npm start` (or run the packaged binary from a terminal)
-        2. Reproduce the issue
-        3. Copy the terminal output
+        Click the **Console** tab, reproduce the issue, and copy any errors or warnings (shown in red/yellow).
+
+        **2. Terminal Output (main process logs)**
+        Start Parachord from a terminal so you can capture main-process output:
+        - **macOS**: Open **Terminal.app** or **iTerm** and run: `/Applications/Parachord.app/Contents/MacOS/Parachord`  (or `npm start` if running from source)
+        - **Windows**: Open **Command Prompt** or **PowerShell**, navigate to the install directory, and run: `Parachord.exe`  (or `npm start` if running from source)
+        - **Linux**: Open a terminal and run: `parachord` or `./Parachord.AppImage`  (or `npm start` if running from source)
+
+        Reproduce the issue, then copy the terminal output.
+
+        **3. App data directory (for crash logs or database issues)**
+        If asked by a maintainer, the app data directory is located at:
+        - **macOS**: `~/Library/Application Support/parachord-desktop/`
+        - **Windows**: `%APPDATA%\parachord-desktop\`
+        - **Linux**: `~/.config/parachord-desktop/`
       render: shell
       placeholder: Paste log output here...
     validations:
