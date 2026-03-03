@@ -52875,22 +52875,22 @@ useEffect(() => {
                     },
                       // Checkbox placeholder
                       React.createElement('div', {
-                        className: 'rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        className: 'rounded shimmer-light animate-shimmer',
                         style: { width: '16px', height: '16px', flexShrink: 0, backgroundSize: '200% 100%' }
                       }),
                       // Image placeholder
                       React.createElement('div', {
-                        className: 'rounded-md bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        className: 'rounded-md shimmer-light animate-shimmer',
                         style: { width: '40px', height: '40px', flexShrink: 0, backgroundSize: '200% 100%' }
                       }),
                       // Text lines
                       React.createElement('div', { style: { flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' } },
                         React.createElement('div', {
-                          className: 'rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                          className: 'rounded shimmer-light animate-shimmer',
                           style: { height: '14px', width: `${55 + (i * 17) % 35}%`, backgroundSize: '200% 100%' }
                         }),
                         React.createElement('div', {
-                          className: 'rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                          className: 'rounded shimmer-light animate-shimmer',
                           style: { height: '12px', width: '80px', backgroundSize: '200% 100%' }
                         })
                       )
