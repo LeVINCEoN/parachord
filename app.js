@@ -1174,7 +1174,7 @@ const loadBuiltinResolvers = async () => {
 const FALLBACK_RESOLVERS = [
   {"manifest":{"id":"spotify","name":"Spotify","version":"1.0.0","author":"Parachord Team","description":"Stream from Spotify via Spotify Connect API. Requires Spotify Premium for remote playback.","icon":"♫","color":"#1DB954","homepage":"https://spotify.com","email":"support@harmonix.app"},"capabilities":{"resolve":true,"search":true,"stream":true,"browse":false,"urlLookup":false},"settings":{"requiresAuth":true,"authType":"oauth","scopes":["user-read-playback-state","user-modify-playback-state","user-read-currently-playing"],"configurable":{"clientId":{"type":"text","label":"Client ID","default":"c040c0ee133344b282e6342198bcbeea","readonly":true}}},"implementation":{"search":"async function(query, config) { if (!config.token) return []; try { const response = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=20`, { headers: { 'Authorization': `Bearer ${config.token}` } }); if (!response.ok) { console.error('Spotify search failed:', response.status); return []; } const data = await response.json(); return data.tracks.items.map(track => ({ id: `spotify-${track.id}`, title: track.name, artist: track.artists.map(a => a.name).join(', '), album: track.album.name, duration: Math.floor(track.duration_ms / 1000), sources: ['spotify'], spotifyUri: track.uri, spotifyId: track.id, albumArt: track.album.images[0]?.url })); } catch (error) { console.error('Spotify search error:', error); return []; } }","resolve":"async function(artist, track, album, config) { const query = `artist:${artist} track:${track}`; const results = await this.search(query, config); return results[0] || null; }","play":"async function(track, config) { if (!config.token) { console.error('Spotify not connected'); return false; } try { const devicesResponse = await fetch('https://api.spotify.com/v1/me/player/devices', { headers: { 'Authorization': `Bearer ${config.token}` } }); if (!devicesResponse.ok) return false; const devicesData = await devicesResponse.json(); const devices = devicesData.devices || []; if (devices.length === 0) { console.error('No Spotify devices found'); return false; } const controllable = devices.filter(d => !d.is_restricted); const available = controllable.length > 0 ? controllable : devices; const computer = available.find(d => d.type === 'Computer'); const phone = available.find(d => d.type === 'Smartphone'); const speaker = available.find(d => d.type === 'Speaker'); const nonWebActive = available.find(d => d.is_active && !d.name.toLowerCase().includes('web')); const nonWeb = available.find(d => !d.name.toLowerCase().includes('web')); let activeDevice = computer || phone || speaker || nonWebActive || nonWeb || available[0]; console.log('Selected device:', activeDevice.name, activeDevice.type); if (!activeDevice.is_active) { const transferResponse = await fetch('https://api.spotify.com/v1/me/player', { method: 'PUT', headers: { 'Authorization': `Bearer ${config.token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ device_ids: [activeDevice.id], play: true }) }); if (!transferResponse.ok && transferResponse.status !== 204) { console.error('Failed to transfer playback'); } await new Promise(resolve => setTimeout(resolve, 1000)); } const playResponse = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${activeDevice.id}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${config.token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ uris: [track.spotifyUri] }) }); return playResponse.ok || playResponse.status === 204; } catch (error) { console.error('Spotify play error:', error); return false; } }","init":"async function(config) { console.log('Spotify resolver initialized'); }","cleanup":"async function() { console.log('Spotify resolver cleanup'); }"}},
   {"manifest":{"id":"bandcamp","name":"Bandcamp","version":"1.0.0","author":"Parachord Team","description":"Find and purchase music on Bandcamp. Opens tracks in browser for streaming.","icon":"🎸","color":"#629AA9","homepage":"https://bandcamp.com","email":"support@harmonix.app"},"capabilities":{"resolve":true,"search":true,"stream":false,"browse":false,"urlLookup":true,"purchase":true},"urlPatterns":["*.bandcamp.com/track/*","*.bandcamp.com/album/*"],"settings":{"requiresAuth":false,"authType":"none","configurable":{}},"implementation":{"search":"async function(query, config) { try { console.log('Searching Bandcamp for:', query); const response = await fetch(`https://bandcamp.com/search?q=${encodeURIComponent(query)}&item_type=t`, { method: 'GET', headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' } }); if (!response.ok) { console.error('Bandcamp search failed:', response.status); return []; } const html = await response.text(); const results = []; const parser = new DOMParser(); const doc = parser.parseFromString(html, 'text/html'); const searchResults = doc.querySelectorAll('.searchresult'); searchResults.forEach((item, index) => { if (index >= 20) return; try { const heading = item.querySelector('.heading'); const subhead = item.querySelector('.subhead'); const itemUrl = item.querySelector('.itemurl'); if (heading && itemUrl) { const title = heading.textContent.trim(); const artistInfo = subhead ? subhead.textContent.trim() : 'Unknown Artist'; const byMatch = artistInfo.match(/by\\s+([^,]+)/); const fromMatch = artistInfo.match(/from\\s+(.+)/); const artist = byMatch ? byMatch[1].trim() : 'Unknown Artist'; const album = fromMatch ? fromMatch[1].trim() : (byMatch ? byMatch[1].trim() : 'Single'); const url = itemUrl.textContent.trim(); results.push({ id: `bandcamp-${Date.now()}-${index}`, title: title, artist: artist, album: album, duration: 210, sources: ['bandcamp'], bandcampUrl: url, purchaseUrl: url }); } } catch (itemError) { console.error('Error parsing Bandcamp result:', itemError); } }); try { const acResp = await fetch(`https://bandcamp.com/api/fuzzysearch/1/app_autocomplete?q=${encodeURIComponent(query)}`, { headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' } }); if (acResp.ok) { const acData = await acResp.json(); if (acData.results) { for (const r of results) { const slug = r.bandcampUrl.replace(/https?:\\/\\//, '').split('/').pop(); const match = acData.results.find(a => a.url && a.url.includes(slug)); if (match) { r.bandcampTrackId = match.id; r.bandcampAlbumId = match.album_id || null; if (match.img) r.albumArt = match.img.replace('_3.jpg', '_10.jpg'); } } } } } catch (e) { console.log('Bandcamp ID enrichment skipped:', e.message); } console.log(`Found ${results.length} Bandcamp results`); return results; } catch (error) { console.error('Bandcamp search error:', error); return []; } }","resolve":"async function(artist, track, album, config) { const query = `${artist} ${track}`; const results = await this.search(query, config); return results[0] || null; }","lookupUrl":"async function(url, config) { try { console.log('Bandcamp URL lookup:', url); const response = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' } }); if (!response.ok) return null; const html = await response.text(); const parser = new DOMParser(); const doc = parser.parseFromString(html, 'text/html'); const ldScripts = doc.querySelectorAll('script[type=\"application/ld+json\"]'); for (const ldEl of ldScripts) { try { const ld = JSON.parse(ldEl.textContent); if (ld['@type'] === 'MusicRecording') { let duration = 0; if (ld.duration) { const m = ld.duration.match(/P(?:\\d+H)?(\\d+)M(\\d+)S/); if (m) duration = parseInt(m[1]) * 60 + parseInt(m[2]); } const artist = ld.byArtist?.name || doc.querySelector('meta[property=\"og:site_name\"]')?.content || ''; const album = ld.inAlbum?.name || ''; const albumArt = doc.querySelector('meta[property=\"og:image\"]')?.content || ld.image || ''; return { id: `bandcamp-${Date.now()}`, title: ld.name, artist: artist, album: album, duration: duration, sources: ['bandcamp'], bandcampUrl: url, purchaseUrl: url, albumArt: albumArt }; } } catch (e) {} } const title = doc.querySelector('meta[property=\"og:title\"]')?.content; const artist = doc.querySelector('meta[property=\"og:site_name\"]')?.content; const albumArt = doc.querySelector('meta[property=\"og:image\"]')?.content; if (!title || !artist) return null; return { id: `bandcamp-${Date.now()}`, title: title, artist: artist, album: '', duration: 0, sources: ['bandcamp'], bandcampUrl: url, purchaseUrl: url, albumArt: albumArt }; } catch (error) { console.error('Bandcamp URL lookup error:', error); return null; } }","lookupAlbum":"async function(url, config) { try { console.log('Bandcamp album lookup:', url); const response = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' } }); if (!response.ok) return null; const html = await response.text(); const parser = new DOMParser(); const doc = parser.parseFromString(html, 'text/html'); const albumArt = doc.querySelector('meta[property=\"og:image\"]')?.content || ''; let albumName = ''; let artist = ''; let tracks = []; const ldScripts = doc.querySelectorAll('script[type=\"application/ld+json\"]'); for (const ldEl of ldScripts) { try { const ld = JSON.parse(ldEl.textContent); if (ld['@type'] === 'MusicAlbum' && ld.track) { albumName = ld.name || ''; artist = ld.byArtist?.name || ''; const items = ld.track.itemListElement || []; tracks = items.map((item, i) => { const t = item.item || item; let duration = 0; if (t.duration) { const m = t.duration.match(/P(?:\\d+H)?(\\d+)M(\\d+)S/); if (m) duration = parseInt(m[1]) * 60 + parseInt(m[2]); } const trackUrl = t['@id'] || t.mainEntityOfPage || url; return { id: `bandcamp-${Date.now()}-${i}`, title: t.name, artist: artist, album: albumName, duration: duration, sources: ['bandcamp'], bandcampUrl: trackUrl, purchaseUrl: trackUrl, trackNumber: item.position || i + 1 }; }); break; } } catch (e) {} } if (!albumName) albumName = doc.querySelector('meta[property=\"og:title\"]')?.content || ''; if (!artist) artist = doc.querySelector('meta[property=\"og:site_name\"]')?.content || ''; if (tracks.length === 0) return null; return { id: `bandcamp-album-${Date.now()}`, name: albumName, artist: artist, albumArt: albumArt, trackCount: tracks.length, tracks: tracks, url: url }; } catch (error) { console.error('Bandcamp album lookup error:', error); return null; } }","play":"async function(track, config) { if (!track.bandcampUrl) { console.error('No Bandcamp URL found'); return false; } try { if (window.electron?.shell?.openExternal) { const result = await window.electron.shell.openExternal(track.bandcampUrl); return result && result.success; } else { const newWindow = window.open(track.bandcampUrl, '_blank'); return !!newWindow; } } catch (error) { console.error('Failed to open Bandcamp link:', error); return false; } }","init":"async function(config) { console.log('Bandcamp resolver initialized'); }","cleanup":"async function() { console.log('Bandcamp resolver cleanup'); }"}},
-  {"manifest":{"id":"qobuz","name":"Qobuz","version":"1.0.0","author":"Parachord Team","description":"High-quality audio streaming with 30-second previews. Subscription required for full playback.","icon":"🎵","color":"#0E7EBF","homepage":"https://qobuz.com","email":"support@harmonix.app"},"capabilities":{"resolve":true,"search":true,"stream":true,"browse":false,"urlLookup":false,"purchase":true},"settings":{"requiresAuth":false,"authType":"apikey","configurable":{"appId":{"type":"text","label":"App ID","default":"285473059","readonly":true,"description":"Public demo app ID"}}},"implementation":{"search":"async function(query, config) { try { console.log('Searching Qobuz for:', query); const appId = config.appId || '285473059'; const response = await fetch(`https://www.qobuz.com/api.json/0.2/track/search?query=${encodeURIComponent(query)}&limit=20&app_id=${appId}`, { headers: { 'User-Agent': 'Parachord/1.0.0' } }); if (!response.ok) { console.error('Qobuz search failed:', response.status); return []; } const data = await response.json(); if (!data.tracks || !data.tracks.items) { console.log('No Qobuz results found'); return []; } const results = data.tracks.items.map(track => ({ id: `qobuz-${track.id}`, title: track.title, artist: track.performer?.name || track.album?.artist?.name || 'Unknown Artist', album: track.album?.title || 'Unknown Album', duration: track.duration || 180, sources: ['qobuz'], qobuzId: track.id, albumArt: track.album?.image?.small || track.album?.image?.thumbnail, previewUrl: track.preview_url, streamable: track.streamable, quality: track.maximum_bit_depth ? `${track.maximum_bit_depth}bit/${track.maximum_sampling_rate}kHz` : 'CD Quality', purchaseUrl: `https://www.qobuz.com/us-en/track/${track.id}` })); console.log(`Found ${results.length} Qobuz results`); return results; } catch (error) { console.error('Qobuz search error:', error); return []; } }","resolve":"async function(artist, track, album, config) { const query = `${artist} ${track}`; const results = await this.search(query, config); return results[0] || null; }","play":"async function(track, config) { if (!track.previewUrl) { console.error('No Qobuz preview URL'); return false; } try { const audio = new Audio(track.previewUrl); audio.volume = config.volume || 0.7; await audio.play(); console.log('Playing Qobuz 30-second preview'); return true; } catch (error) { console.error('Failed to play Qobuz preview:', error); return false; } }","init":"async function(config) { console.log('Qobuz resolver initialized'); }","cleanup":"async function() { console.log('Qobuz resolver cleanup'); }"}},
+
   {"manifest":{"id":"soundcloud","name":"SoundCloud","version":"1.0.0","author":"Parachord Team","description":"Search and stream music from SoundCloud. Requires OAuth login for full access.","icon":"☁","color":"#FF5500","homepage":"https://soundcloud.com","email":"support@parachord.dev"},"capabilities":{"resolve":true,"search":true,"stream":true,"browse":false,"urlLookup":true},"urlPatterns":["soundcloud.com/*","*.soundcloud.com/*"],"settings":{"requiresAuth":true,"authType":"oauth","configurable":{}},"implementation":{"search":"async function(query, config) { if (!config.token) { console.log('SoundCloud: No token, skipping search'); return []; } try { console.log('Searching SoundCloud for:', query); const response = await fetch(`https://api.soundcloud.com/tracks?q=${encodeURIComponent(query)}&limit=20`, { headers: { 'Authorization': `OAuth ${config.token}` } }); if (!response.ok) { console.error('SoundCloud search failed:', response.status); if (response.status === 401) { console.log('SoundCloud token expired or invalid'); } return []; } const tracks = await response.json(); if (!Array.isArray(tracks)) { console.log('No SoundCloud results found'); return []; } const results = tracks.map(track => ({ id: `soundcloud-${track.id}`, title: track.title, artist: track.user?.username || 'Unknown Artist', album: track.label_name || 'SoundCloud', duration: Math.floor((track.duration || 0) / 1000), sources: ['soundcloud'], soundcloudId: track.id, soundcloudUrl: track.permalink_url, albumArt: track.artwork_url?.replace('-large', '-t500x500') || track.user?.avatar_url, streamable: track.streamable && track.access !== 'blocked', waveformUrl: track.waveform_url })); console.log(`Found ${results.length} SoundCloud results`); return results; } catch (error) { console.error('SoundCloud search error:', error); return []; } }","resolve":"async function(artist, track, album, config) { const query = `${artist} ${track}`; const results = await this.search(query, config); return results[0] || null; }","lookupUrl":"async function(url, config) { if (!config.token) return null; try { const resolveResponse = await fetch(`https://api.soundcloud.com/resolve?url=${encodeURIComponent(url)}`, { headers: { 'Authorization': `OAuth ${config.token}` } }); if (!resolveResponse.ok) return null; const data = await resolveResponse.json(); if (data.location) { const trackResponse = await fetch(data.location.replace('soundcloud:tracks:', ''), { headers: { 'Authorization': `OAuth ${config.token}` } }); if (!trackResponse.ok) return null; const track = await trackResponse.json(); return { id: `soundcloud-${track.id}`, title: track.title, artist: track.user?.username || 'Unknown Artist', album: track.label_name || 'SoundCloud', duration: Math.floor((track.duration || 0) / 1000), sources: ['soundcloud'], soundcloudId: track.id, soundcloudUrl: track.permalink_url, albumArt: track.artwork_url?.replace('-large', '-t500x500'), streamable: track.streamable && track.access !== 'blocked' }; } return null; } catch (error) { console.error('SoundCloud URL lookup error:', error); return null; } }","play":"async function(track, config) { if (!track.soundcloudUrl) { console.error('No SoundCloud URL found'); return false; } try { if (window.electron?.shell?.openExternal) { const result = await window.electron.shell.openExternal(track.soundcloudUrl); return result && result.success; } else { const newWindow = window.open(track.soundcloudUrl, '_blank'); return !!newWindow; } } catch (error) { console.error('Failed to open SoundCloud link:', error); return false; } }","init":"async function(config) { console.log('SoundCloud resolver initialized'); }","cleanup":"async function() { console.log('SoundCloud resolver cleanup'); }"}},
   {"manifest":{"id":"applemusic","name":"Apple Music","version":"1.0.0","author":"Parachord Team","description":"Search and identify tracks via iTunes/Apple Music catalog. URL lookup for music.apple.com links. MusicKit integration available with Apple Developer account.","icon":"🍎","color":"#FA243C","homepage":"https://music.apple.com","email":"support@parachord.dev"},"capabilities":{"resolve":true,"search":true,"stream":true,"browse":false,"urlLookup":true},"urlPatterns":["music.apple.com/*/album/*","music.apple.com/*/song/*","music.apple.com/*/playlist/*","itunes.apple.com/*"],"settings":{"requiresAuth":true,"authType":"musickit","configurable":{"developerToken":{"type":"text","label":"MusicKit Developer Token","default":"","description":"Optional: JWT from Apple Developer account for enhanced features"},"storefront":{"type":"text","label":"Storefront (Country)","default":"us","description":"Apple Music storefront code (e.g., us, gb, jp)"}}},"implementation":{"search":"async function(query, config) { try { if (query.trim().length < 2) { console.log('Query too short (min 2 chars)'); return []; } const storefront = config.storefront || 'us'; if (window.appleMusicSearchWithMusicKit) { return await window.appleMusicSearchWithMusicKit(query, storefront, 20); } console.log('Searching Apple Music/iTunes for:', query); const response = await window.iTunesRateLimiter.fetch('https://itunes.apple.com/search?term=' + encodeURIComponent(query) + '&media=music&entity=song&limit=20&country=' + storefront); if (!response.ok) { console.error('iTunes search failed:', response.status); return []; } const data = await response.json(); if (!data.results || data.results.length === 0) { console.log('No iTunes results found'); return []; } const results = data.results.map(function(track) { return { id: 'applemusic-' + track.trackId, title: track.trackName, artist: track.artistName, album: track.collectionName || 'Single', duration: Math.floor((track.trackTimeMillis || 0) / 1000), sources: ['applemusic'], appleMusicId: String(track.trackId), appleMusicUrl: track.trackViewUrl, albumArt: track.artworkUrl100 ? track.artworkUrl100.replace('100x100', '500x500') : null, previewUrl: track.previewUrl, genre: track.primaryGenreName, releaseDate: track.releaseDate, artistId: track.artistId, collectionId: track.collectionId, isStreamable: track.isStreamable }; }); console.log('Found ' + results.length + ' Apple Music results'); return results; } catch (error) { console.error('Apple Music search error:', error); return []; } }","resolve":"async function(artist, track, album, config) { var normalizeStr = function(s) { return s.toLowerCase().replace(/[^a-z0-9]/g, ''); }; var targetArtist = normalizeStr(artist); var targetTrack = normalizeStr(track); var matchFromResults = function(results) { for (var i = 0; i < results.length; i++) { var r = results[i]; if (normalizeStr(r.artist).includes(targetArtist) && normalizeStr(r.title).includes(targetTrack)) { return r; } } return null; }; if (album) { if (!window._amAlbumCache) { window._amAlbumCache = {}; } if (!window._amAlbumPending) { window._amAlbumPending = {}; } var albumKey = normalizeStr(artist + '|' + album); var cached = window._amAlbumCache[albumKey]; if (cached) { var match = matchFromResults(cached); if (match) { return match; } } if (!cached) { if (window._amAlbumPending[albumKey]) { var albumResults = await window._amAlbumPending[albumKey]; } else { var self = this; var searchPromise = self.search(artist + ' ' + album, config); window._amAlbumPending[albumKey] = searchPromise; var albumResults = await searchPromise; window._amAlbumCache[albumKey] = albumResults; delete window._amAlbumPending[albumKey]; setTimeout(function() { delete window._amAlbumCache[albumKey]; }, 60000); } var match = matchFromResults(albumResults); if (match) { return match; } } } var query = artist + ' ' + track; var results = await this.search(query, config); if (results.length === 0) return null; var match = matchFromResults(results); return match || results[0]; }","lookupUrl":"async function(url, config) { try { console.log('Apple Music URL lookup:', url); var trackId = null; var albumIdMatch = url.match(/\\/album\\/[^/]+\\/(\\d+)/); var trackIdMatch = url.match(/[?&]i=(\\d+)/); var songIdMatch = url.match(/\\/song\\/[^/]+\\/(\\d+)/); if (trackIdMatch) { trackId = trackIdMatch[1]; } else if (songIdMatch) { trackId = songIdMatch[1]; } else if (albumIdMatch && !trackIdMatch) { console.log('URL is for album, not track. Use lookupAlbum instead.'); return null; } if (!trackId) { console.log('Could not extract track ID from URL'); return null; } var storefront = config.storefront || 'us'; if (window.appleMusicLookupSong) { return await window.appleMusicLookupSong(trackId, storefront); } var response = await window.iTunesRateLimiter.fetch('https://itunes.apple.com/lookup?id=' + trackId + '&entity=song'); if (!response.ok) return null; var data = await response.json(); if (!data.results || data.results.length === 0) return null; var track = data.results.find(function(r) { return r.wrapperType === 'track'; }) || data.results[0]; return { id: 'applemusic-' + track.trackId, title: track.trackName, artist: track.artistName, album: track.collectionName || 'Single', duration: Math.floor((track.trackTimeMillis || 0) / 1000), sources: ['applemusic'], appleMusicId: String(track.trackId), appleMusicUrl: track.trackViewUrl || url, albumArt: track.artworkUrl100 ? track.artworkUrl100.replace('100x100', '500x500') : null, previewUrl: track.previewUrl, genre: track.primaryGenreName }; } catch (error) { console.error('Apple Music URL lookup error:', error); return null; } }","lookupAlbum":"async function(url, config) { try { console.log('Apple Music album lookup:', url); var albumIdMatch = url.match(/\\/album\\/[^/]+\\/(\\d+)/); if (!albumIdMatch) { console.log('Could not extract album ID from URL'); return null; } var albumId = albumIdMatch[1]; var storefront = config.storefront || 'us'; if (window.appleMusicLookupAlbum) { var result = await window.appleMusicLookupAlbum(albumId, storefront); if (result) { result.url = url; return result; } } var response = await window.iTunesRateLimiter.fetch('https://itunes.apple.com/lookup?id=' + albumId + '&entity=song&limit=200'); if (!response.ok) return null; var data = await response.json(); if (!data.results || data.results.length === 0) return null; var albumInfo = data.results.find(function(r) { return r.wrapperType === 'collection'; }); var trackResults = data.results.filter(function(r) { return r.wrapperType === 'track'; }); var tracks = trackResults.map(function(track) { return { id: 'applemusic-' + track.trackId, title: track.trackName, artist: track.artistName, album: track.collectionName, duration: Math.floor((track.trackTimeMillis || 0) / 1000), sources: ['applemusic'], appleMusicId: String(track.trackId), appleMusicUrl: track.trackViewUrl, albumArt: track.artworkUrl100 ? track.artworkUrl100.replace('100x100', '500x500') : null, previewUrl: track.previewUrl, trackNumber: track.trackNumber, discNumber: track.discNumber }; }); tracks.sort(function(a, b) { if (a.discNumber !== b.discNumber) return a.discNumber - b.discNumber; return a.trackNumber - b.trackNumber; }); return { id: 'applemusic-album-' + albumId, name: albumInfo ? albumInfo.collectionName : 'Unknown Album', artist: albumInfo ? albumInfo.artistName : (tracks[0] ? tracks[0].artist : 'Unknown Artist'), albumArt: albumInfo && albumInfo.artworkUrl100 ? albumInfo.artworkUrl100.replace('100x100', '500x500') : null, releaseDate: albumInfo ? albumInfo.releaseDate : null, trackCount: albumInfo ? albumInfo.trackCount : tracks.length, tracks: tracks, url: url }; } catch (error) { console.error('Apple Music album lookup error:', error); return null; } }","lookupPlaylist":"async function(url, config) { try { console.log('Apple Music playlist lookup:', url); var playlistIdMatch = url.match(/\\/playlist\\/[^/]+\\/(pl\\.[a-zA-Z0-9]+)/); if (!playlistIdMatch) { console.log('Could not extract playlist ID from URL. Note: iTunes API does not support playlist lookup directly. MusicKit required for full playlist support.'); return null; } var playlistId = playlistIdMatch[1]; console.log('Playlist ID extracted:', playlistId); console.log('Note: Full playlist lookup requires MusicKit API with Apple Developer account.'); console.log('For now, open the playlist URL in browser or use the content script scraper.'); return { id: 'applemusic-playlist-' + playlistId, name: 'Apple Music Playlist', description: 'Playlist lookup requires MusicKit API. Configure your Apple Developer token in resolver settings.', tracks: [], url: url, requiresMusicKit: true }; } catch (error) { console.error('Apple Music playlist lookup error:', error); return null; } }","play":"async function(track, config) { console.log('[AppleMusic] Play called, track:', { id: track.id, appleMusicId: track.appleMusicId, hasUrl: !!track.appleMusicUrl, hasPreview: !!track.previewUrl }); var nativeMusicKitAuthorized = false; if (window.electron && window.electron.musicKit && track.appleMusicId) { try { var authStatus = await window.electron.musicKit.checkAuth(); console.log('[AppleMusic] Native auth status:', authStatus); if (authStatus.success && authStatus.authorized) { nativeMusicKitAuthorized = true; console.log('[AppleMusic] Playing via native MusicKit:', track.appleMusicId); var playResult = await window.electron.musicKit.play(track.appleMusicId); console.log('[AppleMusic] Native play result:', JSON.stringify(playResult)); if (playResult.success) { return true; } console.log('[AppleMusic] Native MusicKit play failed, falling back to preview'); } } catch (e) { console.log('[AppleMusic] Native MusicKit error:', e); } } if (!nativeMusicKitAuthorized) { var musicKitWeb = window.getMusicKitWeb ? window.getMusicKitWeb() : null; if (musicKitWeb && track.appleMusicId) { var status = musicKitWeb.getAuthStatus(); console.log('[AppleMusic] MusicKit JS status:', status); if (status.configured && status.authorized) { try { console.log('[AppleMusic] Playing via MusicKit JS:', track.appleMusicId); await musicKitWeb.play(track.appleMusicId); console.log('[AppleMusic] MusicKit JS playback started'); return true; } catch (mkError) { console.log('[AppleMusic] MusicKit JS play failed:', mkError.message); } } } } if (track.previewUrl) { console.log('[AppleMusic] Trying 30-second preview in-app playback'); try { if (!window._appleMusicPreviewAudio) { window._appleMusicPreviewAudio = new Audio(); window._appleMusicPreviewAudio.addEventListener('ended', function() { console.log('[AppleMusic] Preview ended'); if (window.dispatchEvent) { window.dispatchEvent(new CustomEvent('applemusic-preview-ended')); } }); } window._appleMusicPreviewAudio.src = track.previewUrl; window._appleMusicPreviewAudio.volume = (typeof window._parachordVolume === 'number' ? window._parachordVolume / 100 : 1.0); await window._appleMusicPreviewAudio.play(); console.log('[AppleMusic] Playing 30-second preview in-app'); return true; } catch (audioError) { console.log('[AppleMusic] Preview playback failed:', audioError); } } var urlToOpen = track.appleMusicUrl; if (!urlToOpen) { console.error('[AppleMusic] No Apple Music URL found'); return false; } console.log('[AppleMusic] Opening URL externally:', urlToOpen); try { if (window.electron && window.electron.shell && window.electron.shell.openExternal) { var result = await window.electron.shell.openExternal(urlToOpen); return result && result.success; } else { var newWindow = window.open(urlToOpen, '_blank'); return !!newWindow; } } catch (error) { console.error('[AppleMusic] Failed to open Apple Music link:', error); return false; } }","init":"async function(config) { console.log('Apple Music resolver initialized'); if (config.developerToken && window.getMusicKitWeb) { console.log('[AppleMusic] Configuring MusicKit JS with developer token'); try { var musicKitWeb = window.getMusicKitWeb(); await musicKitWeb.configure(config.developerToken, 'Parachord', '1.0.0'); console.log('[AppleMusic] MusicKit JS configured successfully'); var status = musicKitWeb.getAuthStatus(); if (!status.authorized) { console.log('[AppleMusic] MusicKit JS not authorized yet - will prompt on first play'); } } catch (configError) { console.error('[AppleMusic] Failed to configure MusicKit JS:', configError); } } if (window.electron && window.electron.musicKit) { window.electron.musicKit.isAvailable().then(function(avail) { if (avail) { console.log('Native MusicKit available for Apple Music playback'); } }); } }","cleanup":"async function() { console.log('Apple Music resolver cleanup'); var musicKitWeb = window.getMusicKitWeb ? window.getMusicKitWeb() : null; if (musicKitWeb) { try { await musicKitWeb.stop(); } catch (e) {} } }"}},
   {"manifest":{"id":"youtube","name":"YouTube","version":"1.0.0","author":"Parachord Team","description":"Search and play music videos from YouTube. Free with ads. Opens videos in your browser.","icon":"🎥","color":"#FF0000","homepage":"https://youtube.com","email":"support@parachord.dev"},"capabilities":{"resolve":true,"search":true,"stream":true,"browse":false,"urlLookup":true},"urlPatterns":["youtube.com/watch*","youtu.be/*","*.youtube.com/watch*"],"settings":{"requiresAuth":false,"authType":"none","configurable":{}},"implementation":{"search":"async function(query, config) { try { console.log('Searching YouTube for:', query); const response = await fetch('https://www.youtube.com/results?search_query=' + encodeURIComponent(query), { headers: { 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36' } }); if (!response.ok) { console.error('YouTube search failed:', response.status); return []; } const html = await response.text(); const match = html.match(/var ytInitialData = (\\{.*?\\});/s); if (!match) { console.log('Could not extract YouTube data'); return []; } const data = JSON.parse(match[1]); const contents = data?.contents?.twoColumnSearchResultsRenderer?.primaryContents?.sectionListRenderer?.contents || []; const results = []; for (const section of contents) { const items = section?.itemSectionRenderer?.contents || []; for (const item of items) { const video = item?.videoRenderer; if (!video || !video.videoId) continue; if (results.length >= 20) break; const title = video.title?.runs?.[0]?.text || ''; const artist = (video.ownerText?.runs?.[0]?.text || 'Unknown').replace(/ - Topic$/, ''); const lengthText = video.lengthText?.simpleText || ''; const parts = lengthText.split(':').map(Number); let duration = 0; if (parts.length === 3) duration = parts[0] * 3600 + parts[1] * 60 + parts[2]; else if (parts.length === 2) duration = parts[0] * 60 + parts[1]; const thumbnail = video.thumbnail?.thumbnails?.slice(-1)[0]?.url || ''; results.push({ id: 'youtube-' + video.videoId, title: title, artist: artist, album: 'YouTube', duration: duration, sources: ['youtube'], youtubeId: video.videoId, youtubeUrl: 'https://www.youtube.com/watch?v=' + video.videoId, albumArt: thumbnail }); } } console.log('Found ' + results.length + ' YouTube results'); return results; } catch (error) { console.error('YouTube search error:', error); return []; } }","resolve":"async function(artist, track, album, config) { var query = artist + ' ' + track; var results = await this.search(query, config); return results[0] || null; }","lookupUrl":"async function(url, config) { try { var videoIdMatch = url.match(/(?:youtube\\.com\\/watch\\?v=|youtu\\.be\\/)([a-zA-Z0-9_-]{11})/); if (!videoIdMatch) return null; var videoId = videoIdMatch[1]; var response = await fetch('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=' + videoId + '&format=json'); if (!response.ok) return null; var data = await response.json(); return { id: 'youtube-' + videoId, title: data.title || 'Unknown', artist: (data.author_name || 'Unknown').replace(/ - Topic$/, ''), album: 'YouTube', duration: 0, sources: ['youtube'], youtubeId: videoId, youtubeUrl: 'https://www.youtube.com/watch?v=' + videoId, albumArt: data.thumbnail_url || '' }; } catch (error) { console.error('YouTube URL lookup error:', error); return null; } }","play":"async function(track, config) { var url = track.youtubeUrl || ('https://www.youtube.com/watch?v=' + track.youtubeId); if (!url) { console.error('No YouTube URL found'); return false; } try { if (window.electron?.shell?.openExternal) { var result = await window.electron.shell.openExternal(url); return result && result.success; } else { window.open(url, '_blank'); return true; } } catch (error) { console.error('Failed to open YouTube link:', error); return false; } }","init":"async function(config) { console.log('YouTube resolver initialized'); }","cleanup":"async function() { console.log('YouTube resolver cleanup'); }"}},
@@ -7543,8 +7543,12 @@ const Parachord = () => {
 
   // Generate a hash of current resolver settings for cache invalidation
   const getResolverSettingsHash = () => {
-    const sortedActive = [...activeResolvers].sort().join(',');
-    const sortedOrder = [...resolverOrder].join(',');
+    // Only include resolvers that are both active AND loaded — an active resolver
+    // that hasn't loaded yet (e.g. newly added builtin like qobuz) shouldn't
+    // invalidate every cached entry by changing the hash.
+    const loadedIds = new Set(loadedResolvers.map(r => r.id));
+    const sortedActive = [...activeResolvers].filter(id => loadedIds.has(id)).sort().join(',');
+    const sortedOrder = [...resolverOrder].filter(id => loadedIds.has(id)).join(',');
     return `${sortedActive}|${sortedOrder}`;
   };
 
@@ -7624,10 +7628,6 @@ const Parachord = () => {
             }
           }
         }
-
-        // Hide unreleased resolvers (not ready for users yet)
-        const hiddenResolvers = ['qobuz'];
-        resolversToLoad = resolversToLoad.filter(axe => !hiddenResolvers.includes(axe.manifest?.id));
 
         // Filter out user-uninstalled resolvers (they can reinstall from marketplace)
         // But don't filter meta services that the user has explicitly enabled in their config
@@ -17709,11 +17709,26 @@ ${trackListXml}
     }
 
     try {
+      // Batch-load all caches in parallel (each is an independent IPC roundtrip)
+      const [
+        albumArtData, artistData, trackSourcesData, artistImageData,
+        albumReleaseIdData, playlistCoverData, chartsData, newReleasesData
+      ] = await Promise.all([
+        window.electron.store.get('cache_album_art'),
+        window.electron.store.get('cache_artist_data'),
+        window.electron.store.get('cache_track_sources'),
+        window.electron.store.get('cache_artist_images'),
+        window.electron.store.get('cache_album_release_ids'),
+        window.electron.store.get('cache_playlist_covers'),
+        window.electron.store.get('cache_charts'),
+        window.electron.store.get('cache_new_releases')
+      ]);
+
+      const now = Date.now();
+
       // Load album art cache (keep full { url, timestamp } structure)
-      const albumArtData = await window.electron.store.get('cache_album_art');
       if (albumArtData) {
         // Filter out expired and null entries — only keep valid URLs
-        const now = Date.now();
         const validEntries = Object.entries(albumArtData).filter(
           ([_, entry]) => entry && entry.url && entry.timestamp && (now - entry.timestamp) < CACHE_TTL.albumArt
         );
@@ -17724,10 +17739,8 @@ ${trackListXml}
       // Load artist data cache
       // Cache version 2: Added release-group categorization (live, compilation)
       const ARTIST_CACHE_VERSION = 2;
-      const artistData = await window.electron.store.get('cache_artist_data');
       if (artistData) {
         // Filter out expired entries and entries from old cache versions
-        const now = Date.now();
         const validEntries = Object.entries(artistData).filter(
           ([_, entry]) => entry.cacheVersion === ARTIST_CACHE_VERSION &&
                          now - entry.timestamp < CACHE_TTL.artistData
@@ -17738,10 +17751,8 @@ ${trackListXml}
       }
 
       // Load track sources cache
-      const trackSourcesData = await window.electron.store.get('cache_track_sources');
       if (trackSourcesData) {
         // Filter out expired entries
-        const now = Date.now();
         const validEntries = Object.entries(trackSourcesData).filter(
           ([_, entry]) => now - entry.timestamp < CACHE_TTL.trackSources
         );
@@ -17750,10 +17761,8 @@ ${trackListXml}
       }
 
       // Load artist image cache
-      const artistImageData = await window.electron.store.get('cache_artist_images');
       if (artistImageData) {
         // Filter out expired entries
-        const now = Date.now();
         const validEntries = Object.entries(artistImageData).filter(
           ([_, entry]) => now - entry.timestamp < CACHE_TTL.artistImage
         );
@@ -17762,17 +17771,14 @@ ${trackListXml}
       }
 
       // Load album-to-release-ID mapping cache (for Critic's Picks and track art lookups)
-      const albumReleaseIdData = await window.electron.store.get('cache_album_release_ids');
       if (albumReleaseIdData) {
         albumToReleaseIdCache.current = albumReleaseIdData;
         console.log(`📦 Loaded ${Object.keys(albumReleaseIdData).length} album-to-release-ID mappings from cache`);
       }
 
       // Load playlist cover cache
-      const playlistCoverData = await window.electron.store.get('cache_playlist_covers');
       if (playlistCoverData) {
         // Filter out expired entries
-        const now = Date.now();
         const validEntries = Object.entries(playlistCoverData).filter(
           ([_, entry]) => now - entry.timestamp < CACHE_TTL.playlistCover
         );
@@ -17781,10 +17787,8 @@ ${trackListXml}
       }
 
       // Load charts cache
-      const chartsData = await window.electron.store.get('cache_charts');
       if (chartsData) {
         // Filter out expired entries
-        const now = Date.now();
         const validEntries = Object.entries(chartsData).filter(
           ([_, entry]) => entry && entry.timestamp && (now - entry.timestamp) < CACHE_TTL.charts
         );
@@ -17793,7 +17797,6 @@ ${trackListXml}
       }
 
       // Load new releases cache and show instantly on Home
-      const newReleasesData = await window.electron.store.get('cache_new_releases');
       if (newReleasesData && newReleasesData.releases && newReleasesData.timestamp != null) {
         // Filter out broadcasts that may have been cached before the filter was added
         const filteredReleases = newReleasesData.releases.filter(r =>
@@ -17829,8 +17832,13 @@ ${trackListXml}
         }
       }
 
+      // Batch-load AI suggestions and view restoration data in parallel
+      const [aiSuggestionsData, savedLastView] = await Promise.all([
+        window.electron.store.get('cache_ai_suggestions'),
+        window.electron.store.get('last_active_view')
+      ]);
+
       // Load AI suggestions cache (show previous session's suggestions instantly)
-      const aiSuggestionsData = await window.electron.store.get('cache_ai_suggestions');
       if (aiSuggestionsData && (aiSuggestionsData.albums?.length > 0 || aiSuggestionsData.artists?.length > 0)) {
         setHomeData(prev => ({
           ...prev,
@@ -17897,11 +17905,8 @@ ${trackListXml}
       }
 
       // *** EARLY VIEW RESTORATION ***
-      // Load and set activeView immediately after display-critical cached data (new releases, AI suggestions)
+      // Set activeView immediately after display-critical cached data (new releases, AI suggestions)
       // so the UI can render with cached results while the rest of settings continue loading.
-      // Previously this was at the end of loadCacheFromStore, causing a 10+ second blank screen
-      // while resolver auth checks, friends, preferences, etc. loaded sequentially.
-      const savedLastView = await window.electron.store.get('last_active_view');
       if (savedLastView) {
         const validViews = ['home', 'library', 'search', 'artist', 'playlists', 'playlist-view', 'discover', 'critics-picks', 'recommendations', 'history', 'settings', 'friends', 'friendHistory', 'new-releases'];
         if (validViews.includes(savedLastView.view)) {
@@ -18027,13 +18032,45 @@ ${trackListXml}
         setViewHistory(['home']);
       }
 
-      // Load resolver settings
-      const savedActiveResolvers = await window.electron.store.get('active_resolvers');
-      const savedResolverOrder = await window.electron.store.get('resolver_order');
+      // Batch-load all resolver settings and user preferences in parallel
+      const [
+        savedActiveResolvers, savedResolverOrder, savedMetaServiceConfigs,
+        savedAppleMusicDevToken, savedFriends, savedPinnedFriendIds,
+        savedAutoPinnedFriendIds, savedVolumeOffsets, savedSkipExternalPrompt,
+        savedAutoLaunchSpotify, savedSkipUnsavedFriendWarning, savedRememberQueue,
+        savedShowDiscoveryBadges, savedPlaylistsViewMode, savedAiIncludeHistory,
+        savedBlocklist, savedResolverBlocklist, savedAiChatHistories,
+        savedChatProvider, savedSeenRecommendations, savedSeenCriticsPicks,
+        savedSeenCharts
+      ] = await Promise.all([
+        window.electron.store.get('active_resolvers'),
+        window.electron.store.get('resolver_order'),
+        window.electron.store.get('meta_service_configs'),
+        window.electron.store.get('applemusic_developer_token'),
+        window.electron.store.get('friends'),
+        window.electron.store.get('pinnedFriendIds'),
+        window.electron.store.get('autoPinnedFriendIds'),
+        window.electron.store.get('resolver_volume_offsets'),
+        window.electron.store.get('skip_external_prompt'),
+        window.electron.store.get('auto_launch_spotify'),
+        window.electron.store.get('skip_unsaved_friend_warning'),
+        window.electron.store.get('remember_queue'),
+        window.electron.store.get('show_discovery_badges'),
+        window.electron.store.get('playlists_view_mode'),
+        window.electron.store.get('ai_include_history'),
+        window.electron.store.get('recommendation_blocklist'),
+        window.electron.store.get('resolver_blocklist'),
+        window.electron.store.get('ai_chat_histories'),
+        window.electron.store.get('selected_chat_provider'),
+        window.electron.store.get('discovery_seen_recommendations'),
+        window.electron.store.get('discovery_seen_criticsPicks'),
+        window.electron.store.get('discovery_seen_charts')
+      ]);
 
       if (savedActiveResolvers) {
-        // Deduplicate in case of corrupted data
-        const dedupedActive = [...new Set(savedActiveResolvers)];
+        // Deduplicate and strip removed resolvers (e.g. qobuz) from persisted data
+        const removedResolvers = ['qobuz'];
+        const dedupedActive = [...new Set(savedActiveResolvers)].filter(id => !removedResolvers.includes(id));
 
         // Remember the user's saved active resolvers so we can distinguish
         // auth-gated removal (should re-enable) from user-disabled (should not).
@@ -18085,15 +18122,15 @@ ${trackListXml}
       }
 
       if (savedResolverOrder) {
-        // Deduplicate in case of corrupted data (preserving order of first occurrence)
-        const dedupedOrder = [...new Set(savedResolverOrder)];
+        // Deduplicate and strip removed resolvers from persisted data
+        const removedResolvers = ['qobuz'];
+        const dedupedOrder = [...new Set(savedResolverOrder)].filter(id => !removedResolvers.includes(id));
         setResolverOrder(dedupedOrder);
         savedResolverOrderRef.current = dedupedOrder;
         console.log(`📦 Loaded resolver order from storage (${dedupedOrder.length} resolvers)`);
       }
 
       // Load meta service configs (Last.fm, AI services, etc.)
-      const savedMetaServiceConfigs = await window.electron.store.get('meta_service_configs');
       if (savedMetaServiceConfigs) {
         setMetaServiceConfigs(savedMetaServiceConfigs);
         console.log('📦 Loaded meta service configs:', Object.keys(savedMetaServiceConfigs).join(', '));
@@ -18110,7 +18147,6 @@ ${trackListXml}
       }
 
       // Load Apple Music developer token
-      const savedAppleMusicDevToken = await window.electron.store.get('applemusic_developer_token');
       if (savedAppleMusicDevToken) {
         setAppleMusicDeveloperToken(savedAppleMusicDevToken);
         // Also save to localStorage for MusicKit JS to use
@@ -18119,7 +18155,6 @@ ${trackListXml}
       }
 
       // Load friends from storage
-      const savedFriends = await window.electron.store.get('friends');
       if (savedFriends && Array.isArray(savedFriends)) {
         // Migrate friends to have savedToCollection: true (covers both false and undefined from older versions)
         const migratedFriends = savedFriends.map(f =>
@@ -18134,7 +18169,6 @@ ${trackListXml}
         console.log(`👥 Loaded ${migratedFriends.length} friends from storage`);
       }
 
-      const savedPinnedFriendIds = await window.electron.store.get('pinnedFriendIds');
       if (savedPinnedFriendIds && Array.isArray(savedPinnedFriendIds)) {
         // Dedupe in case duplicates were saved
         const dedupedIds = [...new Set(savedPinnedFriendIds)];
@@ -18142,7 +18176,6 @@ ${trackListXml}
         console.log(`📌 Loaded ${dedupedIds.length} pinned friends from storage`);
       }
 
-      const savedAutoPinnedFriendIds = await window.electron.store.get('autoPinnedFriendIds');
       if (savedAutoPinnedFriendIds && Array.isArray(savedAutoPinnedFriendIds)) {
         // Dedupe in case duplicates were saved
         const dedupedIds = [...new Set(savedAutoPinnedFriendIds)];
@@ -18151,21 +18184,18 @@ ${trackListXml}
       }
 
       // Load volume normalization offsets
-      const savedVolumeOffsets = await window.electron.store.get('resolver_volume_offsets');
       if (savedVolumeOffsets) {
         setResolverVolumeOffsets(prev => ({ ...prev, ...savedVolumeOffsets }));
         console.log('📦 Loaded volume normalization offsets');
       }
 
       // Load skip external prompt preference
-      const savedSkipExternalPrompt = await window.electron.store.get('skip_external_prompt');
       if (savedSkipExternalPrompt !== undefined) {
         setSkipExternalPrompt(savedSkipExternalPrompt);
         console.log('📦 Loaded skip external prompt preference:', savedSkipExternalPrompt);
       }
 
       // Load auto-launch Spotify preference and trigger launch if enabled
-      const savedAutoLaunchSpotify = await window.electron.store.get('auto_launch_spotify');
       if (savedAutoLaunchSpotify !== undefined) {
         setAutoLaunchSpotify(savedAutoLaunchSpotify);
         console.log('📦 Loaded auto-launch Spotify preference:', savedAutoLaunchSpotify);
@@ -18178,42 +18208,36 @@ ${trackListXml}
       }
 
       // Load skip unsaved friend warning preference
-      const savedSkipUnsavedFriendWarning = await window.electron.store.get('skip_unsaved_friend_warning');
       if (savedSkipUnsavedFriendWarning !== undefined) {
         setSkipUnsavedFriendWarning(savedSkipUnsavedFriendWarning);
         console.log('📦 Loaded skip unsaved friend warning preference:', savedSkipUnsavedFriendWarning);
       }
 
       // Load remember queue preference
-      const savedRememberQueue = await window.electron.store.get('remember_queue');
       if (savedRememberQueue !== undefined) {
         setRememberQueue(savedRememberQueue);
         console.log('📦 Loaded remember queue preference:', savedRememberQueue);
       }
 
       // Load show discovery badges preference
-      const savedShowDiscoveryBadges = await window.electron.store.get('show_discovery_badges');
       if (savedShowDiscoveryBadges !== undefined) {
         setShowDiscoveryBadges(savedShowDiscoveryBadges);
         console.log('📦 Loaded show discovery badges preference:', savedShowDiscoveryBadges);
       }
 
       // Load playlists view mode preference
-      const savedPlaylistsViewMode = await window.electron.store.get('playlists_view_mode');
       if (savedPlaylistsViewMode) {
         setPlaylistsViewMode(savedPlaylistsViewMode);
         console.log('📦 Loaded playlists view mode:', savedPlaylistsViewMode);
       }
 
       // Load AI include history preference
-      const savedAiIncludeHistory = await window.electron.store.get('ai_include_history');
       if (savedAiIncludeHistory !== undefined) {
         setAiIncludeHistory(savedAiIncludeHistory);
         console.log('📦 Loaded AI include history preference:', savedAiIncludeHistory);
       }
 
       // Load recommendation blocklist
-      const savedBlocklist = await window.electron.store.get('recommendation_blocklist');
       if (savedBlocklist && typeof savedBlocklist === 'object') {
         setRecommendationBlocklist(savedBlocklist);
         const totalBlocked = (savedBlocklist.artists?.length || 0) + (savedBlocklist.albums?.length || 0) + (savedBlocklist.tracks?.length || 0);
@@ -18221,30 +18245,24 @@ ${trackListXml}
       }
 
       // Load resolver blocklist
-      const savedResolverBlocklist = await window.electron.store.get('resolver_blocklist');
       if (Array.isArray(savedResolverBlocklist)) {
         setResolverBlocklist(savedResolverBlocklist);
         console.log('📦 Loaded resolver blocklist:', savedResolverBlocklist.length, 'entries');
       }
 
       // Load AI chat histories (per-provider)
-      const savedAiChatHistories = await window.electron.store.get('ai_chat_histories');
       if (savedAiChatHistories && typeof savedAiChatHistories === 'object') {
         aiChatHistoriesRef.current = savedAiChatHistories;
         console.log('📦 Loaded AI chat histories for providers:', Object.keys(savedAiChatHistories).join(', '));
       }
 
       // Load last used chat provider
-      const savedChatProvider = await window.electron.store.get('selected_chat_provider');
       if (savedChatProvider) {
         setSelectedChatProvider(savedChatProvider);
         console.log('📦 Loaded last used chat provider:', savedChatProvider);
       }
 
       // Load discovery feature seen hashes (for unread badges)
-      const savedSeenRecommendations = await window.electron.store.get('discovery_seen_recommendations');
-      const savedSeenCriticsPicks = await window.electron.store.get('discovery_seen_criticsPicks');
-      const savedSeenCharts = await window.electron.store.get('discovery_seen_charts');
       discoverySeenHashes.current = {
         recommendations: savedSeenRecommendations || null,
         criticsPicks: savedSeenCriticsPicks || null,
@@ -18252,9 +18270,17 @@ ${trackListXml}
       };
       console.log('📦 Loaded discovery seen hashes');
 
-      // Load saved queue if remember queue is enabled
+      // Load saved queue, playback context, shuffle state, tutorial, and version info in parallel
+      const [savedQueue, savedPlaybackContext, savedShuffleState, tutorialCompleted, dismissedVersion] = await Promise.all([
+        savedRememberQueue ? window.electron.store.get('saved_queue') : Promise.resolve(null),
+        savedRememberQueue ? window.electron.store.get('saved_playback_context') : Promise.resolve(null),
+        savedRememberQueue ? window.electron.store.get('saved_shuffle_state') : Promise.resolve(null),
+        window.electron.store.get('tutorial_completed'),
+        window.electron.store.get('whats_new_dismissed_version')
+      ]);
+
+      // Restore saved queue if remember queue is enabled
       if (savedRememberQueue) {
-        const savedQueue = await window.electron.store.get('saved_queue');
         if (savedQueue && Array.isArray(savedQueue) && savedQueue.length > 0) {
           // Move first track to playbar (paused), rest stays in queue
           const [firstTrack, ...remainingQueue] = savedQueue;
@@ -18266,13 +18292,11 @@ ${trackListXml}
           console.log(`📦 Restored queue: "${firstTrack.title}" ready in playbar, ${remainingQueue.length} tracks in queue`);
         }
         // Restore playback context
-        const savedPlaybackContext = await window.electron.store.get('saved_playback_context');
         if (savedPlaybackContext) {
           setPlaybackContext(savedPlaybackContext);
           console.log(`📦 Restored playback context: ${savedPlaybackContext.type}`);
         }
         // Restore shuffle state
-        const savedShuffleState = await window.electron.store.get('saved_shuffle_state');
         if (savedShuffleState) {
           setShuffleMode(savedShuffleState.shuffleMode || false);
           originalQueueRef.current = savedShuffleState.originalQueue || null;
@@ -18283,14 +18307,12 @@ ${trackListXml}
       // (View restoration already happened earlier — right after loading display-critical caches)
 
       // Check if this is the first run (tutorial not completed)
-      const tutorialCompleted = await window.electron.store.get('tutorial_completed');
       if (!tutorialCompleted) {
         console.log('🎓 First run detected - showing tutorial');
         setFirstRunTutorial(prev => ({ ...prev, open: true }));
       }
 
       // Load What's New dismissed version, current app version, and release highlights
-      const dismissedVersion = await window.electron.store.get('whats_new_dismissed_version');
       if (dismissedVersion) {
         setWhatsNewDismissedVersion(dismissedVersion);
       }
@@ -19809,10 +19831,20 @@ ${trackListXml}
     // Check abort after cache check
     if (signal?.aborted) return;
 
-    // If we have valid persisted sources (no in-memory cache), use them and resolve missing
-    // Note: hasValidPersistedSources counts noMatch sentinels; check for real sources
+    // If all persisted sources are noMatch sentinels and no resolvers are missing,
+    // every resolver has already been tried and found nothing — don't re-query.
     const realPersistedSources = filterNoMatch(persistedSources);
     const hasRealPersistedSources = Object.keys(realPersistedSources).length > 0;
+    if (!cacheValid && hasValidPersistedSources && !hasRealPersistedSources && missingResolvers.length === 0) {
+      console.log(`📦 All persisted sources are noMatch for: ${track.title} — skipping re-resolve`);
+      // Cache the all-noMatch state in memory so we don't re-check persisted sources next time
+      trackSourcesCache.current[cacheKey] = {
+        sources: persistedSources,
+        timestamp: now,
+        resolverHash: currentResolverHash
+      };
+      return {};
+    }
     if (!cacheValid && hasRealPersistedSources && missingResolvers.length === 0) {
       console.log(`📦 Using persisted sources for: ${track.title} (sources: ${persistedResolverIds.join(', ')})`);
 
