@@ -17,6 +17,22 @@ console.log('SPOTIFY_CLIENT_ID:', process.env.SPOTIFY_CLIENT_ID ? '✅ .env' : '
 console.log('MUSICKIT_DEVELOPER_TOKEN:', process.env.MUSICKIT_DEVELOPER_TOKEN ? '✅ .env' : '⚪ Will generate from .p8 key');
 console.log('=========================');
 
+// Fix Rosetta 2 auto-update trap: when an x64 Electron build runs on Apple
+// Silicon via Rosetta 2, process.arch reports 'x64', causing electron-updater
+// to fetch latest-mac.yml (Intel) instead of latest-mac-arm64.yml. Override
+// process.arch to the native hardware architecture so the next auto-update
+// downloads the correct Apple Silicon build, permanently breaking the cycle.
+if (process.platform === 'darwin' && process.arch === 'x64') {
+  try {
+    const nativeArch = require('child_process')
+      .execFileSync('uname', ['-m'], { encoding: 'utf-8' }).trim();
+    if (nativeArch === 'arm64') {
+      Object.defineProperty(process, 'arch', { value: 'arm64' });
+      console.log('Detected Apple Silicon — auto-updater will fetch arm64 updates');
+    }
+  } catch { /* ignore — worst case, updater uses x64 manifest */ }
+}
+
 const { app, BrowserWindow, ipcMain, globalShortcut, shell, protocol, Menu } = require('electron');
 const path = require('path');
 
