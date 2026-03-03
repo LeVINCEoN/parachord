@@ -52875,23 +52875,23 @@ useEffect(() => {
                     },
                       // Checkbox placeholder
                       React.createElement('div', {
-                        className: 'animate-shimmer',
-                        style: { width: '16px', height: '16px', borderRadius: '4px', flexShrink: 0, background: 'linear-gradient(90deg, #e5e7eb, #f3f4f6, #e5e7eb)', backgroundSize: '200% 100%' }
+                        className: 'rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        style: { width: '16px', height: '16px', flexShrink: 0, backgroundSize: '200% 100%' }
                       }),
                       // Image placeholder
                       React.createElement('div', {
-                        className: 'animate-shimmer',
-                        style: { width: '40px', height: '40px', borderRadius: '6px', flexShrink: 0, background: 'linear-gradient(90deg, #e5e7eb, #f3f4f6, #e5e7eb)', backgroundSize: '200% 100%' }
+                        className: 'rounded-md bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        style: { width: '40px', height: '40px', flexShrink: 0, backgroundSize: '200% 100%' }
                       }),
                       // Text lines
                       React.createElement('div', { style: { flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' } },
                         React.createElement('div', {
-                          className: 'animate-shimmer',
-                          style: { height: '14px', borderRadius: '4px', width: `${55 + (i * 17) % 35}%`, background: 'linear-gradient(90deg, #e5e7eb, #f3f4f6, #e5e7eb)', backgroundSize: '200% 100%' }
+                          className: 'rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                          style: { height: '14px', width: `${55 + (i * 17) % 35}%`, backgroundSize: '200% 100%' }
                         }),
                         React.createElement('div', {
-                          className: 'animate-shimmer',
-                          style: { height: '12px', borderRadius: '4px', width: '80px', background: 'linear-gradient(90deg, #e5e7eb, #f3f4f6, #e5e7eb)', backgroundSize: '200% 100%' }
+                          className: 'rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                          style: { height: '12px', width: '80px', backgroundSize: '200% 100%' }
                         })
                       )
                     )
