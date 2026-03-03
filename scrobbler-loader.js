@@ -498,19 +498,36 @@ class LastFmScrobbler extends BaseScrobbler {
       body: body.toString()
     });
 
-    if (!response.success) {
-      throw new Error(`Last.fm API request failed: ${response.error || response.status}`);
-    }
-
+    // Parse response body (Last.fm returns JSON with error details even on non-2xx status)
     let data;
+    const responseText = response.text || '';
     try {
-      data = JSON.parse(response.text);
+      data = JSON.parse(responseText);
     } catch (parseErr) {
-      throw new Error(`Failed to parse API response as JSON: ${(response.text || '').substring(0, 200)}`);
+      // If we can't parse JSON and the request failed, throw with HTTP status
+      if (!response.success) {
+        throw new Error(`Last.fm API request failed: ${response.error || `HTTP ${response.status}`}`);
+      }
+      throw new Error(`Failed to parse API response as JSON: ${responseText.substring(0, 200)}`);
     }
 
+    // Check for Last.fm API error in the parsed response
     if (data.error) {
-      throw new Error(`Last.fm API error ${data.error}: ${data.message}`);
+      const errorCode = data.error;
+      const errorMessage = data.message || 'Unknown error';
+      // Error 9: Invalid session key - user needs to re-authenticate
+      // Error 13: Invalid method signature
+      // Error 10: Invalid API key
+      // Error 26: Suspended API key
+      if (errorCode === 9) {
+        console.warn(`[LastFm] Session key is invalid or expired. Please re-authenticate in Settings > Scrobbling.`);
+      }
+      throw new Error(`Last.fm API error ${errorCode}: ${errorMessage}`);
+    }
+
+    // If HTTP request failed but no JSON error code, throw generic error
+    if (!response.success) {
+      throw new Error(`Last.fm API request failed: ${response.error || `HTTP ${response.status}`}`);
     }
 
     return data;
