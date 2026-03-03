@@ -5067,6 +5067,7 @@ const Parachord = () => {
   const [activeResolvers, setActiveResolvers] = useState(['bandcamp', 'localfiles']);
   const [resolverOrder, setResolverOrder] = useState(['bandcamp', 'localfiles']);
   const resolverSettingsLoaded = useRef(false);  // Track if we've loaded settings from storage
+  const resolverAuthSettledTime = useRef(0);  // Timestamp when auth settling completes (for startup grace period)
   const activeResolversRef = useRef(activeResolvers);  // Ref to avoid stale closure in save
   const resolverOrderRef = useRef(resolverOrder);  // Ref to avoid stale closure in save
   const savedResolverOrderRef = useRef(null);  // Persisted order from storage — used to restore priority position when re-enabling
@@ -12003,6 +12004,22 @@ ${trackListXml}
   useEffect(() => {
     // Skip on initial mount (when both are empty)
     if (activeResolvers.length === 0 && resolverOrder.length === 0) return;
+
+    // Skip during startup auth settling — resolver list changes as tokens are
+    // checked and resolvers are removed/re-enabled. Wiping caches during this
+    // phase causes unnecessary UI shimmer and re-resolution of already-resolved tracks.
+    if (!resolverSettingsLoaded.current) return;
+
+    // Grace period: skip cache-wiping for 15 seconds after auth settling completes.
+    // During this window, resolvers may be re-enabled by token refresh callbacks
+    // (checkSpotifyToken, checkSoundcloudToken, etc.) which run on mount and call
+    // reEnableResolver(). These are auth-restoration changes, not user-initiated.
+    if (resolverAuthSettledTime.current === 0) {
+      // First run after settings loaded — record the settling time and skip
+      resolverAuthSettledTime.current = Date.now();
+      return;
+    }
+    if (Date.now() - resolverAuthSettledTime.current < 15000) return;
 
     // Clear scheduler's resolved set so tracks can be re-queued with new resolver config
     resolutionSchedulerRef.current?.clearResolved();
