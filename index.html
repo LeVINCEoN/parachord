@@ -189,6 +189,14 @@
       background-size: 200% 100% !important;
     }
 
+    /* Shimmer background classes (theme-aware via CSS variables when available) */
+    .shimmer-light {
+      background: linear-gradient(to right, var(--shimmer-from, #e5e7eb), var(--shimmer-via, #f3f4f6), var(--shimmer-to, #e5e7eb));
+    }
+    .shimmer-strong {
+      background: linear-gradient(to right, var(--shimmer-from, #d1d5db), var(--shimmer-via, #e5e7eb), var(--shimmer-to, #d1d5db));
+    }
+
     /* Marquee scrolling animation for long text */
     @keyframes marquee-scroll {
       0% { transform: translateX(0); }

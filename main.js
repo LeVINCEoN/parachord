@@ -2194,6 +2194,12 @@ async function ensureValidSpotifyToken(force = false) {
         store.set('spotify_refresh_token', data.refresh_token);
       }
 
+      // Preserve scopes from refresh response so the sync scope check
+      // stays accurate after token refreshes.
+      if (data.scope) {
+        store.set('spotify_token_scopes', data.scope);
+      }
+
       console.log('✅ [Sync] Token refreshed, expires:', new Date(newExpiry).toISOString());
       return data.access_token;
     } catch (error) {
@@ -2556,6 +2562,12 @@ ipcMain.handle('spotify-check-token', async (event, { force = false } = {}) => {
       // Update refresh token if a new one was provided
       if (data.refresh_token) {
         store.set('spotify_refresh_token', data.refresh_token);
+      }
+
+      // Preserve scopes from refresh response so the sync scope check
+      // stays accurate after token refreshes.
+      if (data.scope) {
+        store.set('spotify_token_scopes', data.scope);
       }
 
       console.log('New token expiry:', new Date(newExpiry).toISOString());
@@ -4878,17 +4890,23 @@ ipcMain.handle('sync:start', async (event, providerId, options = {}) => {
   // For Spotify, check that the token was granted with the scopes needed for
   // library sync.  Tokens obtained before these scopes were added will still
   // work for playback but will 403 on library endpoints.
+  // If no scopes are stored at all (legacy auth before scope tracking was
+  // added), skip the check and let the actual API calls handle any 403.
   if (providerId === 'spotify') {
-    const grantedScopes = store.get('spotify_token_scopes') || '';
-    const requiredSyncScopes = ['user-library-read', 'user-follow-read', 'playlist-read-private'];
-    const missing = requiredSyncScopes.filter(s => !grantedScopes.includes(s));
-    if (missing.length > 0) {
-      console.log(`[Sync] Token missing required scopes: ${missing.join(', ')}. Prompting re-auth.`);
-      return {
-        success: false,
-        error: 'Missing permissions. Please disconnect and reconnect Spotify to grant the required permissions for library sync.',
-        errorCode: 'missing_scopes'
-      };
+    const grantedScopes = store.get('spotify_token_scopes');
+    if (grantedScopes) {
+      const requiredSyncScopes = ['user-library-read', 'user-follow-read', 'playlist-read-private'];
+      const missing = requiredSyncScopes.filter(s => !grantedScopes.includes(s));
+      if (missing.length > 0) {
+        console.log(`[Sync] Token missing required scopes: ${missing.join(', ')}. Prompting re-auth.`);
+        return {
+          success: false,
+          error: 'Missing permissions. Please disconnect and reconnect Spotify to grant the required permissions for library sync.',
+          errorCode: 'missing_scopes'
+        };
+      }
+    } else {
+      console.log('[Sync] No stored scopes found (legacy auth). Skipping scope check, API will enforce permissions.');
     }
   }
 
