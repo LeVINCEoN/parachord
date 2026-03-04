@@ -42604,8 +42604,10 @@ useEffect(() => {
               )
           ),
           // Filter bar (outside scrollable area)
-          React.createElement('div', {
-            className: 'flex items-center px-6 py-3 bg-white border-b border-gray-200',
+          (() => {
+            const isDark = effectiveTheme === 'dark';
+            return React.createElement('div', {
+            className: `flex items-center px-6 py-3 border-b ${isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`,
             style: { flexShrink: 0 }
           },
             // Source filter dropdown
@@ -42634,7 +42636,7 @@ useEffect(() => {
                   React.createElement('button', {
                     key: 'source-btn',
                     onClick: (e) => { e.stopPropagation(); setConcertsSourceFilterDropdownOpen(!concertsSourceFilterDropdownOpen); },
-                    className: 'flex items-center gap-1 px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors'
+                    className: `flex items-center gap-1 px-3 py-1.5 text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}`
                   },
                     React.createElement('span', null, selectedLabel),
                     React.createElement('svg', { className: 'w-4 h-4', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
@@ -42643,7 +42645,7 @@ useEffect(() => {
                   ),
                   concertsSourceFilterDropdownOpen && React.createElement('div', {
                     key: 'source-dropdown',
-                    className: 'absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg py-1 min-w-[160px] z-30 border border-gray-200'
+                    className: `absolute left-0 top-full mt-1 rounded-lg shadow-lg py-1 min-w-[160px] z-30 border ${isDark ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'}`
                   },
                     sourceOptions.map(option =>
                       React.createElement('button', {
@@ -42653,8 +42655,8 @@ useEffect(() => {
                           setConcertsSourceFilter(option.value);
                           setConcertsSourceFilterDropdownOpen(false);
                         },
-                        className: `w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center justify-between ${
-                          concertsSourceFilter === option.value ? 'text-gray-900 font-medium' : 'text-gray-600'
+                        className: `w-full px-4 py-2 text-left text-sm flex items-center justify-between ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} ${
+                          concertsSourceFilter === option.value ? (isDark ? 'text-white font-medium' : 'text-gray-900 font-medium') : (isDark ? 'text-gray-300' : 'text-gray-600')
                         }`
                       },
                         option.label,
@@ -42676,7 +42678,7 @@ useEffect(() => {
             React.createElement('button', {
               onClick: () => loadConcerts(true),
               disabled: concertsLoading,
-              className: `ml-2 p-1.5 transition-colors ${concertsLoading ? 'text-violet-500' : 'text-gray-400 hover:text-gray-600'}`,
+              className: `ml-2 p-1.5 transition-colors ${concertsLoading ? 'text-violet-500' : (isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600')}`,
               title: concertsLoading ? 'Loading...' : 'Refresh'
             },
               React.createElement('svg', {
@@ -42687,14 +42689,33 @@ useEffect(() => {
               )
             ),
             // Location filter
-            React.createElement('div', { className: 'relative ml-2' },
-              // Location pin button (always visible)
-              React.createElement('button', {
+            React.createElement('div', { className: 'relative ml-2 flex items-center gap-1.5' },
+              // Location chip (shown when a location is active)
+              concertsLocationCoords && React.createElement('button', {
                 onClick: (e) => { e.stopPropagation(); setConcertsLocationOpen(!concertsLocationOpen); },
-                className: `p-1.5 transition-colors ${concertsLocationCoords ? 'text-violet-500' : concertsLocation ? 'text-violet-400' : 'text-gray-400 hover:text-gray-600'}`,
-                title: concertsLocationCoords
-                  ? `${concertsLocation} (${concertsLocationRadius} mi)`
-                  : concertsLocation ? `Filtered: ${concertsLocation}` : 'Filter by location'
+                className: `flex items-center gap-1.5 pl-2 pr-1.5 py-1 rounded-full text-xs font-medium transition-colors ${isDark ? 'bg-violet-500/20 text-violet-300 hover:bg-violet-500/30' : 'bg-violet-50 text-violet-600 hover:bg-violet-100'}`,
+                title: `${concertsLocation} (${concertsLocationRadius} mi radius)`
+              },
+                React.createElement('svg', { className: 'w-3 h-3 flex-shrink-0', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
+                  React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2.5, d: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' })
+                ),
+                React.createElement('span', { className: 'max-w-[120px] truncate' }, concertsLocation),
+                React.createElement('span', { className: isDark ? 'text-violet-400/60' : 'text-violet-400' }, `${concertsLocationRadius}mi`),
+                // X to clear
+                React.createElement('span', {
+                  onClick: (e) => { e.stopPropagation(); setConcertsLocation(''); setConcertsLocationCoords(null); setConcertsLocationRadius(50); },
+                  className: `ml-0.5 rounded-full p-0.5 transition-colors cursor-pointer ${isDark ? 'hover:bg-violet-500/30 text-violet-400' : 'hover:bg-violet-200 text-violet-400'}`
+                },
+                  React.createElement('svg', { className: 'w-3 h-3', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
+                    React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2.5, d: 'M6 18L18 6M6 6l12 12' })
+                  )
+                )
+              ),
+              // Location pin button (shown when no location is active)
+              !concertsLocationCoords && React.createElement('button', {
+                onClick: (e) => { e.stopPropagation(); setConcertsLocationOpen(!concertsLocationOpen); },
+                className: `p-1.5 transition-colors ${concertsLocation ? 'text-violet-400' : (isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600')}`,
+                title: concertsLocation ? `Filtered: ${concertsLocation}` : 'Filter by location'
               },
                 React.createElement('svg', { className: 'w-4 h-4', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
                   React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' }),
@@ -42703,10 +42724,12 @@ useEffect(() => {
               ),
               // Location dropdown panel
               concertsLocationOpen && React.createElement('div', {
-                className: 'absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg z-30 border border-gray-200',
-                style: { width: '260px', padding: '12px' },
+                className: `absolute left-0 top-full mt-1 rounded-xl shadow-lg z-30 border ${isDark ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'}`,
+                style: { width: '280px', padding: '14px' },
                 onClick: (e) => e.stopPropagation()
               },
+                // Header
+                React.createElement('div', { className: `text-xs font-medium mb-3 ${isDark ? 'text-gray-400' : 'text-gray-500'}` }, 'Filter by location'),
                 // Text input row
                 React.createElement('div', { className: 'flex items-center gap-2 mb-3' },
                   React.createElement('input', {
@@ -42729,7 +42752,7 @@ useEffect(() => {
                     },
                     autoFocus: true,
                     placeholder: 'City or region...',
-                    className: 'flex-1 bg-transparent text-gray-700 text-sm placeholder-gray-400 outline-none border border-gray-200 rounded-md px-2.5 py-1.5'
+                    className: `flex-1 text-sm outline-none rounded-lg px-2.5 py-1.5 transition-colors ${isDark ? 'bg-gray-700 text-gray-200 placeholder-gray-500 border border-gray-600 focus:border-violet-500' : 'bg-gray-50 text-gray-700 placeholder-gray-400 border border-gray-200 focus:border-violet-400'}`
                   }),
                   // "Use my location" button
                   React.createElement('button', {
@@ -42746,7 +42769,7 @@ useEffect(() => {
                       setConcertsGeocodingLoading(false);
                     },
                     disabled: concertsGeocodingLoading,
-                    className: 'p-1.5 text-gray-400 hover:text-violet-500 transition-colors flex-shrink-0',
+                    className: `p-1.5 rounded-lg transition-colors flex-shrink-0 ${isDark ? 'text-gray-400 hover:text-violet-400 hover:bg-gray-700' : 'text-gray-400 hover:text-violet-500 hover:bg-gray-100'}`,
                     title: 'Use my location'
                   },
                     concertsGeocodingLoading
@@ -42761,16 +42784,18 @@ useEffect(() => {
                 ),
                 // Status line
                 concertsLocationCoords && React.createElement('div', {
-                  className: 'flex items-center gap-1 text-xs text-green-600 mb-3'
+                  className: `flex items-center gap-1.5 text-xs mb-3 ${isDark ? 'text-emerald-400' : 'text-emerald-600'}`
                 },
-                  React.createElement('span', null, '✓'),
-                  React.createElement('span', null, `${concertsLocation}`)
+                  React.createElement('svg', { className: 'w-3 h-3', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
+                    React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2.5, d: 'M5 13l4 4L19 7' })
+                  ),
+                  React.createElement('span', null, concertsLocation)
                 ),
                 // Radius slider
-                React.createElement('div', { style: { marginBottom: '8px' } },
-                  React.createElement('div', { className: 'flex items-center justify-between mb-1' },
-                    React.createElement('span', { className: 'text-xs text-gray-500' }, 'Radius'),
-                    React.createElement('span', { className: 'text-xs font-medium text-gray-700' }, `${concertsLocationRadius} mi`)
+                React.createElement('div', { style: { marginBottom: '10px' } },
+                  React.createElement('div', { className: 'flex items-center justify-between mb-1.5' },
+                    React.createElement('span', { className: `text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}` }, 'Radius'),
+                    React.createElement('span', { className: `text-xs font-medium ${isDark ? 'text-gray-200' : 'text-gray-700'}` }, `${concertsLocationRadius} mi`)
                   ),
                   React.createElement('input', {
                     type: 'range',
@@ -42784,7 +42809,7 @@ useEffect(() => {
                   })
                 ),
                 // Action buttons row
-                React.createElement('div', { className: 'flex items-center justify-between mt-2 pt-2', style: { borderTop: '1px solid #e5e7eb' } },
+                React.createElement('div', { className: `flex items-center justify-between mt-2 pt-2.5 border-t ${isDark ? 'border-gray-700' : 'border-gray-100'}` },
                   // Clear button
                   React.createElement('button', {
                     onClick: () => {
@@ -42793,7 +42818,7 @@ useEffect(() => {
                       setConcertsLocationRadius(50);
                       setConcertsLocationOpen(false);
                     },
-                    className: 'text-xs text-gray-400 hover:text-gray-600 transition-colors'
+                    className: `text-xs transition-colors ${isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}`
                   }, 'Clear'),
                   // Apply button (geocode if needed)
                   React.createElement('button', {
@@ -42810,8 +42835,8 @@ useEffect(() => {
                       setConcertsLocationOpen(false);
                     },
                     disabled: concertsGeocodingLoading,
-                    className: 'text-xs font-medium text-violet-600 hover:text-violet-700 transition-colors'
-                  }, concertsGeocodingLoading ? 'Looking up...' : 'Done')
+                    className: `text-xs font-medium px-3 py-1 rounded-md transition-colors ${isDark ? 'bg-violet-600 text-white hover:bg-violet-500' : 'bg-violet-500 text-white hover:bg-violet-600'}`
+                  }, concertsGeocodingLoading ? 'Looking up...' : 'Apply')
                 )
               )
             ),
@@ -42819,7 +42844,7 @@ useEffect(() => {
             // Search
             React.createElement('div', { className: 'flex items-center' },
               concertsSearchOpen ?
-                React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-1.5' },
+                React.createElement('div', { className: `flex items-center border rounded-full px-3 py-1.5 ${isDark ? 'border-gray-600' : 'border-gray-300'}` },
                   React.createElement('input', {
                     type: 'text',
                     value: concertsSearch,
@@ -42827,12 +42852,12 @@ useEffect(() => {
                     onBlur: () => { if (!concertsSearch.trim()) setConcertsSearchOpen(false); },
                     autoFocus: true,
                     placeholder: 'Filter...',
-                    className: 'bg-transparent text-gray-700 text-sm placeholder-gray-400 outline-none',
+                    className: `bg-transparent text-sm outline-none ${isDark ? 'text-gray-200 placeholder-gray-500' : 'text-gray-700 placeholder-gray-400'}`,
                     style: { width: '150px' }
                   }),
                   concertsSearch && React.createElement('button', {
                     onClick: () => { setConcertsSearch(''); setConcertsSearchOpen(false); },
-                    className: 'ml-2 text-gray-400 hover:text-gray-600'
+                    className: `ml-2 ${isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}`
                   },
                     React.createElement('svg', { className: 'w-4 h-4', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
                       React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M6 18L18 6M6 6l12 12' })
@@ -42842,14 +42867,15 @@ useEffect(() => {
               :
                 React.createElement('button', {
                   onClick: () => setConcertsSearchOpen(true),
-                  className: 'p-1.5 text-gray-400 hover:text-gray-600 transition-colors'
+                  className: `p-1.5 transition-colors ${isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}`
                 },
                   React.createElement('svg', { className: 'w-5 h-5', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
                     React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' })
                   )
                 )
             )
-          ),
+          );
+          })(),
           // Scrollable content area
           React.createElement('div', {
             className: 'flex-1 overflow-y-auto',
@@ -43142,33 +43168,34 @@ useEffect(() => {
                                   React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2.5, d: 'M19 9l-7 7-7-7' })
                                 )
                               ),
-                              isOpen && React.createElement('div', {
-                                className: 'absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-30',
+                              isOpen && (() => {
+                                const isDkFlyout = effectiveTheme === 'dark';
+                                return React.createElement('div', {
+                                className: `absolute right-0 top-full mt-1 rounded-lg shadow-lg border py-1 z-30 ${isDkFlyout ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'}`,
                                 style: { minWidth: '180px' },
                                 onClick: (e) => e.stopPropagation()
                               },
                                 sources.map((src, si) => {
-                                  const isDark = effectiveTheme === 'dark';
                                   const srcColors = {
-                                    bandsintown: isDark ? '#2dd4bf' : '#00B4B3',
-                                    songkick: isDark ? '#fb7185' : '#F80046',
-                                    seatgeek: isDark ? '#fb923c' : '#FC4C02',
-                                    ticketmaster: isDark ? '#60a5fa' : '#026CDF'
+                                    bandsintown: isDkFlyout ? '#2dd4bf' : '#00B4B3',
+                                    songkick: isDkFlyout ? '#fb7185' : '#F80046',
+                                    seatgeek: isDkFlyout ? '#fb923c' : '#FC4C02',
+                                    ticketmaster: isDkFlyout ? '#60a5fa' : '#026CDF'
                                   };
-                                  const color = srcColors[src.source] || (isDark ? '#a78bfa' : '#8b5cf6');
+                                  const color = srcColors[src.source] || (isDkFlyout ? '#a78bfa' : '#8b5cf6');
                                   return React.createElement('a', {
                                     key: si,
                                     href: src.ticketUrl,
                                     target: '_blank',
                                     rel: 'noopener noreferrer',
-                                    className: 'flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 transition-colors',
+                                    className: `flex items-center gap-2 px-4 py-2 text-sm transition-colors ${isDkFlyout ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`,
                                     onClick: () => setConcertsTicketFlyout(null)
                                   },
                                     React.createElement('span', {
                                       className: 'w-2 h-2 rounded-full flex-shrink-0',
                                       style: { backgroundColor: color }
                                     }),
-                                    React.createElement('span', { className: 'text-gray-700' }, src.label),
+                                    React.createElement('span', { className: isDkFlyout ? 'text-gray-200' : 'text-gray-700' }, src.label),
                                     React.createElement('svg', {
                                       className: 'w-3 h-3 text-gray-400 ml-auto',
                                       fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor'
@@ -43177,7 +43204,8 @@ useEffect(() => {
                                     )
                                   );
                                 })
-                              )
+                              );
+                              })()
                             );
                           })()
                         );
