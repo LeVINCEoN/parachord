@@ -43496,8 +43496,8 @@ useEffect(() => {
                         },
                           // Date column
                           React.createElement('div', {
-                            className: 'flex flex-col items-center justify-center text-center flex-shrink-0 px-4',
-                            style: { minWidth: '64px' }
+                            className: 'flex flex-col items-center justify-center text-center flex-shrink-0 self-center px-4',
+                            style: { minWidth: '100px' }
                           },
                             React.createElement('span', {
                               className: 'text-xs font-medium text-violet-500 uppercase'
@@ -43534,7 +43534,7 @@ useEffect(() => {
                           ),
 
                           // Event details column
-                          React.createElement('div', { className: 'flex-1 min-w-0 flex items-center px-4 py-3' },
+                          React.createElement('div', { className: 'flex-1 min-w-0 flex items-center self-center px-4 py-3' },
                             React.createElement('div', { className: 'flex-1 min-w-0' },
                               React.createElement('div', { className: 'flex items-center gap-2 mb-0.5' },
                                 React.createElement('span', {
@@ -43586,11 +43586,11 @@ useEffect(() => {
                             )
                           ),
 
-                          // Reason column
-                          reasonText && React.createElement('div', {
+                          // Reason column — fixed width so text aligns vertically across rows
+                          React.createElement('div', {
                             className: `flex-shrink-0 text-xs italic self-center px-3 ${isDark ? 'text-violet-400/70' : 'text-violet-400'}`,
-                            style: { maxWidth: '160px', textAlign: 'left' }
-                          }, reasonText),
+                            style: { width: '140px', textAlign: 'left' }
+                          }, reasonText || ''),
 
                           // Ticket button with provider flyout
                           (() => {
