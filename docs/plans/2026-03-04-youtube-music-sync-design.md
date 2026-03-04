@@ -464,6 +464,7 @@ describe('YouTube Music Sync Provider', () => {
 - **Album art enrichment** — Use MusicBrainz/Discogs to find real album art for imported tracks
 - **Selective playlist import** — Let users pick which playlists to import (like Spotify's picker)
 - **Subscription channel import** — Import subscribed artist channels as followed artists
+- **Lifetime listening history import** — Import full play history from Spotify/Apple Music GDPR data exports (see [issue draft](../issues/listening-history-import.md))
 
 ---
 
