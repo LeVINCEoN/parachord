@@ -24180,10 +24180,20 @@ ${tracks}
     return addr.city || addr.town || addr.village || addr.county || data.display_name?.split(',').slice(0, 2).join(',').trim() || `${lat.toFixed(2)}, ${lng.toFixed(2)}`;
   };
 
-  // Get dedicated concert service plugins (Bandsintown, Songkick, SeatGeek) that are enabled
+  // Get dedicated concert service plugins (Bandsintown, Songkick, SeatGeek) that are enabled and have auth
   const getConcertServices = () => {
     const allResolvers = resolverLoaderRef.current ? resolverLoaderRef.current.getAllResolvers() : [];
-    return allResolvers.filter(r => r.capabilities?.concerts && r.searchArtistEvents);
+    return allResolvers.filter(r => {
+      if (!r.capabilities?.concerts || !r.searchArtistEvents) return false;
+      // Check that the service has valid auth configured
+      const config = metaServiceConfigs[r.id] || {};
+      const noKeyNeeded = r.requiresAuth === false || r.settings?.requiresAuth === false;
+      if (noKeyNeeded) return true;
+      // Check the plugin's expected auth field (e.g. clientId, appId, apiKey)
+      const configurable = r.settings?.configurable || r.configurable || {};
+      const authField = Object.keys(configurable).find(k => k !== 'model') || 'apiKey';
+      return !!(config[authField] || config.apiKey);
+    });
   };
 
   // Get AI chat services that can suggest concerts
@@ -24343,9 +24353,13 @@ ${tracks}
       };
 
       // Run dedicated service queries and AI queries in parallel
+      // Use concurrency pool to avoid hammering APIs while keeping it fast
       const dedicatedPromise = (async () => {
         const dedicatedEvents = [];
-        for (const artist of artistList) {
+        const concurrency = 5; // max parallel artist queries
+        let idx = 0;
+        const fetchArtist = async (artist) => {
+          const results = [];
           for (const service of concertServices) {
             try {
               const rawConfig = metaServiceConfigs[service.id] || {};
@@ -24356,15 +24370,22 @@ ${tracks}
                 : rawConfig;
               const events = await service.searchArtistEvents(artist.name, config);
               if (events && events.length > 0) {
-                dedicatedEvents.push(...events.map(e => ({ event: e, artist: artist.name })));
+                results.push(...events.map(e => ({ event: e, artist: artist.name })));
               }
             } catch (e) {
               console.log(`🎤 Error fetching concerts for ${artist.name} from ${service.id}:`, e.message);
             }
           }
-          // Rate limit: small delay between artists to avoid hammering APIs
-          await new Promise(resolve => setTimeout(resolve, 200));
-        }
+          return results;
+        };
+        const runNext = async () => {
+          while (idx < artistList.length) {
+            const i = idx++;
+            const results = await fetchArtist(artistList[i]);
+            dedicatedEvents.push(...results);
+          }
+        };
+        await Promise.all(Array.from({ length: Math.min(concurrency, artistList.length) }, () => runNext()));
         return dedicatedEvents;
       })();
 
