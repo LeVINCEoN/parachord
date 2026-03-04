@@ -548,7 +548,7 @@ const PlayTop10Icon = ({ size = 24, className = '' }) => {
       fill: 'white',
       fontSize: 7,
       fontWeight: 'bold',
-      fontFamily: 'system-ui, -apple-system, sans-serif'
+      fontFamily: 'var(--font-sans)'
     }, '10')
   );
 };
@@ -590,7 +590,7 @@ const QueueTop10Icon = ({ size = 24, className = '' }) => {
       fill: 'white',
       fontSize: 6.5,
       fontWeight: 'bold',
-      fontFamily: 'system-ui, -apple-system, sans-serif',
+      fontFamily: 'var(--font-sans)',
       stroke: 'none'
     }, '10')
   );
@@ -1272,8 +1272,9 @@ const FixedTooltip = ({ children, content }) => {
           zIndex: 99999,
           maxWidth: 280,
           minWidth: 180,
-          backgroundColor: '#1f2937',
-          color: '#ffffff',
+          backgroundColor: 'var(--tooltip-bg)',
+          color: 'var(--tooltip-text)',
+          border: '1px solid var(--tooltip-border)',
           borderRadius: 8,
           padding: '10px 14px',
           fontSize: 12,
@@ -1775,7 +1776,7 @@ const VirtualizedQueueList = React.memo(({
           fontWeight: index === 0 ? '500' : '400',
           color: isLoading ? 'rgba(156, 163, 175, 0.6)' :
                  isError ? '#f87171' :
-                 isCurrentTrack ? '#a78bfa' : 'rgba(229, 231, 235, 0.9)'
+                 isCurrentTrack ? 'var(--accent-soft)' : 'rgba(229, 231, 235, 0.9)'
         }
       },
         isLoading ? 'Loading...' :
@@ -1820,11 +1821,11 @@ const VirtualizedQueueList = React.memo(({
         : isLoading ?
           React.createElement('div', { className: 'flex items-center gap-1' },
             React.createElement('div', {
-              className: 'rounded bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 bg-[length:200%_100%] animate-shimmer',
+              className: 'rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
               style: { width: '20px', height: '20px' }
             }),
             React.createElement('div', {
-              className: 'rounded bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 bg-[length:200%_100%] animate-shimmer',
+              className: 'rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
               style: { width: '20px', height: '20px', animationDelay: '0.1s' }
             })
           )
@@ -1863,12 +1864,12 @@ const VirtualizedQueueList = React.memo(({
         :
           React.createElement('div', { className: 'flex items-center gap-1' },
             React.createElement('div', {
-              className: 'rounded bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 bg-[length:200%_100%] animate-shimmer',
+              className: 'rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
               style: { width: '20px', height: '20px' },
               title: 'Resolving track...'
             }),
             React.createElement('div', {
-              className: 'rounded bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 bg-[length:200%_100%] animate-shimmer',
+              className: 'rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
               style: { width: '20px', height: '20px', animationDelay: '0.1s' }
             })
           )
@@ -1961,7 +1962,7 @@ const ResolverCard = React.memo(({
     isDragOver && React.createElement('div', {
       className: 'absolute -left-3 top-0 bottom-6 w-1 rounded-full',
       style: {
-        backgroundColor: '#7c3aed',
+        backgroundColor: 'var(--accent-primary)',
         boxShadow: '0 0 8px rgba(124, 58, 237, 0.6)',
         zIndex: 10
       }
@@ -1976,7 +1977,7 @@ const ResolverCard = React.memo(({
         backgroundColor: resolver.color || '#6B7280',
         opacity: isAvailable ? 0.5 : 1,
         boxShadow: isDragOver
-          ? '0 0 0 3px #7c3aed, 0 4px 12px rgba(0, 0, 0, 0.15)'
+          ? '0 0 0 3px var(--accent-primary), 0 4px 12px rgba(0, 0, 0, 0.15)'
           : '0 2px 8px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.05)'
       },
       onClick: onClick
@@ -1993,7 +1994,7 @@ const ResolverCard = React.memo(({
           borderRadius: '6px',
           fontSize: '11px',
           fontWeight: '600',
-          color: '#374151',
+          color: '#111827',
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
         }
       }, priorityNumber),
@@ -2051,7 +2052,7 @@ const ResolverCard = React.memo(({
         marginTop: '10px',
         fontSize: '13px',
         fontWeight: '500',
-        color: isAvailable ? '#9ca3af' : '#1f2937',
+        color: isAvailable ? 'var(--text-tertiary)' : 'var(--text-primary)',
         textAlign: 'center',
         width: '120px',
         overflow: 'hidden',
@@ -2065,7 +2066,7 @@ const ResolverCard = React.memo(({
     }, 'Setup required'),
     // "Available" label - not enabled
     isAvailable && React.createElement('span', {
-      style: { fontSize: '10px', fontWeight: '500', color: '#9ca3af', marginTop: '2px' }
+      style: { fontSize: '10px', fontWeight: '500', color: 'var(--text-tertiary)', marginTop: '2px' }
     }, 'Available')
   );
 });
@@ -2114,13 +2115,13 @@ const McpSettingsSection = () => {
     mcpInfo && React.createElement('div', { className: 'relative' },
       React.createElement('pre', {
         style: {
-          backgroundColor: '#f8f9fa',
-          border: '1px solid #e5e7eb',
+          backgroundColor: 'var(--bg-inset)',
+          border: '1px solid var(--border-default)',
           borderRadius: '8px',
           padding: '12px 16px',
           fontSize: '12px',
           lineHeight: '1.6',
-          color: '#1f2937',
+          color: 'var(--text-primary)',
           overflow: 'auto',
           fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace',
           whiteSpace: 'pre-wrap',
@@ -2136,12 +2137,12 @@ const McpSettingsSection = () => {
           padding: '4px 10px',
           fontSize: '11px',
           fontWeight: '500',
-          color: copied ? '#059669' : '#6b7280',
-          backgroundColor: copied ? '#ecfdf5' : '#f3f4f6',
-          border: '1px solid ' + (copied ? '#a7f3d0' : '#d1d5db'),
+          color: copied ? '#059669' : 'var(--text-secondary)',
+          backgroundColor: copied ? '#ecfdf5' : 'var(--placeholder-bg-light)',
+          border: '1px solid ' + (copied ? '#a7f3d0' : 'var(--border-default)'),
           borderRadius: '6px',
           cursor: 'pointer',
-          transition: 'all 0.15s'
+          transition: 'background-color 0.15s, color 0.15s, border-color 0.15s'
         }
       }, copied ? 'Copied!' : 'Copy')
     ),
@@ -2469,11 +2470,11 @@ const RelatedArtistCard = ({ artist, getArtistImage, onNavigate }) => {
     // Artist image square - gray bg while loading, pattern only when no image found
     React.createElement('div', {
       className: 'w-full aspect-square mb-2 relative overflow-hidden rounded-lg',
-      style: { background: imageUrl === null ? pattern.gradient : '#e5e7eb' }
+      style: { background: imageUrl === null ? pattern.gradient : 'var(--placeholder-bg)' }
     },
       // Loading shimmer (only while fetching - imageUrl is undefined)
       imageUrl === undefined && React.createElement('div', {
-        className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+        className: 'absolute inset-0 shimmer-strong animate-shimmer',
         style: { backgroundSize: '200% 100%' }
       }),
       // Image (fades in when loaded - imageUrl is a string)
@@ -2549,7 +2550,7 @@ const SearchArtistCard = ({ artist, getArtistImage, onClick, onContextMenu, onPl
     // Square image container - gray bg while loading, pattern only when no image found
     React.createElement('div', {
       className: 'aspect-square relative group/art overflow-hidden',
-      style: { background: imageUrl === null ? pattern.gradient : '#e5e7eb' }
+      style: { background: imageUrl === null ? pattern.gradient : 'var(--placeholder-bg)' }
     },
       // Initials overlay (only show when no image found - imageUrl is null)
       imageUrl === null && React.createElement('div', {
@@ -2573,7 +2574,7 @@ const SearchArtistCard = ({ artist, getArtistImage, onClick, onContextMenu, onPl
       }),
       // Shimmer loading state (only while fetching - imageUrl is undefined)
       imageUrl === undefined && React.createElement('div', {
-        className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+        className: 'absolute inset-0 shimmer-strong animate-shimmer',
         style: { backgroundSize: '200% 100%' }
       }),
       // Hover overlay with action buttons (Play, Queue)
@@ -2725,7 +2726,7 @@ const CollectionArtistCard = ({ artist, getArtistImage, onNavigate, onPlayTopTra
     // Square image container - gray bg while loading, pattern only when no image found
     React.createElement('div', {
       className: 'aspect-square relative group/art overflow-hidden',
-      style: { background: imageUrl === null ? pattern.gradient : '#e5e7eb' }
+      style: { background: imageUrl === null ? pattern.gradient : 'var(--placeholder-bg)' }
     },
       // Initials overlay (only show when no image found, not while loading)
       imageUrl === null && React.createElement('div', {
@@ -2749,7 +2750,7 @@ const CollectionArtistCard = ({ artist, getArtistImage, onNavigate, onPlayTopTra
       }),
       // Shimmer loading state (only while fetching)
       imageUrl === undefined && React.createElement('div', {
-        className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+        className: 'absolute inset-0 shimmer-strong animate-shimmer',
         style: { backgroundSize: '200% 100%' }
       }),
       // Hover overlay with action buttons (Play, Queue)
@@ -2829,9 +2830,9 @@ const CollectionAlbumCard = ({ album, getAlbumArt, onNavigate, onAddToPlaylist, 
     style: {
       padding: '10px',
       borderRadius: '10px',
-      backgroundColor: '#ffffff',
+      backgroundColor: 'var(--card-bg)',
       border: 'none',
-      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+      boxShadow: 'var(--card-shadow)',
       animationDelay: `${animationDelay}ms`
     }
   },
@@ -2848,8 +2849,8 @@ const CollectionAlbumCard = ({ album, getAlbumArt, onNavigate, onAddToPlaylist, 
         background: imageUrl === null
           ? 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
           : imageUrl === undefined
-            ? 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)'
-            : '#f3f4f6',
+            ? 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))'
+            : 'var(--placeholder-bg-light)',
         backgroundSize: imageUrl === undefined ? '200% 100%' : undefined
       }
     },
@@ -2938,7 +2939,7 @@ const CollectionAlbumCard = ({ album, getAlbumArt, onNavigate, onAddToPlaylist, 
       style: {
         fontWeight: '500',
         fontSize: '13px',
-        color: '#1f2937',
+        color: 'var(--text-primary)',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
@@ -2949,15 +2950,15 @@ const CollectionAlbumCard = ({ album, getAlbumArt, onNavigate, onAddToPlaylist, 
     }, album.title),
     // Artist name
     React.createElement('p', {
-      style: { fontSize: '12px', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
+      style: { fontSize: '12px', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
     }, album.artist),
     // Year and track count
     React.createElement('div', { style: { display: 'flex', alignItems: 'center', gap: '6px', marginTop: '3px' } },
       album.year && React.createElement('span', {
-        style: { fontSize: '11px', color: '#9ca3af' }
+        style: { fontSize: '11px', color: 'var(--text-tertiary)' }
       }, album.year),
       React.createElement('span', {
-        style: { fontSize: '11px', color: '#9ca3af' }
+        style: { fontSize: '11px', color: 'var(--text-tertiary)' }
       }, `${album.trackCount} track${album.trackCount !== 1 ? 's' : ''}`)
     )
   );
@@ -3012,8 +3013,8 @@ const FriendMiniPlaybar = ({ track, getAlbumArt, onPlay, onContextMenu }) => {
   }, [track.name, track.artist]);
 
   return React.createElement('div', {
-    className: 'mt-1 flex items-center bg-gray-800 rounded cursor-pointer hover:bg-gray-700 transition-colors pr-2',
-    style: { maxWidth: '180px', height: '20px' },
+    className: 'mt-1 flex items-center rounded cursor-pointer transition-colors pr-2',
+    style: { maxWidth: '180px', height: '20px', backgroundColor: 'var(--surface-dark)', color: '#d1d5db' },
     onClick: onPlay,
     onContextMenu: onContextMenu
   },
@@ -3087,9 +3088,9 @@ const ReleaseCard = ({ release, currentArtist, fetchReleaseData, onContextMenu, 
 
   // Badge colors - refined palette matching app aesthetic
   const badgeStyles = {
-    album: { bg: 'rgba(17, 24, 39, 0.06)', color: '#4b5563' },
+    album: { bg: 'rgba(17, 24, 39, 0.06)', color: 'var(--nav-inactive)' },
     ep: { bg: 'rgba(233, 30, 99, 0.08)', color: '#db2777' },
-    single: { bg: 'rgba(139, 92, 246, 0.08)', color: '#7c3aed' },
+    single: { bg: 'rgba(139, 92, 246, 0.08)', color: 'var(--accent-primary)' },
     live: { bg: 'rgba(245, 158, 11, 0.08)', color: '#d97706' },
     compilation: { bg: 'rgba(20, 184, 166, 0.08)', color: '#0d9488' }
   };
@@ -3105,12 +3106,12 @@ const ReleaseCard = ({ release, currentArtist, fetchReleaseData, onContextMenu, 
       width: '100%',
       textAlign: 'left',
       display: isVisible ? 'block' : 'none',
-      backgroundColor: '#ffffff',
+      backgroundColor: 'var(--card-bg)',
       borderRadius: '10px',
       padding: '10px',
       cursor: 'grab',
       border: 'none',
-      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+      boxShadow: 'var(--card-shadow)',
       animationDelay: `${animationDelay}ms`
     },
     onClick: handleClick,
@@ -3137,8 +3138,8 @@ const ReleaseCard = ({ release, currentArtist, fetchReleaseData, onContextMenu, 
         background: release.albumArt === null || imageFailed
           ? 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
           : imageLoaded
-            ? '#f3f4f6'
-            : 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)',
+            ? 'var(--placeholder-bg-light)'
+            : 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))',
         backgroundSize: (release.albumArt === null || imageFailed || imageLoaded) ? undefined : '200% 100%',
         display: 'flex',
         alignItems: 'center',
@@ -3249,12 +3250,12 @@ const ReleaseCard = ({ release, currentArtist, fetchReleaseData, onContextMenu, 
       style: {
         fontWeight: '500',
         fontSize: '13px',
-        lineHeight: '1.35',
+        lineHeight: '1.4',
         marginBottom: '3px',
         overflow: 'hidden',
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap',
-        color: '#1f2937',
+        color: 'var(--text-primary)',
         letterSpacing: '0.005em',
         pointerEvents: 'none'
       },
@@ -3274,7 +3275,7 @@ const ReleaseCard = ({ release, currentArtist, fetchReleaseData, onContextMenu, 
       year && React.createElement('span', {
         style: {
           fontSize: '11px',
-          color: '#9ca3af',
+          color: 'var(--text-tertiary)',
           fontWeight: '400'
         }
       }, year),
@@ -3365,9 +3366,9 @@ const ReleasePage = ({
       const year = release.date ? release.date.split('-')[0] : '';
       // Badge colors - matching ReleaseCard palette
       const badgeStyles = {
-        album: { bg: 'rgba(17, 24, 39, 0.06)', color: '#4b5563' },
+        album: { bg: 'rgba(17, 24, 39, 0.06)', color: 'var(--nav-inactive)' },
         ep: { bg: 'rgba(233, 30, 99, 0.08)', color: '#db2777' },
-        single: { bg: 'rgba(139, 92, 246, 0.08)', color: '#7c3aed' },
+        single: { bg: 'rgba(139, 92, 246, 0.08)', color: 'var(--accent-primary)' },
         live: { bg: 'rgba(245, 158, 11, 0.08)', color: '#d97706' },
         compilation: { bg: 'rgba(20, 184, 166, 0.08)', color: '#0d9488' }
       };
@@ -3402,10 +3403,10 @@ const ReleasePage = ({
           className: 'no-drag cursor-grab active:cursor-grabbing',
           style: {
             width: `${albumArtSize}px`,
-            backgroundColor: '#ffffff',
+            backgroundColor: 'var(--card-bg)',
             borderRadius: '10px',
             padding: '10px',
-            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+            boxShadow: 'var(--card-shadow)',
             transition: 'width 300ms ease'
           },
           onContextMenu: onAlbumContextMenu ? (e) => {
@@ -3525,12 +3526,12 @@ const ReleasePage = ({
             style: {
               fontWeight: '500',
               fontSize: '13px',
-              lineHeight: '1.35',
+              lineHeight: '1.4',
               marginBottom: '3px',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
-              color: '#1f2937',
+              color: 'var(--text-primary)',
               letterSpacing: '0.005em',
               pointerEvents: 'none'
             },
@@ -3550,7 +3551,7 @@ const ReleasePage = ({
             year && React.createElement('span', {
               style: {
                 fontSize: '11px',
-                color: '#9ca3af',
+                color: 'var(--text-tertiary)',
                 fontWeight: '400'
               }
             }, year),
@@ -3594,7 +3595,7 @@ const ReleasePage = ({
             ),
             shareDropdownOpen === 'album' && React.createElement('div', {
               className: 'absolute left-0 top-full mt-1 rounded-lg py-1 min-w-[160px] z-30',
-              style: { backgroundColor: '#1f2937', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)' },
+              style: { backgroundColor: 'var(--tooltip-bg)', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)' },
               onClick: (e) => e.stopPropagation()
             },
               React.createElement('button', {
@@ -3640,19 +3641,19 @@ const ReleasePage = ({
           },
             // Track number
             React.createElement('div', {
-              className: 'w-6 h-4 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+              className: 'w-6 h-4 rounded shimmer-light animate-shimmer',
               style: { backgroundSize: '200% 100%' }
             }),
             // Track title
             React.createElement('div', { className: 'flex-1' },
               React.createElement('div', {
-                className: 'h-4 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                className: 'h-4 rounded shimmer-light animate-shimmer',
                 style: { width: `${width}%`, backgroundSize: '200% 100%' }
               })
             ),
             // Duration
             React.createElement('div', {
-              className: 'w-10 h-4 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+              className: 'w-10 h-4 rounded shimmer-light animate-shimmer',
               style: { backgroundSize: '200% 100%' }
             })
           )
@@ -3770,7 +3771,7 @@ const ReleasePage = ({
                   pointerEvents: 'none',
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: isNowPlaying ? '#8b5cf6' : '#9ca3af'
+                  color: isNowPlaying ? 'var(--accent-secondary)' : 'var(--text-tertiary)'
                 }
               }, isNowPlaying ? '▶' : String(track.position).padStart(2, '0')),
 
@@ -3781,7 +3782,7 @@ const ReleasePage = ({
                   pointerEvents: 'none',
                   fontSize: '13px',
                   fontWeight: isNowPlaying ? '500' : '400',
-                  color: isNowPlaying ? '#7c3aed' : '#374151'
+                  color: isNowPlaying ? 'var(--accent-primary)' : 'var(--text-primary)'
                 }
               }, track.title),
 
@@ -3791,7 +3792,7 @@ const ReleasePage = ({
                 style: {
                   pointerEvents: 'none',
                   fontSize: '12px',
-                  color: '#9ca3af'
+                  color: 'var(--text-tertiary)'
                 }
               }, formatDuration(track.length)),
               
@@ -3810,11 +3811,11 @@ const ReleasePage = ({
                       className: 'flex items-center gap-1'
                     },
                       React.createElement('div', {
-                        className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                        className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                         title: 'Resolving track...'
                       }),
                       React.createElement('div', {
-                        className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                        className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                         style: { animationDelay: '0.1s' }
                       })
                     );
@@ -5113,6 +5114,8 @@ const Parachord = () => {
   const isAdvancingTrackRef = useRef(false); // Re-entrancy guard for handleNext()
   const waitingForBrowserPlaybackRef = useRef(false); // True when we're waiting for browser to connect after opening external track
   const [settingsTab, setSettingsTab] = useState('plugins'); // 'plugins' | 'general' | 'about'
+  const [themePref, setThemePref] = useState('system'); // 'light' | 'dark' | 'system'
+  const [effectiveTheme, setEffectiveTheme] = useState('light'); // resolved 'light' | 'dark'
   const [pluginsFilter, setPluginsFilter] = useState('all'); // 'all' | 'installed' | 'available'
   const [marketplaceManifest, setMarketplaceManifest] = useState(null);
   const [marketplaceLoading, setMarketplaceLoading] = useState(false);
@@ -5525,6 +5528,46 @@ const Parachord = () => {
 
   // Responsive breakpoints
   const isCompactHeader = mainContentWidth < 700;
+
+  // Theme initialization and system theme change listener
+  useEffect(() => {
+    const initTheme = async () => {
+      // Load saved preference
+      const saved = await window.electron?.store?.get('theme_preference');
+      const pref = saved || 'system';
+      setThemePref(pref);
+
+      // Get effective theme from main process
+      if (pref === 'system') {
+        const systemTheme = await window.electron?.theme?.getSystem();
+        setEffectiveTheme(systemTheme || 'light');
+      } else {
+        setEffectiveTheme(pref);
+      }
+
+      // Set native theme source
+      await window.electron?.theme?.setNative(pref);
+    };
+
+    initTheme();
+
+    // Listen for system theme changes
+    const cleanup = window.electron?.theme?.onChanged((theme) => {
+      setEffectiveTheme(theme);
+    });
+
+    return () => { if (cleanup) cleanup(); };
+  }, []);
+
+  // Apply dark class to HTML element when theme changes
+  useEffect(() => {
+    const html = document.documentElement;
+    if (effectiveTheme === 'dark') {
+      html.classList.add('dark');
+    } else {
+      html.classList.remove('dark');
+    }
+  }, [effectiveTheme]);
 
   // Close playlists sort dropdown when clicking outside
   useEffect(() => {
@@ -6083,6 +6126,20 @@ const Parachord = () => {
       setCollectionTab(bestTab.key);
     }
   }, [activeView, collectionLoading, collectionTab, collectionData, library, friends]);
+
+  const handleThemeChange = async (newPref) => {
+    setThemePref(newPref);
+    await window.electron?.store?.set('theme_preference', newPref);
+
+    if (newPref === 'system') {
+      const systemTheme = await window.electron?.theme?.getSystem();
+      setEffectiveTheme(systemTheme || 'light');
+    } else {
+      setEffectiveTheme(newPref);
+    }
+
+    await window.electron?.theme?.setNative(newPref);
+  };
 
   const [collectionDropHighlight, setCollectionDropHighlight] = useState(false);
   const [dropTargetPlaylistId, setDropTargetPlaylistId] = useState(null); // Playlist being hovered during drag
@@ -7240,7 +7297,7 @@ const Parachord = () => {
         style: {
           fontSize: '18px',
           fontWeight: '600',
-          color: '#a855f7'
+          color: 'var(--accent-tertiary)'
         }
       }, text)
     );
@@ -16256,7 +16313,7 @@ ${trackListXml}
             }
           },
             React.createElement('svg', {
-              style: { width: '14px', height: '14px', marginLeft: '2px', color: '#111827' },
+              style: { width: '14px', height: '14px', marginLeft: '2px', color: 'var(--text-primary)' },
               fill: 'currentColor',
               viewBox: '0 0 24 24'
             },
@@ -16280,7 +16337,7 @@ ${trackListXml}
         artist && React.createElement('div', {
           style: {
             fontSize: '12px',
-            color: '#9ca3af',
+            color: 'var(--text-tertiary)',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap'
@@ -16289,7 +16346,7 @@ ${trackListXml}
       ),
       // Type indicator
       React.createElement('div', {
-        style: { fontSize: '10px', color: '#6b7280', textTransform: 'uppercase' }
+        style: { fontSize: '10px', color: 'var(--text-secondary)', textTransform: 'uppercase' }
       }, type)
     );
   });
@@ -16493,7 +16550,7 @@ ${trackListXml}
                   window.electron?.shell?.openExternal(url);
                 }
               },
-              style: { color: isUserMessage ? '#c4b5fd' : '#a78bfa', textDecoration: 'underline', cursor: 'pointer' }
+              style: { color: isUserMessage ? '#c4b5fd' : 'var(--accent-soft)', textDecoration: 'underline', cursor: 'pointer' }
             }, linkText)
           );
         } else if (r.type === 'bold') {
@@ -16610,7 +16667,7 @@ ${trackListXml}
             React.createElement('div', {
               style: {
                 fontSize: '12px',
-                color: '#9ca3af',
+                color: 'var(--text-tertiary)',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap'
@@ -16619,7 +16676,7 @@ ${trackListXml}
           ),
           // Type indicator
           React.createElement('div', {
-            style: { fontSize: '10px', color: '#6b7280', textTransform: 'uppercase' }
+            style: { fontSize: '10px', color: 'var(--text-secondary)', textTransform: 'uppercase' }
           }, 'playlist')
         );
       }
@@ -16669,7 +16726,7 @@ ${trackListXml}
             key: `line-${keyCounter++}`,
             style: { display: 'flex', gap: '8px', marginTop: lineIdx > 0 ? '12px' : 0 }
           },
-            React.createElement('span', { style: { color: '#9ca3af', minWidth: '20px', flexShrink: 0 } }, `${listMatch[1]}.`),
+            React.createElement('span', { style: { color: 'var(--text-tertiary)', minWidth: '20px', flexShrink: 0 } }, `${listMatch[1]}.`),
             React.createElement('div', { style: { flex: 1, minWidth: 0 } }, parseInlineMarkdown(listMatch[2], `item-${lineIdx}`))
           )
         );
@@ -30396,22 +30453,34 @@ useEffect(() => {
         React.createElement('div', {
           className: 'flex items-center gap-2 px-4 pb-2'
         },
-          React.createElement('button', {
-            onClick: navigateBack,
-            disabled: viewHistory.length <= 1,
-            className: `p-1.5 rounded hover:bg-gray-200 transition-colors no-drag ${viewHistory.length <= 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600'}`
-          },
-            React.createElement('svg', { className: 'w-4 h-4', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
-              React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M15 19l-7-7 7-7' })
+          React.createElement(Tooltip, { content: 'Back', position: 'bottom' },
+            React.createElement('button', {
+              onClick: navigateBack,
+              disabled: viewHistory.length <= 1,
+              className: 'p-1.5 rounded transition-colors no-drag',
+              style: {
+                color: viewHistory.length <= 1 ? 'var(--text-tertiary)' : 'var(--text-secondary)',
+                cursor: viewHistory.length <= 1 ? 'not-allowed' : 'pointer'
+              }
+            },
+              React.createElement('svg', { className: 'w-4 h-4', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
+                React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M15 19l-7-7 7-7' })
+              )
             )
           ),
-          React.createElement('button', {
-            onClick: navigateForward,
-            disabled: forwardHistory.length === 0,
-            className: `p-1.5 rounded hover:bg-gray-200 transition-colors no-drag ${forwardHistory.length === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600'}`
-          },
-            React.createElement('svg', { className: 'w-4 h-4', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
-              React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M9 5l7 7-7 7' })
+          React.createElement(Tooltip, { content: 'Forward', position: 'bottom' },
+            React.createElement('button', {
+              onClick: navigateForward,
+              disabled: forwardHistory.length === 0,
+              className: 'p-1.5 rounded transition-colors no-drag',
+              style: {
+                color: forwardHistory.length === 0 ? 'var(--text-tertiary)' : 'var(--text-secondary)',
+                cursor: forwardHistory.length === 0 ? 'not-allowed' : 'pointer'
+              }
+            },
+              React.createElement('svg', { className: 'w-4 h-4', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
+                React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M9 5l7 7-7 7' })
+              )
             )
           )
         ),
@@ -30420,14 +30489,14 @@ useEffect(() => {
         React.createElement('div', {
           style: {
             padding: '4px 8px 12px',
-            borderBottom: '1px solid rgba(0, 0, 0, 0.06)'
+            borderBottom: '1px solid var(--border-subtle)'
           }
         },
           React.createElement('button', {
             className: 'w-full flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors rounded-lg',
             style: {
-              backgroundColor: 'rgba(0, 0, 0, 0.04)',
-              color: activeView === 'search' ? '#1f2937' : '#9ca3af'
+              backgroundColor: 'var(--hover-bg-default)',
+              color: activeView === 'search' ? 'var(--text-primary)' : 'var(--text-tertiary)'
             },
             onClick: () => navigateTo('search')
           },
@@ -30450,8 +30519,8 @@ useEffect(() => {
             onClick: () => navigateTo('home'),
             className: 'w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors mb-3',
             style: {
-              backgroundColor: activeView === 'home' ? 'rgba(124, 58, 237, 0.1)' : 'transparent',
-              color: activeView === 'home' ? '#7c3aed' : '#4b5563',
+              backgroundColor: activeView === 'home' ? 'var(--accent-primary-alpha-10)' : 'transparent',
+              color: activeView === 'home' ? 'var(--accent-primary)' : 'var(--nav-inactive)',
               fontWeight: activeView === 'home' ? '600' : '500'
             }
           },
@@ -30469,7 +30538,7 @@ useEffect(() => {
                 padding: '8px 12px',
                 fontSize: '11px',
                 fontWeight: '600',
-                color: '#9ca3af',
+                color: 'var(--text-tertiary)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em'
               }
@@ -30479,7 +30548,7 @@ useEffect(() => {
               className: 'w-full flex items-center gap-3 px-3 py-1.5 rounded text-sm transition-colors',
               style: {
                 backgroundColor: (activeView === 'playlists' || activeView === 'playlist-view') ? 'rgba(236, 72, 153, 0.1)' : 'transparent',
-                color: (activeView === 'playlists' || activeView === 'playlist-view') ? '#ec4899' : '#4b5563',
+                color: (activeView === 'playlists' || activeView === 'playlist-view') ? '#ec4899' : 'var(--nav-inactive)',
                 fontWeight: (activeView === 'playlists' || activeView === 'playlist-view') ? '500' : '400'
               }
             },
@@ -30492,7 +30561,7 @@ useEffect(() => {
                 className: 'ml-auto sidebar-badge',
                 style: {
                   fontSize: '11px',
-                  backgroundColor: '#7c3aed',
+                  backgroundColor: 'var(--accent-primary)',
                   color: '#ffffff',
                   padding: '2px 6px',
                   borderRadius: '10px'
@@ -30507,12 +30576,12 @@ useEffect(() => {
               onDrop: handleCollectionDrop,
               className: 'w-full flex items-center gap-3 px-3 py-1.5 rounded text-sm transition-colors',
               style: collectionDropHighlight ? {
-                backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                backgroundColor: 'var(--accent-primary-alpha-10)',
                 border: '2px solid #a78bfa',
-                color: '#7c3aed'
+                color: 'var(--accent-primary)'
               } : {
                 backgroundColor: activeView === 'library' ? 'rgba(147, 51, 234, 0.1)' : 'transparent',
-                color: activeView === 'library' ? '#9333ea' : '#4b5563',
+                color: activeView === 'library' ? '#9333ea' : 'var(--nav-inactive)',
                 fontWeight: activeView === 'library' ? '500' : '400'
               }
             },
@@ -30525,7 +30594,7 @@ useEffect(() => {
                 className: 'ml-auto sidebar-badge',
                 style: {
                   fontSize: '11px',
-                  backgroundColor: '#7c3aed',
+                  backgroundColor: 'var(--accent-primary)',
                   color: '#ffffff',
                   padding: '2px 6px',
                   borderRadius: '10px'
@@ -30540,7 +30609,7 @@ useEffect(() => {
               className: 'w-full flex items-center gap-3 px-3 py-1.5 rounded text-sm transition-colors',
               style: {
                 backgroundColor: activeView === 'history' ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
-                color: activeView === 'history' ? '#3b82f6' : '#4b5563',
+                color: activeView === 'history' ? '#3b82f6' : 'var(--nav-inactive)',
                 fontWeight: activeView === 'history' ? '500' : '400'
               }
             },
@@ -30558,7 +30627,7 @@ useEffect(() => {
                 padding: '8px 12px',
                 fontSize: '11px',
                 fontWeight: '600',
-                color: '#9ca3af',
+                color: 'var(--text-tertiary)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em'
               }
@@ -30571,7 +30640,7 @@ useEffect(() => {
               className: 'w-full flex items-center gap-3 px-3 py-1.5 rounded text-sm transition-colors',
               style: {
                 backgroundColor: activeView === 'new-releases' ? 'rgba(16, 185, 129, 0.1)' : 'transparent',
-                color: activeView === 'new-releases' ? '#10b981' : '#4b5563',
+                color: activeView === 'new-releases' ? '#10b981' : 'var(--nav-inactive)',
                 fontWeight: activeView === 'new-releases' ? '500' : '400'
               }
             },
@@ -30591,7 +30660,7 @@ useEffect(() => {
               className: 'w-full flex items-center gap-3 px-3 py-1.5 rounded text-sm transition-colors',
               style: {
                 backgroundColor: activeView === 'recommendations' ? 'rgba(168, 85, 247, 0.1)' : 'transparent',
-                color: activeView === 'recommendations' ? '#a855f7' : '#4b5563',
+                color: activeView === 'recommendations' ? 'var(--accent-tertiary)' : 'var(--nav-inactive)',
                 fontWeight: activeView === 'recommendations' ? '500' : '400'
               }
             },
@@ -30614,8 +30683,8 @@ useEffect(() => {
               },
               className: 'w-full flex items-center gap-3 px-3 py-1.5 rounded text-sm transition-colors',
               style: {
-                backgroundColor: activeView === 'discover' ? 'rgba(236, 72, 153, 0.1)' : 'transparent',
-                color: activeView === 'discover' ? '#ec4899' : '#4b5563',
+                backgroundColor: activeView === 'discover' ? 'rgba(249, 115, 22, 0.1)' : 'transparent',
+                color: activeView === 'discover' ? '#f97316' : 'var(--nav-inactive)',
                 fontWeight: activeView === 'discover' ? '500' : '400'
               }
             },
@@ -30626,7 +30695,7 @@ useEffect(() => {
               React.createElement('span', { className: 'flex items-center gap-1.5' },
                 'Pop of the Tops',
                 showDiscoveryBadges && discoveryUnread.charts && React.createElement('span', {
-                  className: 'w-2 h-2 rounded-full bg-pink-500 animate-pulse'
+                  className: 'w-2 h-2 rounded-full bg-orange-500 animate-pulse'
                 })
               )
             ),
@@ -30637,8 +30706,8 @@ useEffect(() => {
               },
               className: 'w-full flex items-center gap-3 px-3 py-1.5 rounded text-sm transition-colors',
               style: {
-                backgroundColor: activeView === 'critics-picks' ? 'rgba(249, 115, 22, 0.1)' : 'transparent',
-                color: activeView === 'critics-picks' ? '#f97316' : '#4b5563',
+                backgroundColor: activeView === 'critics-picks' ? 'rgba(239, 68, 68, 0.1)' : 'transparent',
+                color: activeView === 'critics-picks' ? '#ef4444' : 'var(--nav-inactive)',
                 fontWeight: activeView === 'critics-picks' ? '500' : '400'
               }
             },
@@ -30649,7 +30718,7 @@ useEffect(() => {
               React.createElement('span', { className: 'flex items-center gap-1.5' },
                 "Critical Darlings",
                 showDiscoveryBadges && discoveryUnread.criticsPicks && React.createElement('span', {
-                  className: 'w-2 h-2 rounded-full bg-orange-500 animate-pulse'
+                  className: 'w-2 h-2 rounded-full bg-red-500 animate-pulse'
                 })
               )
             ),
@@ -30659,7 +30728,7 @@ useEffect(() => {
           React.createElement('div', {
             className: 'rounded-lg transition-colors',
             style: friendDragOverSidebar ? {
-              backgroundColor: 'rgba(124, 58, 237, 0.05)',
+              backgroundColor: 'var(--accent-primary-alpha-06)',
               boxShadow: 'inset 0 0 0 2px rgba(167, 139, 250, 0.5)'
             } : {},
             onDragOver: (e) => {
@@ -30689,7 +30758,7 @@ useEffect(() => {
               style: {
                 fontSize: '11px',
                 fontWeight: '600',
-                color: '#9ca3af',
+                color: 'var(--text-tertiary)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em'
               }
@@ -30757,8 +30826,8 @@ useEffect(() => {
               className: `px-3 py-1 rounded cursor-pointer group transition-all duration-300 ease-in-out flex items-center ${isNewlyPinned ? 'friend-entry' : ''} ${wasMoved ? 'friend-moved' : ''}`,
               style: {
                 minHeight: '44px',
-                backgroundColor: isSelected ? 'rgba(0, 0, 0, 0.06)' : 'transparent',
-                color: isSelected ? '#1f2937' : 'inherit'
+                backgroundColor: isSelected ? 'var(--hover-bg-default)' : 'transparent',
+                color: isSelected ? 'var(--text-primary)' : 'inherit'
               },
               draggable: true,
               onClick: () => navigateToFriend(friend),
@@ -30818,7 +30887,8 @@ useEffect(() => {
                   ),
                   // On-air indicator dot
                   onAir && React.createElement('div', {
-                    className: 'absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-50'
+                    className: 'absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2',
+                    style: { borderColor: 'var(--bg-secondary)' }
                   })
                 ),
                 // Name and track info
@@ -30941,13 +31011,13 @@ useEffect(() => {
         React.createElement('div', {
           style: {
             padding: '12px 16px 16px',
-            borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+            borderTop: '1px solid var(--border-subtle)'
           }
         },
           React.createElement('button', {
             className: 'w-full flex items-center gap-2 cursor-pointer transition-colors',
             style: {
-              color: activeView === 'settings' ? '#1f2937' : '#6b7280',
+              color: activeView === 'settings' ? 'var(--text-primary)' : 'var(--text-secondary)',
               fontWeight: activeView === 'settings' ? '500' : '400'
             },
             onClick: () => navigateTo('settings')
@@ -30973,7 +31043,7 @@ useEffect(() => {
         className: 'fixed bottom-24 left-1/2 transform -translate-x-1/2 z-50 transition-all flex items-center gap-3',
         style: {
           padding: '12px 20px',
-          backgroundColor: toast.type === 'error' ? '#dc2626' : toast.type === 'info' ? '#2563eb' : '#1f2937',
+          backgroundColor: toast.type === 'error' ? '#dc2626' : toast.type === 'info' ? '#2563eb' : 'var(--tooltip-bg)',
           color: '#ffffff',
           fontSize: '13px',
           fontWeight: '500',
@@ -31039,7 +31109,7 @@ useEffect(() => {
     },
       React.createElement('div', {
         style: {
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--card-bg)',
           borderRadius: '16px',
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15), 0 12px 48px rgba(0, 0, 0, 0.1)',
           maxWidth: '380px',
@@ -31074,7 +31144,7 @@ useEffect(() => {
             top: '16px',
             right: '16px',
             padding: '6px',
-            color: '#9ca3af',
+            color: 'var(--text-tertiary)',
             backgroundColor: 'transparent',
             border: 'none',
             borderRadius: '8px',
@@ -31094,12 +31164,12 @@ useEffect(() => {
               width: '56px',
               height: '56px',
               borderRadius: '50%',
-              backgroundColor: 'rgba(124, 58, 237, 0.1)',
+              backgroundColor: 'var(--accent-primary-alpha-10)',
               marginBottom: '16px'
             }
           },
             React.createElement('svg', {
-              style: { width: '28px', height: '28px', color: '#7c3aed' },
+              style: { width: '28px', height: '28px', color: 'var(--accent-primary)' },
               fill: 'none',
               viewBox: '0 0 24 24',
               stroke: 'currentColor',
@@ -31117,7 +31187,7 @@ useEffect(() => {
             style: {
               fontSize: '16px',
               fontWeight: '600',
-              color: '#1f2937',
+              color: 'var(--text-primary)',
               marginBottom: '12px'
             }
           },
@@ -31129,13 +31199,13 @@ useEffect(() => {
               style: {
                 fontSize: '14px',
                 fontWeight: '500',
-                color: '#1f2937'
+                color: 'var(--text-primary)'
               }
             }, pendingExternalTrack.title),
             React.createElement('div', {
               style: {
                 fontSize: '13px',
-                color: '#6b7280',
+                color: 'var(--text-secondary)',
                 marginTop: '4px'
               }
             }, pendingExternalTrack.artist)
@@ -31151,10 +31221,10 @@ useEffect(() => {
               marginTop: '8px',
               backgroundColor: pendingExternalTrack.bandcampUrl ? 'rgba(6, 182, 212, 0.1)' :
                 pendingExternalTrack.youtubeUrl || pendingExternalTrack.youtubeId ? 'rgba(239, 68, 68, 0.1)' :
-                'rgba(124, 58, 237, 0.1)',
+                'var(--accent-primary-alpha-10)',
               color: pendingExternalTrack.bandcampUrl ? '#0891b2' :
                 pendingExternalTrack.youtubeUrl || pendingExternalTrack.youtubeId ? '#dc2626' :
-                '#7c3aed'
+                'var(--accent-primary)'
             }
           },
             (allResolvers.find(r =>
@@ -31168,7 +31238,7 @@ useEffect(() => {
           style: {
             textAlign: 'center',
             fontSize: '12px',
-            color: '#9ca3af',
+            color: 'var(--text-tertiary)',
             paddingBottom: '12px'
           }
         },
@@ -31185,7 +31255,7 @@ useEffect(() => {
             style: {
               width: '16px',
               height: '16px',
-              accentColor: '#7c3aed',
+              accentColor: 'var(--accent-primary)',
               cursor: 'pointer'
             },
             onChange: async (e) => {
@@ -31199,7 +31269,7 @@ useEffect(() => {
           React.createElement('span', {
             style: {
               fontSize: '12px',
-              color: '#6b7280'
+              color: 'var(--text-secondary)'
             }
           }, "Don't show this again")
         ),
@@ -31216,7 +31286,7 @@ useEffect(() => {
               fontSize: '13px',
               fontWeight: '500',
               color: '#ffffff',
-              backgroundColor: '#7c3aed',
+              backgroundColor: 'var(--accent-primary)',
               border: 'none',
               borderRadius: '10px',
               cursor: 'pointer'
@@ -31229,8 +31299,8 @@ useEffect(() => {
               padding: '12px 16px',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#374151',
-              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              color: 'var(--text-primary)',
+              backgroundColor: 'var(--hover-bg-default)',
               border: 'none',
               borderRadius: '10px',
               cursor: 'pointer'
@@ -31256,7 +31326,7 @@ useEffect(() => {
     },
       React.createElement('div', {
         style: {
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--card-bg)',
           borderRadius: '16px',
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15), 0 12px 48px rgba(0, 0, 0, 0.1)',
           maxWidth: '380px',
@@ -31299,14 +31369,14 @@ useEffect(() => {
             style: {
               fontSize: '16px',
               fontWeight: '600',
-              color: '#1f2937',
+              color: 'var(--text-primary)',
               marginBottom: '8px'
             }
           }, 'Friend Not Saved'),
           React.createElement('p', {
             style: {
               fontSize: '13px',
-              color: '#6b7280',
+              color: 'var(--text-secondary)',
               lineHeight: '1.5'
             }
           }, `${pendingUnpinFriend.displayName} isn't saved to your collection. If you unpin them, you'll need to add them again to pin them later.`)
@@ -31321,7 +31391,7 @@ useEffect(() => {
             style: {
               width: '16px',
               height: '16px',
-              accentColor: '#7c3aed',
+              accentColor: 'var(--accent-primary)',
               cursor: 'pointer'
             },
             onChange: async (e) => {
@@ -31335,7 +31405,7 @@ useEffect(() => {
           React.createElement('span', {
             style: {
               fontSize: '12px',
-              color: '#6b7280'
+              color: 'var(--text-secondary)'
             }
           }, "Don't show this again")
         ),
@@ -31360,7 +31430,7 @@ useEffect(() => {
               fontSize: '13px',
               fontWeight: '500',
               color: '#ffffff',
-              backgroundColor: '#7c3aed',
+              backgroundColor: 'var(--accent-primary)',
               border: 'none',
               borderRadius: '10px',
               cursor: 'pointer'
@@ -31373,8 +31443,8 @@ useEffect(() => {
               padding: '12px 16px',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#374151',
-              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              color: 'var(--text-primary)',
+              backgroundColor: 'var(--hover-bg-default)',
               border: 'none',
               borderRadius: '10px',
               cursor: 'pointer'
@@ -31392,7 +31462,7 @@ useEffect(() => {
       React.createElement('div', {
         className: 'loading-wordmark'
       },
-        React.createElement(ParachordWordmark, { fill: '#1f2937', height: 52 })
+        React.createElement(ParachordWordmark, { fill: 'var(--text-primary)', height: 52 })
       ),
       // Animated loading dots
       React.createElement('div', {
@@ -31803,11 +31873,11 @@ useEffect(() => {
                       // Square image container - gray while loading, pattern only when imageLoaded && no image
                       React.createElement('div', {
                         className: 'aspect-square relative group/art',
-                        style: { background: artist.imageLoaded && !artist.image ? searchArtistPattern.gradient : '#e5e7eb' }
+                        style: { background: artist.imageLoaded && !artist.image ? searchArtistPattern.gradient : 'var(--placeholder-bg)' }
                       },
                         // Shimmer while loading (imageLoaded not yet true)
                         !artist.imageLoaded && React.createElement('div', {
-                          className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+                          className: 'absolute inset-0 shimmer-strong animate-shimmer',
                           style: { backgroundSize: '200% 100%' }
                         }),
                         // Initials fallback (only show when imageLoaded && no image)
@@ -31941,8 +32011,8 @@ useEffect(() => {
                       style: {
                         padding: '10px',
                         borderRadius: '10px',
-                        backgroundColor: '#ffffff',
-                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                        backgroundColor: 'var(--card-bg)',
+                        boxShadow: 'var(--card-shadow)',
                         animationDelay: `${animationDelay}ms`
                       },
                       draggable: true,
@@ -32081,7 +32151,7 @@ useEffect(() => {
                         style: {
                           fontSize: '13px',
                           fontWeight: '500',
-                          color: '#1f2937',
+                          color: 'var(--text-primary)',
                           marginTop: '6px'
                         }
                       }, album.title),
@@ -32090,7 +32160,7 @@ useEffect(() => {
                         className: 'truncate hover:text-purple-600 hover:underline cursor-pointer transition-colors',
                         style: {
                           fontSize: '11px',
-                          color: '#6b7280',
+                          color: 'var(--text-secondary)',
                           marginTop: '2px'
                         },
                         onClick: (e) => {
@@ -32210,7 +32280,7 @@ useEffect(() => {
                         width: '32px',
                         fontSize: '12px',
                         fontWeight: '500',
-                        color: isNowPlaying && isPlaying ? '#8b5cf6' : '#9ca3af'
+                        color: isNowPlaying && isPlaying ? 'var(--accent-secondary)' : 'var(--text-tertiary)'
                       }
                     }, isNowPlaying && isPlaying ? '▶' : String(index + 1).padStart(2, '0')),
 
@@ -32223,7 +32293,7 @@ useEffect(() => {
                         minWidth: 0,
                         fontSize: '13px',
                         fontWeight: isNowPlaying && isPlaying ? '500' : '400',
-                        color: isNowPlaying && isPlaying ? '#7c3aed' : hasResolved ? '#374151' : '#9ca3af'
+                        color: isNowPlaying && isPlaying ? 'var(--accent-primary)' : hasResolved ? 'var(--text-primary)' : 'var(--text-tertiary)'
                       }
                     }, track.title),
 
@@ -32234,7 +32304,7 @@ useEffect(() => {
                         flex: '0.7 1 0',
                         minWidth: 0,
                         fontSize: '13px',
-                        color: '#6b7280'
+                        color: 'var(--text-secondary)'
                       },
                       onClick: (e) => {
                         e.stopPropagation();
@@ -32249,7 +32319,7 @@ useEffect(() => {
                         flex: '0.5 1 0',
                         minWidth: 0,
                         fontSize: '13px',
-                        color: '#6b7280'
+                        color: 'var(--text-secondary)'
                       },
                       onClick: (e) => {
                         e.stopPropagation();
@@ -32262,7 +32332,7 @@ useEffect(() => {
                         flex: '0.5 1 0',
                         minWidth: 0,
                         fontSize: '13px',
-                        color: '#6b7280'
+                        color: 'var(--text-secondary)'
                       }
                     }, ''),
 
@@ -32274,7 +32344,7 @@ useEffect(() => {
                         width: '50px',
                         marginRight: '16px',
                         fontSize: '12px',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         textAlign: 'right'
                       }
                     }, formatTime(track.duration)),
@@ -32289,11 +32359,11 @@ useEffect(() => {
                           className: 'flex items-center gap-1'
                         },
                           React.createElement('div', {
-                            className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                            className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                             title: 'Resolving track...'
                           }),
                           React.createElement('div', {
-                            className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                            className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                             style: { animationDelay: '0.1s' }
                           })
                         )
@@ -32370,8 +32440,8 @@ useEffect(() => {
                     style: {
                       padding: '10px',
                       borderRadius: '10px',
-                      backgroundColor: '#ffffff',
-                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                      backgroundColor: 'var(--card-bg)',
+                      boxShadow: 'var(--card-shadow)',
                       animationDelay: `${animationDelay}ms`
                     },
                     onClick: () => handlePlaylistClick(playlist)
@@ -32489,7 +32559,7 @@ useEffect(() => {
                       style: {
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         marginTop: '6px'
                       }
                     }, playlist.title),
@@ -32498,7 +32568,7 @@ useEffect(() => {
                       className: 'truncate',
                       style: {
                         fontSize: '11px',
-                        color: '#6b7280',
+                        color: 'var(--text-secondary)',
                         marginTop: '2px'
                       }
                     }, `${playlist.creator || 'Unknown'} • ${playlist.tracks?.length || 0} tracks`)
@@ -32549,8 +32619,8 @@ useEffect(() => {
               placeholder: '',
               className: 'w-full text-6xl font-extralight text-gray-900 bg-transparent border-none outline-none tracking-tight',
               style: {
-                caretColor: '#9ca3af',
-                fontFamily: 'system-ui, -apple-system, sans-serif'
+                caretColor: 'var(--text-tertiary)',
+                fontFamily: 'var(--font-sans)'
               }
             })
           ),
@@ -32640,12 +32710,12 @@ useEffect(() => {
                     className: 'bg-white rounded-lg overflow-hidden'
                   },
                     React.createElement('div', {
-                      className: 'aspect-square bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                      className: 'aspect-square shimmer-light animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100}ms` }
                     }),
                     React.createElement('div', { className: 'p-3' },
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 w-3/4 rounded animate-shimmer',
+                        className: 'h-4 shimmer-light w-3/4 rounded animate-shimmer',
                         style: { backgroundSize: '200% 100%', animationDelay: `${i * 100 + 50}ms` }
                       })
                     )
@@ -32665,19 +32735,19 @@ useEffect(() => {
                     style: { width: skeletonWidth }
                   },
                     React.createElement('div', {
-                      className: 'w-full aspect-square rounded-lg bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 mb-2 animate-shimmer',
+                      className: 'w-full aspect-square rounded-lg shimmer-light mb-2 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 w-3/4 mb-1 rounded animate-shimmer',
+                      className: 'h-3 shimmer-light w-3/4 mb-1 rounded animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100 + 50}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-2 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 w-1/2 rounded animate-shimmer',
+                      className: 'h-2 shimmer-light w-1/2 rounded animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100 + 100}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 w-10 mt-1 rounded animate-shimmer',
+                      className: 'h-4 shimmer-light w-10 mt-1 rounded animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100 + 150}ms` }
                     })
                   );
@@ -32696,15 +32766,15 @@ useEffect(() => {
                     style: { width: skeletonWidth }
                   },
                     React.createElement('div', {
-                      className: 'w-full aspect-square rounded-lg bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 mb-3 animate-shimmer',
+                      className: 'w-full aspect-square rounded-lg shimmer-light mb-3 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 w-3/4 mb-1 rounded animate-shimmer',
+                      className: 'h-3 shimmer-light w-3/4 mb-1 rounded animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100 + 50}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-2 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 w-1/2 rounded animate-shimmer',
+                      className: 'h-2 shimmer-light w-1/2 rounded animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 100 + 100}ms` }
                     })
                   );
@@ -32858,8 +32928,8 @@ useEffect(() => {
                     width: trackItemWidth,
                     padding: '10px',
                     borderRadius: '10px',
-                    backgroundColor: '#ffffff',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                    backgroundColor: 'var(--card-bg)',
+                    boxShadow: 'var(--card-shadow)',
                     animationDelay: `${animationDelay}ms`
                   },
                   draggable: true,
@@ -33024,7 +33094,7 @@ useEffect(() => {
                     style: {
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#1f2937',
+                      color: 'var(--text-primary)',
                       marginTop: '6px'
                     }
                   }, track.title),
@@ -33033,7 +33103,7 @@ useEffect(() => {
                     className: 'truncate',
                     style: {
                       fontSize: '11px',
-                      color: '#6b7280',
+                      color: 'var(--text-secondary)',
                       marginTop: '2px'
                     }
                   }, track.artist)
@@ -33082,8 +33152,8 @@ useEffect(() => {
                     width: albumItemWidth,
                     padding: '10px',
                     borderRadius: '10px',
-                    backgroundColor: '#ffffff',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                    backgroundColor: 'var(--card-bg)',
+                    boxShadow: 'var(--card-shadow)',
                     animationDelay: `${animationDelay}ms`
                   },
                   draggable: true,
@@ -33252,7 +33322,7 @@ useEffect(() => {
                     style: {
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#1f2937',
+                      color: 'var(--text-primary)',
                       marginTop: '6px'
                     }
                   }, album.title),
@@ -33261,7 +33331,7 @@ useEffect(() => {
                     className: 'truncate',
                     style: {
                       fontSize: '11px',
-                      color: '#6b7280',
+                      color: 'var(--text-secondary)',
                       marginTop: '2px'
                     }
                   },
@@ -33306,8 +33376,8 @@ useEffect(() => {
                     width: '160px',
                     padding: '12px',
                     borderRadius: '10px',
-                    backgroundColor: '#ffffff',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                    backgroundColor: 'var(--card-bg)',
+                    boxShadow: 'var(--card-shadow)',
                     animationDelay: `${animationDelay}ms`
                   }
                 },
@@ -33336,7 +33406,7 @@ useEffect(() => {
                     style: {
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#1f2937'
+                      color: 'var(--text-primary)'
                     }
                   }, playlist.title),
                   // Track count
@@ -33344,7 +33414,7 @@ useEffect(() => {
                     className: 'truncate',
                     style: {
                       fontSize: '11px',
-                      color: '#6b7280',
+                      color: 'var(--text-secondary)',
                       marginTop: '2px'
                     }
                   },
@@ -33915,7 +33985,7 @@ useEffect(() => {
         },
           // Skeleton header area with shimmer
           React.createElement('div', {
-            className: 'relative h-48 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+            className: 'relative h-48 shimmer-light animate-shimmer',
             style: { backgroundSize: '200% 100%' }
           }),
           // Skeleton content
@@ -33925,14 +33995,14 @@ useEffect(() => {
               Array.from({ length: 4 }).map((_, i) =>
                 React.createElement('div', {
                   key: `filter-skeleton-${i}`,
-                  className: 'h-10 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-full animate-shimmer',
+                  className: 'h-10 shimmer-light rounded-full animate-shimmer',
                   style: { width: `${80 + i * 15}px`, backgroundSize: '200% 100%', animationDelay: `${i * 100}ms` }
                 })
               )
             ),
             // Skeleton release count
             React.createElement('div', {
-              className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-24 mb-6 animate-shimmer',
+              className: 'h-4 shimmer-light rounded w-24 mb-6 animate-shimmer',
               style: { backgroundSize: '200% 100%' }
             }),
             // Skeleton album grid
@@ -33942,15 +34012,15 @@ useEffect(() => {
               Array.from({ length: 10 }).map((_, i) =>
                 React.createElement('div', { key: `album-skeleton-${i}` },
                   React.createElement('div', {
-                    className: 'aspect-square bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded-lg mb-3 animate-shimmer',
+                    className: 'aspect-square shimmer-light rounded-lg mb-3 animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                   }),
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-3/4 mb-2 animate-shimmer',
+                    className: 'h-4 shimmer-light rounded w-3/4 mb-2 animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                   }),
                   React.createElement('div', {
-                    className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/2 animate-shimmer',
+                    className: 'h-3 shimmer-light rounded w-1/2 animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                   })
                 )
@@ -33974,9 +34044,9 @@ useEffect(() => {
           artistPageTab === 'music' && React.createElement('div', {
             className: 'sticky top-0 z-10 flex items-center px-6 py-4',
             style: {
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
+              backgroundColor: 'var(--bg-secondary)',
               backdropFilter: 'blur(8px)',
-              borderBottom: '1px solid rgba(0, 0, 0, 0.06)'
+              borderBottom: '1px solid var(--border-subtle)'
             }
           },
             // Release type filter pills
@@ -34004,11 +34074,11 @@ useEffect(() => {
                   className: 'no-drag transition-all',
                   style: {
                     padding: '8px 16px',
-                    borderRadius: '20px',
+                    borderRadius: '16px',
                     fontSize: '13px',
                     fontWeight: '500',
-                    backgroundColor: isActive ? '#7c3aed' : 'rgba(0, 0, 0, 0.04)',
-                    color: isActive ? '#ffffff' : '#4b5563',
+                    backgroundColor: isActive ? 'var(--accent-primary)' : 'var(--hover-bg-default)',
+                    color: isActive ? '#ffffff' : 'var(--nav-inactive)',
                     border: 'none',
                     cursor: 'pointer',
                     boxShadow: isActive ? '0 2px 8px rgba(124, 58, 237, 0.3)' : 'none'
@@ -34027,7 +34097,7 @@ useEffect(() => {
                   padding: '8px 12px',
                   fontSize: '13px',
                   fontWeight: '500',
-                  color: '#6b7280',
+                  color: 'var(--text-secondary)',
                   cursor: 'pointer'
                 }
               },
@@ -34072,9 +34142,9 @@ useEffect(() => {
                   className: 'flex items-center',
                   style: {
                     padding: '6px 14px',
-                    borderRadius: '20px',
-                    backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                    border: '1px solid rgba(0, 0, 0, 0.08)'
+                    borderRadius: '16px',
+                    backgroundColor: 'var(--hover-bg-default)',
+                    border: '1px solid var(--border-subtle)'
                   }
                 },
                   React.createElement('input', {
@@ -34092,7 +34162,7 @@ useEffect(() => {
                     style: {
                       width: '150px',
                       fontSize: '13px',
-                      color: '#374151'
+                      color: 'var(--text-primary)'
                     }
                   }),
                   artistSearch && React.createElement('button', {
@@ -34113,7 +34183,7 @@ useEffect(() => {
                   className: 'transition-colors',
                   style: {
                     padding: '8px',
-                    color: '#9ca3af',
+                    color: 'var(--text-tertiary)',
                     cursor: 'pointer'
                   }
                 },
@@ -34399,29 +34469,29 @@ useEffect(() => {
               React.createElement('div', {
                 style: {
                   width: '192px',
-                  backgroundColor: '#ffffff',
+                  backgroundColor: 'var(--card-bg)',
                   borderRadius: '10px',
                   padding: '14px',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)'
+                  boxShadow: 'var(--card-shadow)'
                 }
               },
                 // Loading skeleton for extended info
                 loadingExtendedInfo && React.createElement('div', { className: 'space-y-4' },
                   // Section skeleton
                   React.createElement('div', { className: 'space-y-2' },
-                    React.createElement('div', { className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-16', style: { backgroundSize: '200% 100%' } }),
-                    React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-24', style: { backgroundSize: '200% 100%', animationDelay: '50ms' } })
+                    React.createElement('div', { className: 'h-3 shimmer-light rounded animate-shimmer w-16', style: { backgroundSize: '200% 100%' } }),
+                    React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-24', style: { backgroundSize: '200% 100%', animationDelay: '50ms' } })
                   ),
                   React.createElement('div', { className: 'space-y-2' },
-                    React.createElement('div', { className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-20', style: { backgroundSize: '200% 100%', animationDelay: '100ms' } }),
-                    React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-28', style: { backgroundSize: '200% 100%', animationDelay: '150ms' } })
+                    React.createElement('div', { className: 'h-3 shimmer-light rounded animate-shimmer w-20', style: { backgroundSize: '200% 100%', animationDelay: '100ms' } }),
+                    React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-28', style: { backgroundSize: '200% 100%', animationDelay: '150ms' } })
                   ),
                   React.createElement('div', { className: 'space-y-2' },
-                    React.createElement('div', { className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-14', style: { backgroundSize: '200% 100%', animationDelay: '200ms' } }),
+                    React.createElement('div', { className: 'h-3 shimmer-light rounded animate-shimmer w-14', style: { backgroundSize: '200% 100%', animationDelay: '200ms' } }),
                     React.createElement('div', { className: 'flex gap-2' },
-                      React.createElement('div', { className: 'h-6 w-6 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer', style: { backgroundSize: '200% 100%', animationDelay: '250ms' } }),
-                      React.createElement('div', { className: 'h-6 w-6 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer', style: { backgroundSize: '200% 100%', animationDelay: '300ms' } }),
-                      React.createElement('div', { className: 'h-6 w-6 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer', style: { backgroundSize: '200% 100%', animationDelay: '350ms' } })
+                      React.createElement('div', { className: 'h-6 w-6 shimmer-light rounded animate-shimmer', style: { backgroundSize: '200% 100%', animationDelay: '250ms' } }),
+                      React.createElement('div', { className: 'h-6 w-6 shimmer-light rounded animate-shimmer', style: { backgroundSize: '200% 100%', animationDelay: '300ms' } }),
+                      React.createElement('div', { className: 'h-6 w-6 shimmer-light rounded animate-shimmer', style: { backgroundSize: '200% 100%', animationDelay: '350ms' } })
                     )
                   )
                 ),
@@ -34434,7 +34504,7 @@ useEffect(() => {
                       style: {
                         fontSize: '10px',
                         fontWeight: '600',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
                         marginBottom: '2px'
@@ -34444,8 +34514,8 @@ useEffect(() => {
                       style: {
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#1f2937',
-                        lineHeight: '1.35'
+                        color: 'var(--text-primary)',
+                        lineHeight: '1.4'
                       }
                     },
                       (() => {
@@ -34469,7 +34539,7 @@ useEffect(() => {
                       style: {
                         fontSize: '10px',
                         fontWeight: '600',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
                         marginBottom: '2px'
@@ -34479,8 +34549,8 @@ useEffect(() => {
                       style: {
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#1f2937',
-                        lineHeight: '1.35'
+                        color: 'var(--text-primary)',
+                        lineHeight: '1.4'
                       }
                     }, artistExtendedInfo.foundedIn)
                   ),
@@ -34491,7 +34561,7 @@ useEffect(() => {
                       style: {
                         fontSize: '10px',
                         fontWeight: '600',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
                         marginBottom: '2px'
@@ -34501,8 +34571,8 @@ useEffect(() => {
                       style: {
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: artistExtendedInfo.isActive ? '#16a34a' : '#6b7280',
-                        lineHeight: '1.35'
+                        color: artistExtendedInfo.isActive ? '#16a34a' : 'var(--text-secondary)',
+                        lineHeight: '1.4'
                       }
                     }, artistExtendedInfo.isActive ? 'Active' : `Disbanded${artistExtendedInfo.endedDate ? ` (${artistExtendedInfo.endedDate.split('-')[0]})` : ''}`)
                   ),
@@ -34513,7 +34583,7 @@ useEffect(() => {
                       style: {
                         fontSize: '10px',
                         fontWeight: '600',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
                         marginBottom: '2px'
@@ -34545,7 +34615,7 @@ useEffect(() => {
                       style: {
                         fontSize: '10px',
                         fontWeight: '600',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.05em',
                         marginBottom: '6px'
@@ -34561,17 +34631,17 @@ useEffect(() => {
                           width: '28px',
                           height: '28px',
                           borderRadius: '6px',
-                          backgroundColor: '#f3f4f6',
+                          backgroundColor: 'var(--placeholder-bg-light)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           transition: 'background-color 150ms ease'
                         },
                         title: 'Twitter/X',
-                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = '#e5e7eb',
-                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = '#f3f4f6'
+                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg)',
+                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg-light)'
                       },
-                        React.createElement('svg', { style: { width: '14px', height: '14px', color: '#4b5563' }, viewBox: '0 0 24 24', fill: 'currentColor' },
+                        React.createElement('svg', { style: { width: '14px', height: '14px', color: 'var(--nav-inactive)' }, viewBox: '0 0 24 24', fill: 'currentColor' },
                           React.createElement('path', { d: 'M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z' })
                         )
                       ),
@@ -34584,17 +34654,17 @@ useEffect(() => {
                           width: '28px',
                           height: '28px',
                           borderRadius: '6px',
-                          backgroundColor: '#f3f4f6',
+                          backgroundColor: 'var(--placeholder-bg-light)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           transition: 'background-color 150ms ease'
                         },
                         title: 'Instagram',
-                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = '#e5e7eb',
-                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = '#f3f4f6'
+                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg)',
+                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg-light)'
                       },
-                        React.createElement('svg', { style: { width: '14px', height: '14px', color: '#4b5563' }, viewBox: '0 0 24 24', fill: 'currentColor' },
+                        React.createElement('svg', { style: { width: '14px', height: '14px', color: 'var(--nav-inactive)' }, viewBox: '0 0 24 24', fill: 'currentColor' },
                           React.createElement('path', { d: 'M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z' })
                         )
                       ),
@@ -34607,17 +34677,17 @@ useEffect(() => {
                           width: '28px',
                           height: '28px',
                           borderRadius: '6px',
-                          backgroundColor: '#f3f4f6',
+                          backgroundColor: 'var(--placeholder-bg-light)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           transition: 'background-color 150ms ease'
                         },
                         title: 'Facebook',
-                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = '#e5e7eb',
-                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = '#f3f4f6'
+                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg)',
+                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg-light)'
                       },
-                        React.createElement('svg', { style: { width: '14px', height: '14px', color: '#4b5563' }, viewBox: '0 0 24 24', fill: 'currentColor' },
+                        React.createElement('svg', { style: { width: '14px', height: '14px', color: 'var(--nav-inactive)' }, viewBox: '0 0 24 24', fill: 'currentColor' },
                           React.createElement('path', { d: 'M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z' })
                         )
                       ),
@@ -34630,17 +34700,17 @@ useEffect(() => {
                           width: '28px',
                           height: '28px',
                           borderRadius: '6px',
-                          backgroundColor: '#f3f4f6',
+                          backgroundColor: 'var(--placeholder-bg-light)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           transition: 'background-color 150ms ease'
                         },
                         title: 'YouTube',
-                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = '#e5e7eb',
-                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = '#f3f4f6'
+                        onMouseEnter: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg)',
+                        onMouseLeave: (e) => e.currentTarget.style.backgroundColor = 'var(--placeholder-bg-light)'
                       },
-                        React.createElement('svg', { style: { width: '14px', height: '14px', color: '#4b5563' }, viewBox: '0 0 24 24', fill: 'currentColor' },
+                        React.createElement('svg', { style: { width: '14px', height: '14px', color: 'var(--nav-inactive)' }, viewBox: '0 0 24 24', fill: 'currentColor' },
                           React.createElement('path', { d: 'M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z' })
                         )
                       )
@@ -34661,7 +34731,7 @@ useEffect(() => {
                         style: {
                           fontSize: '10px',
                           fontWeight: '600',
-                          color: '#9ca3af',
+                          color: 'var(--text-tertiary)',
                           textTransform: 'uppercase',
                           letterSpacing: '0.05em',
                           marginBottom: '6px'
@@ -34674,7 +34744,7 @@ useEffect(() => {
                             style: {
                               fontSize: '12px',
                               fontWeight: '500',
-                              color: '#374151',
+                              color: 'var(--text-primary)',
                               lineHeight: '1.4'
                             }
                           },
@@ -34683,7 +34753,7 @@ useEffect(() => {
                               style: {
                                 fontSize: '10px',
                                 fontWeight: '400',
-                                color: '#9ca3af',
+                                color: 'var(--text-tertiary)',
                                 marginLeft: '4px'
                               }
                             }, `(${member.attributes.join(', ')})`)
@@ -34697,7 +34767,7 @@ useEffect(() => {
                         style: {
                           fontSize: '10px',
                           fontWeight: '600',
-                          color: '#9ca3af',
+                          color: 'var(--text-tertiary)',
                           textTransform: 'uppercase',
                           letterSpacing: '0.05em',
                           marginBottom: '6px'
@@ -34710,7 +34780,7 @@ useEffect(() => {
                             style: {
                               fontSize: '12px',
                               fontWeight: '400',
-                              color: '#6b7280',
+                              color: 'var(--text-secondary)',
                               lineHeight: '1.4'
                             }
                           },
@@ -34719,7 +34789,7 @@ useEffect(() => {
                               style: {
                                 fontSize: '10px',
                                 fontWeight: '400',
-                                color: '#9ca3af',
+                                color: 'var(--text-tertiary)',
                                 marginLeft: '4px'
                               }
                             }, `(${member.attributes.join(', ')})`)
@@ -34734,7 +34804,7 @@ useEffect(() => {
                 !loadingExtendedInfo && artistExtendedInfo === false && React.createElement('div', {
                   style: {
                     fontSize: '11px',
-                    color: '#9ca3af',
+                    color: 'var(--text-tertiary)',
                     textAlign: 'center',
                     padding: '16px 0'
                   }
@@ -34748,21 +34818,21 @@ useEffect(() => {
               loadingBio && React.createElement('div', { className: 'space-y-4' },
                 // First paragraph skeleton (longer)
                 React.createElement('div', { className: 'space-y-2' },
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%' } }),
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '50ms' } }),
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-11/12', style: { backgroundSize: '200% 100%', animationDelay: '100ms' } }),
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-4/5', style: { backgroundSize: '200% 100%', animationDelay: '150ms' } })
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%' } }),
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '50ms' } }),
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-11/12', style: { backgroundSize: '200% 100%', animationDelay: '100ms' } }),
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-4/5', style: { backgroundSize: '200% 100%', animationDelay: '150ms' } })
                 ),
                 // Second paragraph skeleton
                 React.createElement('div', { className: 'space-y-2' },
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '200ms' } }),
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '250ms' } }),
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-3/4', style: { backgroundSize: '200% 100%', animationDelay: '300ms' } })
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '200ms' } }),
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '250ms' } }),
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-3/4', style: { backgroundSize: '200% 100%', animationDelay: '300ms' } })
                 ),
                 // Third paragraph skeleton (shorter)
                 React.createElement('div', { className: 'space-y-2' },
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '350ms' } }),
-                  React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer w-2/3', style: { backgroundSize: '200% 100%', animationDelay: '400ms' } })
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-full', style: { backgroundSize: '200% 100%', animationDelay: '350ms' } }),
+                  React.createElement('div', { className: 'h-4 shimmer-light rounded animate-shimmer w-2/3', style: { backgroundSize: '200% 100%', animationDelay: '400ms' } })
                 )
               ),
               // Bio content (artistBio is an object when bio exists)
@@ -34879,12 +34949,12 @@ useEffect(() => {
                     },
                       // Square image container - gray while loading, pattern only when imageLoaded && no image
                       React.createElement('div', {
-                        className: 'aspect-square relative group/art',
-                        style: { background: artist.imageLoaded && !artist.image ? relatedPattern.gradient : '#e5e7eb' }
+                        className: 'aspect-square relative group/art overflow-hidden',
+                        style: { background: artist.imageLoaded && !artist.image ? relatedPattern.gradient : 'var(--placeholder-bg)' }
                       },
                         // Shimmer while loading (imageLoaded not yet true)
                         !artist.imageLoaded && React.createElement('div', {
-                          className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+                          className: 'absolute inset-0 shimmer-strong animate-shimmer',
                           style: { backgroundSize: '200% 100%' }
                         }),
                         // Initials fallback (only show when imageLoaded && no image)
@@ -35030,7 +35100,7 @@ useEffect(() => {
               className: 'text-2xl font-bold text-white',
               style: {
                 textShadow: '0 2px 10px rgba(0,0,0,0.5)',
-                letterSpacing: '0.1em',
+                letterSpacing: '0.08em',
                 textTransform: 'uppercase'
               }
             }, pendingPlaylistLoad?.title || 'Loading...')
@@ -35094,7 +35164,7 @@ useEffect(() => {
                 Array.from({ length: 4 }).map((_, i) =>
                   React.createElement('div', {
                     key: `cover-skeleton-${i}`,
-                    className: 'aspect-square bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                    className: 'aspect-square shimmer-light animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                   })
                 )
@@ -35102,15 +35172,15 @@ useEffect(() => {
               // Skeleton metadata
               React.createElement('div', { className: 'mt-4 space-y-2' },
                 React.createElement('div', {
-                  className: 'h-5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-40 animate-shimmer',
+                  className: 'h-5 shimmer-light rounded w-40 animate-shimmer',
                   style: { backgroundSize: '200% 100%' }
                 }),
                 React.createElement('div', {
-                  className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-32 animate-shimmer',
+                  className: 'h-4 shimmer-light rounded w-32 animate-shimmer',
                   style: { backgroundSize: '200% 100%', animationDelay: '100ms' }
                 }),
                 React.createElement('div', {
-                  className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-24 animate-shimmer',
+                  className: 'h-4 shimmer-light rounded w-24 animate-shimmer',
                   style: { backgroundSize: '200% 100%', animationDelay: '200ms' }
                 })
               )
@@ -35123,20 +35193,20 @@ useEffect(() => {
                   className: 'flex items-center gap-4 py-2 px-3'
                 },
                   React.createElement('div', {
-                    className: 'w-8 h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'w-8 h-4 shimmer-light rounded animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 30}ms` }
                   }),
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'h-4 shimmer-light rounded animate-shimmer',
                     style: { width: '200px', backgroundSize: '200% 100%', animationDelay: `${i * 30 + 15}ms` }
                   }),
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'h-4 shimmer-light rounded animate-shimmer',
                     style: { width: '120px', backgroundSize: '200% 100%', animationDelay: `${i * 30 + 30}ms` }
                   }),
                   React.createElement('div', { className: 'flex-1' }),
                   React.createElement('div', {
-                    className: 'w-10 h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'w-10 h-4 shimmer-light rounded animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 30 + 45}ms` }
                   })
                 )
@@ -35197,7 +35267,7 @@ useEffect(() => {
               className: 'text-2xl font-bold text-white',
               style: {
                 textShadow: '0 2px 10px rgba(0,0,0,0.5)',
-                letterSpacing: '0.1em',
+                letterSpacing: '0.08em',
                 textTransform: 'uppercase'
               },
               onContextMenu: copyParachordLink
@@ -35565,8 +35635,8 @@ useEffect(() => {
                   style: {
                     padding: '10px',
                     borderRadius: '10px',
-                    backgroundColor: '#ffffff',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                    backgroundColor: 'var(--card-bg)',
+                    boxShadow: 'var(--card-shadow)',
                     width: '212px'
                   },
                   onContextMenu: (e) => {
@@ -35715,7 +35785,7 @@ useEffect(() => {
                     style: {
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#1f2937',
+                      color: 'var(--text-primary)',
                       marginTop: '10px',
                       letterSpacing: '0.005em'
                     },
@@ -35724,14 +35794,14 @@ useEffect(() => {
                   // Track count - matching grid typography (11px)
                   playlistTracks.length === 0 && selectedPlaylist?.isEphemeral ?
                     React.createElement('div', {
-                      className: 'h-4 w-20 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                      className: 'h-4 w-20 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                       style: { marginTop: '2px' }
                     }) :
                     React.createElement('div', {
                       className: 'truncate',
                       style: {
                         fontSize: '11px',
-                        color: '#6b7280',
+                        color: 'var(--text-secondary)',
                         marginTop: '2px'
                       }
                     }, `${playlistTracks.length} Songs`)
@@ -35853,7 +35923,7 @@ useEffect(() => {
                 ),
                 shareDropdownOpen === 'playlist' && React.createElement('div', {
                   className: 'absolute left-0 top-full mt-1 rounded-lg py-1 min-w-[160px] z-30',
-                  style: { backgroundColor: '#1f2937', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)' },
+                  style: { backgroundColor: 'var(--tooltip-bg)', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)' },
                   onClick: (e) => e.stopPropagation()
                 },
                   React.createElement('button', {
@@ -36022,7 +36092,7 @@ useEffect(() => {
                               width: '32px',
                               fontSize: '12px',
                               fontWeight: '500',
-                              color: isNowPlaying && isPlaying ? '#8b5cf6' : '#9ca3af'
+                              color: isNowPlaying && isPlaying ? 'var(--accent-secondary)' : 'var(--text-tertiary)'
                             }
                           }, isNowPlaying && isPlaying ? '▶' : String(index + 1).padStart(2, '0')),
 
@@ -36035,7 +36105,7 @@ useEffect(() => {
                           minWidth: 0,
                           fontSize: '13px',
                           fontWeight: isNowPlaying && isPlaying ? '500' : '400',
-                          color: isNowPlaying && isPlaying ? '#7c3aed' : hasResolved ? '#374151' : '#9ca3af'
+                          color: isNowPlaying && isPlaying ? 'var(--accent-primary)' : hasResolved ? 'var(--text-primary)' : 'var(--text-tertiary)'
                         }
                       }, track.title),
 
@@ -36046,7 +36116,7 @@ useEffect(() => {
                           flex: '0.7 1 0',
                           minWidth: 0,
                           fontSize: '12px',
-                          color: '#6b7280'
+                          color: 'var(--text-secondary)'
                         },
                         onClick: (e) => {
                           e.stopPropagation();
@@ -36061,7 +36131,7 @@ useEffect(() => {
                           pointerEvents: 'none',
                           width: '50px',
                           fontSize: '12px',
-                          color: '#9ca3af'
+                          color: 'var(--text-tertiary)'
                         }
                       }, formatTime(track.duration)),
 
@@ -36075,11 +36145,11 @@ useEffect(() => {
                             className: 'flex items-center gap-1'
                           },
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                               title: 'Resolving track...'
                             }),
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                               style: { animationDelay: '0.1s' }
                             })
                           )
@@ -36129,11 +36199,11 @@ useEffect(() => {
                             className: 'flex items-center gap-1'
                           },
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                               title: 'Resolving track...'
                             }),
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                               style: { animationDelay: '0.1s' }
                             })
                           )
@@ -36152,32 +36222,32 @@ useEffect(() => {
                     },
                       // Track number skeleton
                       React.createElement('div', {
-                        className: 'w-6 h-4 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                        className: 'w-6 h-4 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                         style: { width: '32px', animationDelay: `${index * 50}ms` }
                       }),
                       // Track title skeleton - flexible
                       React.createElement('div', {
-                        className: 'h-4 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                        className: 'h-4 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                         style: { flex: '1 1 0', minWidth: 0, animationDelay: `${index * 50 + 25}ms` }
                       }),
                       // Artist name skeleton - flexible
                       React.createElement('div', {
-                        className: 'h-4 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                        className: 'h-4 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                         style: { flex: '0.7 1 0', minWidth: 0, animationDelay: `${index * 50 + 50}ms` }
                       }),
                       // Duration skeleton
                       React.createElement('div', {
-                        className: 'h-4 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer flex-shrink-0',
+                        className: 'h-4 rounded shimmer-light bg-[length:200%_100%] animate-shimmer flex-shrink-0',
                         style: { width: '40px', animationDelay: `${index * 50 + 75}ms` }
                       }),
                       // Resolver icons skeleton
                       React.createElement('div', { className: 'flex items-center gap-1', style: { width: '140px', flexShrink: 0 } },
                         React.createElement('div', {
-                          className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                          className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                           style: { animationDelay: `${index * 50 + 100}ms` }
                         }),
                         React.createElement('div', {
-                          className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                          className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                           style: { animationDelay: `${index * 50 + 125}ms` }
                         })
                       )
@@ -36441,7 +36511,7 @@ useEffect(() => {
                         [0, 1, 2, 3].map(idx =>
                           React.createElement('div', {
                             key: idx,
-                            className: 'bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                            className: 'shimmer-light animate-shimmer',
                             style: { backgroundSize: '200% 100%', animationDelay: `${(i * 4 + idx) * 30}ms` }
                           })
                         )
@@ -36449,12 +36519,12 @@ useEffect(() => {
                     ),
                     // Skeleton title
                     React.createElement('div', {
-                      className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-3/4 mb-2 animate-shimmer',
+                      className: 'h-4 shimmer-light rounded w-3/4 mb-2 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                     }),
                     // Skeleton creator
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/2 animate-shimmer',
+                      className: 'h-3 shimmer-light rounded w-1/2 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                     })
                   )
@@ -36515,8 +36585,8 @@ useEffect(() => {
                     style: {
                       padding: '10px',
                       borderRadius: '10px',
-                      backgroundColor: '#ffffff',
-                      boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                      backgroundColor: 'var(--card-bg)',
+                      boxShadow: 'var(--card-shadow)',
                       animationDelay: `${animationDelay}ms`
                     }
                   },
@@ -36590,7 +36660,7 @@ useEffect(() => {
                             await refreshHostedPlaylist(playlist.id);
                             setRefreshingPlaylist(null);
                           },
-                          className: `p-1 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors ${refreshingPlaylist === playlist.id ? 'animate-spin' : ''}`,
+                          className: `p-1 bg-white/90 backdrop-blur-sm rounded-full hover:bg-white transition-colors ${refreshingPlaylist === playlist.id ? 'animate-spin-reverse' : ''}`,
                           title: 'Refresh playlist'
                         },
                           React.createElement('svg', { className: 'w-3 h-3 text-gray-600', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
@@ -36699,7 +36769,7 @@ useEffect(() => {
                       style: {
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         marginTop: '6px'
                       }
                     }, playlist.title),
@@ -36707,7 +36777,7 @@ useEffect(() => {
                       className: 'truncate',
                       style: {
                         fontSize: '11px',
-                        color: '#6b7280',
+                        color: 'var(--text-secondary)',
                         marginTop: '2px'
                       }
                     },
@@ -36726,7 +36796,7 @@ useEffect(() => {
                         [0, 1, 2, 3].map(idx =>
                           React.createElement('div', {
                             key: idx,
-                            className: 'bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                            className: 'shimmer-light animate-shimmer',
                             style: { backgroundSize: '200% 100%', animationDelay: `${(i * 4 + idx) * 30}ms` }
                           })
                         )
@@ -36734,12 +36804,12 @@ useEffect(() => {
                     ),
                     // Skeleton title
                     React.createElement('div', {
-                      className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-3/4 mb-2 animate-shimmer',
+                      className: 'h-4 shimmer-light rounded w-3/4 mb-2 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                     }),
                     // Skeleton creator
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/2 animate-shimmer',
+                      className: 'h-3 shimmer-light rounded w-1/2 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                     })
                   )
@@ -36896,23 +36966,23 @@ useEffect(() => {
                 },
                   // Skeleton thumbnail
                   React.createElement('div', {
-                    className: 'w-12 h-12 rounded overflow-hidden flex-shrink-0 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                    className: 'w-12 h-12 rounded overflow-hidden flex-shrink-0 shimmer-light animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                   }),
                   // Skeleton title/creator
                   React.createElement('div', { className: 'flex-1 min-w-0' },
                     React.createElement('div', {
-                      className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-48 mb-2 animate-shimmer',
+                      className: 'h-4 shimmer-light rounded w-48 mb-2 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-24 animate-shimmer',
+                      className: 'h-3 shimmer-light rounded w-24 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                     })
                   ),
                   // Skeleton track count
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-16 flex-shrink-0 animate-shimmer',
+                    className: 'h-4 shimmer-light rounded w-16 flex-shrink-0 animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                   })
                 )
@@ -37075,7 +37145,7 @@ useEffect(() => {
                     description: `Install ${uninstalledPopular.length} more resolver${uninstalledPopular.length > 1 ? 's' : ''} to expand your library`,
                     action: () => { navigateTo('settings'); setSettingsTab('plugins'); },
                     actionLabel: 'Browse Plugins',
-                    color: '#8b5cf6'
+                    color: 'var(--accent-secondary)'
                   });
                 }
 
@@ -37198,10 +37268,10 @@ useEffect(() => {
                         key: suggestion.id,
                         className: 'release-card card-fade-up flex items-start gap-3 p-4 text-left',
                         style: {
-                          backgroundColor: '#ffffff',
+                          backgroundColor: 'var(--card-bg)',
                           borderRadius: '10px',
                           border: 'none',
-                          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                          boxShadow: 'var(--card-shadow)',
                           animationDelay: `${index * 50}ms`
                         },
                         onClick: suggestion.action
@@ -37318,7 +37388,7 @@ useEffect(() => {
                       key: `album-skeleton-${i}`,
                       className: 'animate-pulse',
                       style: {
-                        backgroundColor: '#ffffff',
+                        backgroundColor: 'var(--card-bg)',
                         borderRadius: '10px',
                         padding: '10px',
                         boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
@@ -37326,15 +37396,15 @@ useEffect(() => {
                     },
                       React.createElement('div', {
                         className: 'aspect-square rounded-md mb-2',
-                        style: { backgroundColor: '#e5e7eb' }
+                        style: { backgroundColor: 'var(--placeholder-bg)' }
                       }),
                       React.createElement('div', {
                         className: 'h-4 rounded mb-2',
-                        style: { backgroundColor: '#e5e7eb', width: '80%' }
+                        style: { backgroundColor: 'var(--placeholder-bg)', width: '80%' }
                       }),
                       React.createElement('div', {
                         className: 'h-3 rounded',
-                        style: { backgroundColor: '#e5e7eb', width: '60%' }
+                        style: { backgroundColor: 'var(--placeholder-bg)', width: '60%' }
                       })
                     )
                   ),
@@ -37347,11 +37417,11 @@ useEffect(() => {
                         key: album.id || `${album.artist}-${album.title}`,
                         className: 'release-card card-fade-up text-left group/art',
                         style: {
-                          backgroundColor: '#ffffff',
+                          backgroundColor: 'var(--card-bg)',
                           borderRadius: '10px',
                           padding: '10px',
                           border: 'none',
-                          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                          boxShadow: 'var(--card-shadow)',
                           animationDelay: `${index * 50}ms`
                         },
                         onClick: () => handleCollectionAlbumClick(album),
@@ -37497,9 +37567,9 @@ useEffect(() => {
                           key: jam.id,
                           className: 'release-card card-fade-up text-left rounded-xl overflow-hidden transition-all hover:shadow-lg',
                           style: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'var(--card-bg)',
                             border: 'none',
-                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                            boxShadow: 'var(--card-shadow)',
                             animationDelay: `${index * 50}ms`
                           },
                           onClick: () => {
@@ -37539,7 +37609,7 @@ useEffect(() => {
                               style: {
                                 background: weeklyJamCovers[jam.id]
                                   ? 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
-                                  : 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)',
+                                  : 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))',
                                 backgroundSize: !weeklyJamCovers[jam.id] ? '200% 100%' : undefined
                               }
                             },
@@ -37680,10 +37750,10 @@ useEffect(() => {
                             key: playlist.id,
                             className: 'release-card card-fade-up flex items-center gap-3 p-3 text-left w-full',
                             style: {
-                              backgroundColor: '#ffffff',
+                              backgroundColor: 'var(--card-bg)',
                               borderRadius: '10px',
                               border: 'none',
-                              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                              boxShadow: 'var(--card-shadow)',
                               animationDelay: `${index * 50}ms`
                             },
                             onClick: () => {
@@ -37711,7 +37781,7 @@ useEffect(() => {
                                 style: {
                                   background: allPlaylistCovers[playlist.id]
                                     ? 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
-                                    : 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)',
+                                    : 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))',
                                   backgroundSize: !allPlaylistCovers[playlist.id] ? '200% 100%' : undefined
                                 }
                               },
@@ -37787,9 +37857,9 @@ useEffect(() => {
                           key: friend.id,
                           className: 'release-card card-fade-up flex items-center gap-3 p-3 cursor-pointer',
                           style: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'var(--card-bg)',
                             borderRadius: '10px',
-                            boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                            boxShadow: 'var(--card-shadow)',
                             animationDelay: `${index * 50}ms`
                           },
                           onClick: () => navigateToFriend(friend)
@@ -37825,13 +37895,13 @@ useEffect(() => {
                               // Time indicator
                               React.createElement('span', {
                                 className: 'text-xs flex-shrink-0',
-                                style: { color: onAir ? '#16a34a' : '#9ca3af' }
+                                style: { color: onAir ? '#16a34a' : 'var(--text-tertiary)' }
                               }, onAir ? 'now' : formatTimeAgo(track?.timestamp))
                             ),
                             // Track info - click to play, right-click for context menu
                             track && React.createElement('p', {
                               className: 'text-xs truncate mt-0.5 cursor-pointer hover:underline',
-                              style: { color: onAir ? '#4b5563' : '#9ca3af' },
+                              style: { color: onAir ? 'var(--nav-inactive)' : 'var(--text-tertiary)' },
                               onClick: (e) => {
                                 e.stopPropagation();
                                 const cacheKey = `${track.artist.toLowerCase()}|${track.name.toLowerCase()}`;
@@ -37866,7 +37936,7 @@ useEffect(() => {
                               }
                             },
                               React.createElement('span', {
-                                style: { color: onAir ? '#22c55e' : '#d1d5db' }
+                                style: { color: onAir ? '#22c55e' : 'var(--border-default)' }
                               }, '\u266A '),
                               `${track.name} \u00B7 ${track.artist}`
                             )
@@ -37914,7 +37984,7 @@ useEffect(() => {
                     ),
                     React.createElement('div', {
                       className: 'flex-1 flex flex-col items-center justify-center rounded-xl p-6',
-                      style: { backgroundColor: '#f9fafb' }
+                      style: { backgroundColor: 'var(--bg-secondary)' }
                     },
                       React.createElement('svg', { className: 'w-12 h-12 text-gray-300 mb-3', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
                         React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 1.5, d: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' })
@@ -37974,7 +38044,7 @@ useEffect(() => {
                     },
                       React.createElement('div', {
                         className: 'w-12 h-12 rounded-full overflow-hidden flex-shrink-0',
-                        style: { background: 'linear-gradient(135deg, #4c1d95 0%, #7c3aed 100%)' }
+                        style: { background: 'linear-gradient(135deg, #4c1d95 0%, var(--accent-primary) 100%)' }
                       },
                         recommendations.artists[0].image
                           ? React.createElement('img', {
@@ -38195,7 +38265,7 @@ useEffect(() => {
                         React.createElement('h2', { className: 'text-lg font-semibold text-gray-900' }, 'Album Suggestions'),
                         React.createElement('span', {
                           className: 'px-2 py-0.5 rounded-full text-xs font-medium',
-                          style: { backgroundColor: '#ede9fe', color: '#7c3aed' }
+                          style: { backgroundColor: 'var(--accent-surface)', color: 'var(--accent-primary)' }
                         }, 'Shuffleupagus'),
                         React.createElement('button', {
                           className: 'ml-auto p-1.5 text-purple-600 hover:text-purple-700 transition-colors',
@@ -38256,7 +38326,7 @@ useEffect(() => {
                             }
                           }
                         },
-                          React.createElement('svg', { className: 'w-4 h-4' + (aiRecs.loading ? ' animate-spin' : ''), fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
+                          React.createElement('svg', { className: 'w-4 h-4' + (aiRecs.loading ? ' animate-spin-reverse' : ''), fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
                             React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15' })
                           )
                         )
@@ -38271,9 +38341,9 @@ useEffect(() => {
                             style: {
                               padding: '10px',
                               borderRadius: '10px',
-                              backgroundColor: '#ffffff',
+                              backgroundColor: 'var(--card-bg)',
                               border: 'none',
-                              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                              boxShadow: 'var(--card-shadow)',
                               animationDelay: `${index * 50}ms`
                             },
                             onClick: () => handleCollectionAlbumClick({ title: album.title, artist: album.artist }),
@@ -38306,7 +38376,7 @@ useEffect(() => {
                                 overflow: 'hidden',
                                 position: 'relative',
                                 background: album.art
-                                  ? '#f3f4f6'
+                                  ? 'var(--placeholder-bg-light)'
                                   : 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
                               }
                             },
@@ -38432,7 +38502,7 @@ useEffect(() => {
                                   style: {
                                     fontWeight: '500',
                                     fontSize: '13px',
-                                    color: '#1f2937',
+                                    color: 'var(--text-primary)',
                                     overflow: 'hidden',
                                     textOverflow: 'ellipsis',
                                     whiteSpace: 'nowrap',
@@ -38440,7 +38510,7 @@ useEffect(() => {
                                   }
                                 }, album.title),
                                 React.createElement('p', {
-                                  style: { fontSize: '12px', color: '#6b7280', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
+                                  style: { fontSize: '12px', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
                                 }, album.artist)
                               )
                             )
@@ -38451,7 +38521,7 @@ useEffect(() => {
                           React.createElement('div', {
                             key: `ai-album-skeleton-${i}`,
                             style: {
-                              backgroundColor: '#ffffff',
+                              backgroundColor: 'var(--card-bg)',
                               borderRadius: '10px',
                               padding: '10px',
                               boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
@@ -38459,10 +38529,10 @@ useEffect(() => {
                           },
                             React.createElement('div', {
                               className: 'aspect-square rounded-md mb-2 animate-shimmer',
-                              style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)' }
+                              style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))' }
                             }),
-                            React.createElement('div', { className: 'h-4 rounded mb-2 animate-shimmer', style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', width: '80%' } }),
-                            React.createElement('div', { className: 'h-3 rounded animate-shimmer', style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', width: '60%' } })
+                            React.createElement('div', { className: 'h-4 rounded mb-2 animate-shimmer', style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', width: '80%' } }),
+                            React.createElement('div', { className: 'h-3 rounded animate-shimmer', style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', width: '60%' } })
                           )
                         ) : [])
                       )
@@ -38473,7 +38543,7 @@ useEffect(() => {
                         React.createElement('h2', { className: 'text-lg font-semibold text-gray-900' }, 'Artist Suggestions'),
                         React.createElement('span', {
                           className: 'px-2 py-0.5 rounded-full text-xs font-medium',
-                          style: { backgroundColor: '#ede9fe', color: '#7c3aed' }
+                          style: { backgroundColor: 'var(--accent-surface)', color: 'var(--accent-primary)' }
                         }, 'Shuffleupagus')
                       ),
                       React.createElement('div', {
@@ -38496,11 +38566,11 @@ useEffect(() => {
                           },
                             React.createElement('div', {
                               className: 'aspect-square relative group/art overflow-hidden',
-                              style: { background: artist.image === null ? generateArtistPattern(artist.name).gradient : '#e5e7eb' }
+                              style: { background: artist.image === null ? generateArtistPattern(artist.name).gradient : 'var(--placeholder-bg)' }
                             },
                               // Loading shimmer
                               artist.image === undefined && React.createElement('div', {
-                                className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+                                className: 'absolute inset-0 shimmer-strong animate-shimmer',
                                 style: { backgroundSize: '200% 100%' }
                               }),
                               // Artist image
@@ -38599,7 +38669,7 @@ useEffect(() => {
                       React.createElement('h2', { className: 'text-lg font-semibold text-gray-900' }, 'Album Suggestions'),
                       React.createElement('span', {
                         className: 'px-2 py-0.5 rounded-full text-xs font-medium',
-                        style: { backgroundColor: '#ede9fe', color: '#7c3aed' }
+                        style: { backgroundColor: 'var(--accent-surface)', color: 'var(--accent-primary)' }
                       }, 'Shuffleupagus')
                     ),
                     React.createElement('div', { className: 'grid grid-cols-5 gap-4 mb-6' },
@@ -38607,7 +38677,7 @@ useEffect(() => {
                         React.createElement('div', {
                           key: `ai-album-skeleton-${i}`,
                           style: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'var(--card-bg)',
                             borderRadius: '10px',
                             padding: '10px',
                             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
@@ -38615,10 +38685,10 @@ useEffect(() => {
                         },
                           React.createElement('div', {
                             className: 'aspect-square rounded-md mb-2 animate-shimmer',
-                            style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)' }
+                            style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))' }
                           }),
-                          React.createElement('div', { className: 'h-4 rounded mb-2 animate-shimmer', style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', width: '80%' } }),
-                          React.createElement('div', { className: 'h-3 rounded animate-shimmer', style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', width: '60%' } })
+                          React.createElement('div', { className: 'h-4 rounded mb-2 animate-shimmer', style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', width: '80%' } }),
+                          React.createElement('div', { className: 'h-3 rounded animate-shimmer', style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', width: '60%' } })
                         )
                       )
                     ),
@@ -38626,7 +38696,7 @@ useEffect(() => {
                       React.createElement('h2', { className: 'text-lg font-semibold text-gray-900' }, 'Artist Suggestions'),
                       React.createElement('span', {
                         className: 'px-2 py-0.5 rounded-full text-xs font-medium',
-                        style: { backgroundColor: '#ede9fe', color: '#7c3aed' }
+                        style: { backgroundColor: 'var(--accent-surface)', color: 'var(--accent-primary)' }
                       }, 'Shuffleupagus')
                     ),
                     React.createElement('div', { className: 'grid grid-cols-5 gap-4' },
@@ -38634,7 +38704,7 @@ useEffect(() => {
                         React.createElement('div', {
                           key: `ai-artist-skeleton-${i}`,
                           style: {
-                            backgroundColor: '#ffffff',
+                            backgroundColor: 'var(--card-bg)',
                             borderRadius: '10px',
                             padding: '10px',
                             boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
@@ -38642,9 +38712,9 @@ useEffect(() => {
                         },
                           React.createElement('div', {
                             className: 'aspect-square rounded-lg mb-2 animate-shimmer',
-                            style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)' }
+                            style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))' }
                           }),
-                          React.createElement('div', { className: 'h-4 rounded animate-shimmer', style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', width: '70%' } })
+                          React.createElement('div', { className: 'h-4 rounded animate-shimmer', style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', width: '70%' } })
                         )
                       )
                     )
@@ -38692,7 +38762,7 @@ useEffect(() => {
                 const statsGrid = React.createElement('div', { className: 'grid grid-cols-2 md:grid-cols-5 gap-4 mt-4' },
                   [
                     { label: 'Songs', value: library.length + collectionData.tracks.length, icon: 'M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2z', color: '#3b82f6', onClick: () => { navigateTo('library'); setCollectionTab('tracks'); } },
-                    { label: 'Albums', value: collectionData.albums.length, icon: 'M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3', color: '#8b5cf6', onClick: () => { navigateTo('library'); setCollectionTab('albums'); } },
+                    { label: 'Albums', value: collectionData.albums.length, icon: 'M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3', color: 'var(--accent-secondary)', onClick: () => { navigateTo('library'); setCollectionTab('albums'); } },
                     { label: 'Artists', value: collectionData.artists.length, icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', color: '#ec4899', onClick: () => { navigateTo('library'); setCollectionTab('artists'); } },
                     { label: 'Playlists', value: playlists.length, icon: 'M4 6h16M4 10h16M4 14h16M4 18h16', color: '#f59e0b', onClick: () => navigateTo('playlists') },
                     { label: 'Friends', value: friends.length, icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', color: '#10b981', onClick: () => { navigateTo('library'); setCollectionTab('friends'); } }
@@ -38701,10 +38771,10 @@ useEffect(() => {
                       key: stat.label,
                       className: 'release-card card-fade-up p-4 text-left',
                       style: {
-                        backgroundColor: hasSyncEnabled ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+                        backgroundColor: 'var(--card-bg)',
                         borderRadius: '10px',
                         border: 'none',
-                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                        boxShadow: 'var(--card-shadow)',
                         animationDelay: `${index * 50}ms`
                       },
                       onClick: stat.onClick
@@ -38732,8 +38802,8 @@ useEffect(() => {
                 return React.createElement('div', null, sectionHeader, React.createElement('div', {
                   className: 'rounded-xl overflow-hidden mt-4',
                   style: {
-                    background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 50%, #f0f9ff 100%)',
-                    border: '1px solid rgba(0, 0, 0, 0.06)'
+                    background: 'var(--bg-inset)',
+                    border: '1px solid var(--border-subtle)'
                   }
                 },
                   React.createElement('div', { className: 'p-5' },
@@ -39037,7 +39107,7 @@ useEffect(() => {
                   onClick: () => setSyncMenuOpen(!syncMenuOpen),
                   className: 'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5',
                   style: {
-                    backgroundColor: Object.values(resolverSyncSettings).some(s => s?.enabled) ? '#22c55e' : '#4b5563',
+                    backgroundColor: Object.values(resolverSyncSettings).some(s => s?.enabled) ? '#22c55e' : 'var(--nav-inactive)',
                     color: '#ffffff',
                     border: 'none',
                     cursor: 'pointer'
@@ -39060,10 +39130,10 @@ useEffect(() => {
                     right: 0,
                     marginTop: '4px',
                     width: '200px',
-                    backgroundColor: '#ffffff',
+                    backgroundColor: 'var(--card-bg)',
                     borderRadius: '12px',
                     boxShadow: '0 10px 25px rgba(0, 0, 0, 0.15)',
-                    border: '1px solid rgba(0, 0, 0, 0.08)',
+                    border: '1px solid var(--border-subtle)',
                     zIndex: 50,
                     overflow: 'hidden'
                   }
@@ -39080,13 +39150,13 @@ useEffect(() => {
                         padding: '10px 14px',
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
                         transition: 'background-color 100ms ease'
                       },
-                      onMouseEnter: (e) => e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.04)',
+                      onMouseEnter: (e) => e.currentTarget.style.backgroundColor = 'var(--hover-bg-default)',
                       onMouseLeave: (e) => e.currentTarget.style.backgroundColor = 'transparent'
                     },
                       React.createElement('div', {
@@ -39299,27 +39369,27 @@ useEffect(() => {
                     },
                       // Track number skeleton
                       React.createElement('div', {
-                        className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                        className: 'h-3 shimmer-light rounded animate-shimmer',
                         style: { width: '24px', flexShrink: 0 }
                       }),
                       // Title skeleton - flexible
                       React.createElement('div', {
-                        className: 'h-3.5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                        className: 'h-3.5 shimmer-light rounded animate-shimmer',
                         style: { flex: '1 1 0', minWidth: 0, animationDelay: '0.1s' }
                       }),
                       // Artist skeleton - flexible
                       React.createElement('div', {
-                        className: 'h-3.5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                        className: 'h-3.5 shimmer-light rounded animate-shimmer',
                         style: { flex: '0.7 1 0', minWidth: 0, animationDelay: '0.2s' }
                       }),
                       // Album skeleton - flexible
                       React.createElement('div', {
-                        className: 'h-3.5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                        className: 'h-3.5 shimmer-light rounded animate-shimmer',
                         style: { flex: '0.5 1 0', minWidth: 0, animationDelay: '0.3s' }
                       }),
                       // Duration skeleton
                       React.createElement('div', {
-                        className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer flex-shrink-0',
+                        className: 'h-3 shimmer-light rounded animate-shimmer flex-shrink-0',
                         style: { width: '50px', marginRight: '16px', animationDelay: '0.4s' }
                       }),
                       // Resolver icons skeleton
@@ -39328,11 +39398,11 @@ useEffect(() => {
                         style: { width: '140px', flexShrink: 0 }
                       },
                         React.createElement('div', {
-                          className: 'w-5 h-5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                          className: 'w-5 h-5 shimmer-light rounded animate-shimmer',
                           style: { animationDelay: '0.5s' }
                         }),
                         React.createElement('div', {
-                          className: 'w-5 h-5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                          className: 'w-5 h-5 shimmer-light rounded animate-shimmer',
                           style: { animationDelay: '0.6s' }
                         })
                       )
@@ -39457,7 +39527,7 @@ useEffect(() => {
                         pointerEvents: 'none',
                         fontSize: '12px',
                         fontWeight: '500',
-                        color: isNowPlaying && isPlaying ? '#8b5cf6' : '#9ca3af'
+                        color: isNowPlaying && isPlaying ? 'var(--accent-secondary)' : 'var(--text-tertiary)'
                       }
                     }, isNowPlaying && isPlaying ? '▶' : String(index + 1).padStart(2, '0')),
 
@@ -39470,7 +39540,7 @@ useEffect(() => {
                         minWidth: 0,
                         fontSize: '13px',
                         fontWeight: isNowPlaying && isPlaying ? '500' : '400',
-                        color: isNowPlaying && isPlaying ? '#7c3aed' : '#374151'
+                        color: isNowPlaying && isPlaying ? 'var(--accent-primary)' : 'var(--text-primary)'
                       }
                     }, track.title),
 
@@ -39481,7 +39551,7 @@ useEffect(() => {
                         flex: '0.7 1 0',
                         minWidth: 0,
                         fontSize: '13px',
-                        color: '#6b7280'
+                        color: 'var(--text-secondary)'
                       },
                       onClick: (e) => {
                         e.stopPropagation();
@@ -39496,7 +39566,7 @@ useEffect(() => {
                         flex: '0.5 1 0',
                         minWidth: 0,
                         fontSize: '13px',
-                        color: '#6b7280'
+                        color: 'var(--text-secondary)'
                       },
                       onClick: (e) => {
                         e.stopPropagation();
@@ -39509,7 +39579,7 @@ useEffect(() => {
                         flex: '0.5 1 0',
                         minWidth: 0,
                         fontSize: '13px',
-                        color: '#6b7280'
+                        color: 'var(--text-secondary)'
                       }
                     }, ''),
 
@@ -39521,7 +39591,7 @@ useEffect(() => {
                         width: '50px',
                         marginRight: '16px',
                         fontSize: '12px',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         textAlign: 'right'
                       }
                     }, formatTime(track.duration)),
@@ -39611,11 +39681,11 @@ useEffect(() => {
                             }, React.createElement(ResolverIcon, { resolverId: 'localfiles', size: 12 })),
                             // Shimmer skeletons
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                               title: 'Resolving...'
                             }),
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                               style: { animationDelay: '0.1s' }
                             })
                           );
@@ -39744,8 +39814,8 @@ useEffect(() => {
                       style: {
                         padding: '14px 12px',
                         borderRadius: '10px',
-                        backgroundColor: '#ffffff',
-                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                        backgroundColor: 'var(--card-bg)',
+                        boxShadow: 'var(--card-shadow)',
                         animationDelay: `${Math.min(index * 30, 300)}ms`
                       },
                       draggable: true,
@@ -39779,8 +39849,8 @@ useEffect(() => {
                             clipPath: 'polygon(50% 0%, 93.3% 25%, 93.3% 75%, 50% 100%, 6.7% 75%, 6.7% 25%)',
                             background: onAir
                               ? 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)'
-                              : 'linear-gradient(135deg, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.04) 100%)',
-                            transition: 'all 0.3s ease'
+                              : 'linear-gradient(135deg, var(--hover-bg-subtle) 0%, var(--hover-bg-default) 100%)',
+                            transition: 'background 0.3s ease'
                           },
                           className: 'group-hover:scale-105'
                         }),
@@ -39853,7 +39923,7 @@ useEffect(() => {
                           style: {
                             fontSize: '13px',
                             fontWeight: '500',
-                            color: '#1f2937',
+                            color: 'var(--text-primary)',
                             textAlign: 'center',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
@@ -39864,7 +39934,7 @@ useEffect(() => {
                         }, friend.displayName),
                         // Pin icon for manually pinned friends (not auto-pinned)
                         isPinned && !autoPinnedFriendIds.includes(friend.id) && React.createElement('svg', {
-                          style: { width: '12px', height: '12px', color: '#a78bfa', flexShrink: 0 },
+                          style: { width: '12px', height: '12px', color: 'var(--accent-soft)', flexShrink: 0 },
                           fill: 'currentColor',
                           viewBox: '0 0 24 24',
                           title: 'Pinned to sidebar'
@@ -39886,7 +39956,7 @@ useEffect(() => {
                         style: {
                           marginTop: '6px',
                           fontSize: '11px',
-                          color: '#6b7280',
+                          color: 'var(--text-secondary)',
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',
@@ -40252,16 +40322,16 @@ useEffect(() => {
               Array.from({ length: 15 }).map((_, i) =>
                 React.createElement('div', { key: `skeleton-${i}` },
                   React.createElement('div', {
-                    className: 'aspect-square rounded-lg mb-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                    className: 'aspect-square rounded-lg mb-3 shimmer-light animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                   }),
                   React.createElement('div', { className: 'space-y-2' },
                     React.createElement('div', {
-                      className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-3/4 animate-shimmer',
+                      className: 'h-4 shimmer-light rounded w-3/4 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/2 animate-shimmer',
+                      className: 'h-3 shimmer-light rounded w-1/2 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                     })
                   )
@@ -40298,9 +40368,9 @@ useEffect(() => {
                   style: {
                     padding: '10px',
                     borderRadius: '10px',
-                    backgroundColor: '#ffffff',
+                    backgroundColor: 'var(--card-bg)',
                     border: 'none',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                    boxShadow: 'var(--card-shadow)',
                     animationDelay: `${Math.min(index * 30, 300)}ms`
                   },
                   onMouseEnter: () => prefetchChartsTracks(item),
@@ -40334,8 +40404,8 @@ useEffect(() => {
                       background: item.albumArt === null
                         ? 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
                         : item.albumArt === undefined
-                          ? 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)'
-                          : '#f3f4f6',
+                          ? 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))'
+                          : 'var(--placeholder-bg-light)',
                       backgroundSize: item.albumArt === undefined ? '200% 100%' : undefined
                     }
                   },
@@ -40475,7 +40545,7 @@ useEffect(() => {
                       style: {
                         fontWeight: '500',
                         fontSize: '13px',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
@@ -40487,7 +40557,7 @@ useEffect(() => {
                     React.createElement('div', {
                       style: {
                         fontSize: '12px',
-                        color: '#6b7280',
+                        color: 'var(--text-secondary)',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         whiteSpace: 'nowrap',
@@ -40521,27 +40591,27 @@ useEffect(() => {
                 },
                   // Track number skeleton
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'h-4 shimmer-light rounded animate-shimmer',
                     style: { width: '32px', backgroundSize: '200% 100%', animationDelay: `${i * 30}ms`, flexShrink: 0 }
                   }),
                   // Title skeleton - flexible
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'h-4 shimmer-light rounded animate-shimmer',
                     style: { flex: '1 1 0', minWidth: 0, backgroundSize: '200% 100%', animationDelay: `${i * 30 + 15}ms` }
                   }),
                   // Artist skeleton - flexible
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'h-4 shimmer-light rounded animate-shimmer',
                     style: { flex: '0.7 1 0', minWidth: 0, backgroundSize: '200% 100%', animationDelay: `${i * 30 + 30}ms` }
                   }),
                   // Listeners skeleton
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'h-4 shimmer-light rounded animate-shimmer',
                     style: { width: '80px', backgroundSize: '200% 100%', animationDelay: `${i * 30 + 45}ms`, flexShrink: 0 }
                   }),
                   // Badge skeleton
                   React.createElement('div', {
-                    className: 'h-5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-shimmer',
+                    className: 'h-5 shimmer-light rounded animate-shimmer',
                     style: { width: '50px', backgroundSize: '200% 100%', animationDelay: `${i * 30 + 60}ms`, flexShrink: 0 }
                   })
                 )
@@ -40632,7 +40702,7 @@ useEffect(() => {
                         width: '32px',
                         fontSize: '12px',
                         fontWeight: '500',
-                        color: isNowPlaying ? '#8b5cf6' : '#9ca3af'
+                        color: isNowPlaying ? 'var(--accent-secondary)' : 'var(--text-tertiary)'
                       }
                     }, isNowPlaying ? '▶' : String(track.rank).padStart(2, '0')),
 
@@ -40645,7 +40715,7 @@ useEffect(() => {
                         minWidth: 0,
                         fontSize: '13px',
                         fontWeight: isNowPlaying ? '500' : '400',
-                        color: isNowPlaying ? '#7c3aed' : hasResolved ? '#374151' : '#9ca3af'
+                        color: isNowPlaying ? 'var(--accent-primary)' : hasResolved ? 'var(--text-primary)' : 'var(--text-tertiary)'
                       }
                     }, track.title),
 
@@ -40656,7 +40726,7 @@ useEffect(() => {
                         flex: '0.7 1 0',
                         minWidth: 0,
                         fontSize: '12px',
-                        color: '#6b7280'
+                        color: 'var(--text-secondary)'
                       },
                       onClick: (e) => {
                         e.stopPropagation();
@@ -40671,7 +40741,7 @@ useEffect(() => {
                         pointerEvents: 'none',
                         width: '90px',
                         fontSize: '12px',
-                        color: '#9ca3af'
+                        color: 'var(--text-tertiary)'
                       }
                     }, `${(track.listeners / 1000).toFixed(0)}K listeners`),
 
@@ -40683,11 +40753,11 @@ useEffect(() => {
                       isResolving ?
                         React.createElement('div', { className: 'flex items-center gap-1' },
                           React.createElement('div', {
-                            className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                            className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                             title: 'Resolving track...'
                           }),
                           React.createElement('div', {
-                            className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                            className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                             style: { animationDelay: '0.1s' }
                           })
                         )
@@ -40875,7 +40945,7 @@ useEffect(() => {
               title: newReleasesLoading ? 'Loading...' : 'Refresh'
             },
               React.createElement('svg', {
-                className: `w-4 h-4 ${newReleasesLoading ? 'animate-spin' : ''}`,
+                className: `w-4 h-4 ${newReleasesLoading ? 'animate-spin-reverse' : ''}`,
                 fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor'
               },
                 React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15' })
@@ -40949,23 +41019,23 @@ useEffect(() => {
                 React.createElement('div', {
                   key: `skeleton-${i}`,
                   style: {
-                    backgroundColor: '#ffffff',
+                    backgroundColor: 'var(--card-bg)',
                     borderRadius: '10px',
                     padding: '10px',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)'
+                    boxShadow: 'var(--card-shadow)'
                   }
                 },
                   React.createElement('div', {
                     className: 'animate-shimmer',
-                    style: { aspectRatio: '1', borderRadius: '6px', marginBottom: '10px', background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
+                    style: { aspectRatio: '1', borderRadius: '6px', marginBottom: '10px', background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                   }),
                   React.createElement('div', {
                     className: 'h-4 rounded animate-shimmer',
-                    style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', backgroundSize: '200% 100%', width: '80%', marginBottom: '6px', animationDelay: `${i * 50 + 25}ms` }
+                    style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', backgroundSize: '200% 100%', width: '80%', marginBottom: '6px', animationDelay: `${i * 50 + 25}ms` }
                   }),
                   React.createElement('div', {
                     className: 'h-3 rounded animate-shimmer',
-                    style: { background: 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)', backgroundSize: '200% 100%', width: '60%', animationDelay: `${i * 50 + 50}ms` }
+                    style: { background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))', backgroundSize: '200% 100%', width: '60%', animationDelay: `${i * 50 + 50}ms` }
                   })
                 )
               )
@@ -41019,9 +41089,9 @@ useEffect(() => {
                       style: {
                         padding: '10px',
                         borderRadius: '10px',
-                        backgroundColor: '#ffffff',
+                        backgroundColor: 'var(--card-bg)',
                         border: 'none',
-                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                        boxShadow: 'var(--card-shadow)',
                         animationDelay: `${Math.min(index, 20) * 30}ms`,
                         cursor: 'pointer'
                       },
@@ -41198,7 +41268,7 @@ useEffect(() => {
                             style: {
                               fontWeight: '500',
                               fontSize: '13px',
-                              color: '#1f2937',
+                              color: 'var(--text-primary)',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap',
@@ -41208,7 +41278,7 @@ useEffect(() => {
                           React.createElement('p', {
                             style: {
                               fontSize: '12px',
-                              color: '#6b7280',
+                              color: 'var(--text-secondary)',
                               overflow: 'hidden',
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap',
@@ -41227,7 +41297,7 @@ useEffect(() => {
                             const isFuture = d > today;
                             const formatted = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                             return React.createElement('p', {
-                              style: { fontSize: '11px', color: isFuture ? '#8b5cf6' : '#9ca3af', marginTop: '2px' }
+                              style: { fontSize: '11px', color: isFuture ? 'var(--accent-secondary)' : 'var(--text-tertiary)', marginTop: '2px' }
                             }, isFuture ? `Coming ${formatted}` : formatted);
                           })()
                         )
@@ -41434,26 +41504,26 @@ useEffect(() => {
               },
                 // Skeleton album art
                 React.createElement('div', {
-                  className: 'w-28 h-28 flex-shrink-0 rounded-lg bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                  className: 'w-28 h-28 flex-shrink-0 rounded-lg shimmer-light animate-shimmer',
                   style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                 }),
                 // Skeleton content
                 React.createElement('div', { className: 'flex-1 space-y-3 py-1' },
                   React.createElement('div', {
-                    className: 'h-5 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-2/5 animate-shimmer',
+                    className: 'h-5 shimmer-light rounded w-2/5 animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                   }),
                   React.createElement('div', {
-                    className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/4 animate-shimmer',
+                    className: 'h-4 shimmer-light rounded w-1/4 animate-shimmer',
                     style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                   }),
                   React.createElement('div', { className: 'space-y-2 pt-2' },
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-full animate-shimmer',
+                      className: 'h-3 shimmer-light rounded w-full animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 75}ms` }
                     }),
                     React.createElement('div', {
-                      className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-4/5 animate-shimmer',
+                      className: 'h-3 shimmer-light rounded w-4/5 animate-shimmer',
                       style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 100}ms` }
                     })
                   )
@@ -41492,9 +41562,9 @@ useEffect(() => {
                 style: {
                   padding: '12px',
                   borderRadius: '10px',
-                  backgroundColor: '#ffffff',
+                  backgroundColor: 'var(--card-bg)',
                   border: 'none',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                  boxShadow: 'var(--card-shadow)',
                   animationDelay: `${Math.min(index * 40, 400)}ms`
                 },
                 draggable: true,
@@ -41546,8 +41616,8 @@ useEffect(() => {
                     background: album.albumArt === null
                       ? 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
                       : album.albumArt === undefined
-                        ? 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)'
-                        : '#f3f4f6',
+                        ? 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))'
+                        : 'var(--placeholder-bg-light)',
                     backgroundSize: album.albumArt === undefined ? '200% 100%' : undefined
                   }
                 },
@@ -41676,7 +41746,7 @@ useEffect(() => {
                     style: {
                       fontWeight: '500',
                       fontSize: '15px',
-                      color: '#1f2937',
+                      color: 'var(--text-primary)',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -41687,7 +41757,7 @@ useEffect(() => {
                   React.createElement('div', {
                     style: {
                       fontSize: '13px',
-                      color: '#6b7280',
+                      color: 'var(--text-secondary)',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap',
@@ -41705,7 +41775,7 @@ useEffect(() => {
                   album.description && React.createElement('p', {
                     style: {
                       fontSize: '12px',
-                      color: '#9ca3af',
+                      color: 'var(--text-tertiary)',
                       marginTop: '8px',
                       lineHeight: '1.5'
                     }
@@ -41915,19 +41985,19 @@ useEffect(() => {
                       className: 'flex items-center gap-4 py-2 px-3 border-b border-gray-100'
                     },
                       React.createElement('div', {
-                        className: 'w-8 h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer flex-shrink-0',
+                        className: 'w-8 h-4 shimmer-light animate-shimmer flex-shrink-0',
                         style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        className: 'h-4 shimmer-light animate-shimmer',
                         style: { flex: '1 1 0', minWidth: 0, backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        className: 'h-4 shimmer-light animate-shimmer',
                         style: { flex: '0.7 1 0', minWidth: 0, backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer flex-shrink-0',
+                        className: 'h-4 shimmer-light animate-shimmer flex-shrink-0',
                         style: { width: '50px', backgroundSize: '200% 100%', animationDelay: `${i * 50 + 75}ms` }
                       }),
                       React.createElement('div', {
@@ -41935,11 +42005,11 @@ useEffect(() => {
                         style: { width: '140px' }
                       },
                         React.createElement('div', {
-                          className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                          className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                           style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 100}ms` }
                         }),
                         React.createElement('div', {
-                          className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                          className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                           style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 125}ms` }
                         })
                       )
@@ -42043,11 +42113,11 @@ useEffect(() => {
                       // Square image container - gray while loading, pattern only when imageLoaded && no image
                       React.createElement('div', {
                         className: 'aspect-square relative group/art',
-                        style: { background: artist.imageLoaded && !artist.image ? recsArtistPattern.gradient : '#e5e7eb' }
+                        style: { background: artist.imageLoaded && !artist.image ? recsArtistPattern.gradient : 'var(--placeholder-bg)' }
                       },
                         // Shimmer while loading (imageLoaded not yet true)
                         !artist.imageLoaded && React.createElement('div', {
-                          className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+                          className: 'absolute inset-0 shimmer-strong animate-shimmer',
                           style: { backgroundSize: '200% 100%' }
                         }),
                         // Initials fallback (only show when imageLoaded && no image)
@@ -42195,19 +42265,19 @@ useEffect(() => {
                         // Track number
                         React.createElement('span', {
                           className: 'flex-shrink-0 text-right',
-                          style: { pointerEvents: 'none', width: '32px', fontSize: '12px', fontWeight: '500', color: '#9ca3af' }
+                          style: { pointerEvents: 'none', width: '32px', fontSize: '12px', fontWeight: '500', color: 'var(--text-tertiary)' }
                         }, String(index + 1).padStart(2, '0')),
 
                         // Track title - flexible column
                         React.createElement('span', {
                           className: 'truncate transition-colors',
-                          style: { pointerEvents: 'none', flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: '400', color: hasResolved ? '#374151' : '#9ca3af' }
+                          style: { pointerEvents: 'none', flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: '400', color: hasResolved ? 'var(--text-primary)' : 'var(--text-tertiary)' }
                         }, track.title),
 
                         // Artist name - flexible column, clickable
                         React.createElement('span', {
                           className: 'truncate hover:text-purple-600 hover:underline cursor-pointer transition-colors',
-                          style: { flex: '0.7 1 0', minWidth: 0, fontSize: '12px', color: '#6b7280' },
+                          style: { flex: '0.7 1 0', minWidth: 0, fontSize: '12px', color: 'var(--text-secondary)' },
                           onClick: (e) => {
                             e.stopPropagation();
                             fetchArtistData(track.artist);
@@ -42217,13 +42287,13 @@ useEffect(() => {
                         // Album name - flexible column
                         React.createElement('span', {
                           className: 'truncate',
-                          style: { pointerEvents: 'none', flex: '0.5 1 0', minWidth: 0, fontSize: '12px', color: '#9ca3af' }
+                          style: { pointerEvents: 'none', flex: '0.5 1 0', minWidth: 0, fontSize: '12px', color: 'var(--text-tertiary)' }
                         }, track.album || ''),
 
                         // Duration - fixed width column
                         React.createElement('span', {
                           className: 'text-right tabular-nums flex-shrink-0',
-                          style: { pointerEvents: 'none', width: '50px', fontSize: '12px', color: '#9ca3af' }
+                          style: { pointerEvents: 'none', width: '50px', fontSize: '12px', color: 'var(--text-tertiary)' }
                         }, formatTime(track.duration)),
 
                         // Resolver icons - fixed width column
@@ -42236,11 +42306,11 @@ useEffect(() => {
                               className: 'flex items-center gap-1'
                             },
                               React.createElement('div', {
-                                className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                                className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                                 title: 'Resolving track...'
                               }),
                               React.createElement('div', {
-                                className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                                className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                                 style: { animationDelay: '0.1s' }
                               })
                             )
@@ -42290,11 +42360,11 @@ useEffect(() => {
                               className: 'flex items-center gap-1'
                             },
                               React.createElement('div', {
-                                className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                                className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                                 title: 'Resolving track...'
                               }),
                               React.createElement('div', {
-                                className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer',
+                                className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
                                 style: { animationDelay: '0.1s' }
                               })
                             )
@@ -42581,19 +42651,19 @@ useEffect(() => {
                       className: 'flex items-center gap-4 py-2 px-3 border-b border-gray-100'
                     },
                       React.createElement('div', {
-                        className: 'w-8 h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer flex-shrink-0',
+                        className: 'w-8 h-4 shimmer-light animate-shimmer flex-shrink-0',
                         style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        className: 'h-4 shimmer-light animate-shimmer',
                         style: { flex: '1 1 0', minWidth: 0, backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        className: 'h-4 shimmer-light animate-shimmer',
                         style: { flex: '0.7 1 0', minWidth: 0, backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer flex-shrink-0',
+                        className: 'h-4 shimmer-light animate-shimmer flex-shrink-0',
                         style: { width: '80px', backgroundSize: '200% 100%', animationDelay: `${i * 50 + 75}ms` }
                       }),
                       React.createElement('div', {
@@ -42601,11 +42671,11 @@ useEffect(() => {
                         style: { width: '140px' }
                       },
                         React.createElement('div', {
-                          className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                          className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                           style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 100}ms` }
                         }),
                         React.createElement('div', {
-                          className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                          className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                           style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 125}ms` }
                         })
                       )
@@ -42682,24 +42752,24 @@ useEffect(() => {
                       },
                         React.createElement('span', {
                           className: 'flex-shrink-0 text-right',
-                          style: { pointerEvents: 'none', width: '32px', fontSize: '12px', fontWeight: '500', color: track.nowPlaying ? '#8b5cf6' : '#9ca3af' }
+                          style: { pointerEvents: 'none', width: '32px', fontSize: '12px', fontWeight: '500', color: track.nowPlaying ? 'var(--accent-secondary)' : 'var(--text-tertiary)' }
                         }, track.nowPlaying ? '▶' : String(index + 1).padStart(2, '0')),
                         React.createElement('span', {
                           className: 'truncate transition-colors',
-                          style: { pointerEvents: 'none', flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: track.nowPlaying ? '500' : '400', color: track.nowPlaying ? '#7c3aed' : hasResolved ? '#374151' : '#9ca3af' }
+                          style: { pointerEvents: 'none', flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: track.nowPlaying ? '500' : '400', color: track.nowPlaying ? 'var(--accent-primary)' : hasResolved ? 'var(--text-primary)' : 'var(--text-tertiary)' }
                         }, track.title),
                         React.createElement('span', {
                           className: 'truncate hover:text-purple-600 hover:underline cursor-pointer transition-colors',
-                          style: { flex: '0.7 1 0', minWidth: 0, fontSize: '12px', color: '#6b7280' },
+                          style: { flex: '0.7 1 0', minWidth: 0, fontSize: '12px', color: 'var(--text-secondary)' },
                           onClick: (e) => { e.stopPropagation(); fetchArtistData(track.artist); }
                         }, track.artist),
                         React.createElement('span', {
                           className: 'truncate',
-                          style: { pointerEvents: 'none', flex: '0.5 1 0', minWidth: 0, fontSize: '12px', color: '#9ca3af' }
+                          style: { pointerEvents: 'none', flex: '0.5 1 0', minWidth: 0, fontSize: '12px', color: 'var(--text-tertiary)' }
                         }, track.album || ''),
                         React.createElement('span', {
                           className: 'text-right tabular-nums flex-shrink-0',
-                          style: { pointerEvents: 'none', width: '80px', fontSize: '12px', color: '#9ca3af' }
+                          style: { pointerEvents: 'none', width: '80px', fontSize: '12px', color: 'var(--text-tertiary)' }
                         }, track.timestamp ? formatTimeAgo(track.timestamp) : ''),
                         React.createElement('div', {
                           className: 'flex items-center gap-1 justify-end',
@@ -42707,8 +42777,8 @@ useEffect(() => {
                         },
                           isResolving ?
                             React.createElement('div', { className: 'flex items-center gap-1' },
-                              React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                              React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
                             )
                           : hasResolved ?
                             Object.entries(resolvedSources).filter(([resolverId]) => activeResolvers.includes(resolverId)).sort(([aId], [bId]) => resolverOrder.indexOf(aId) - resolverOrder.indexOf(bId)).map(([resolverId, source]) => {
@@ -42726,8 +42796,8 @@ useEffect(() => {
                             })
                           :
                             React.createElement('div', { className: 'flex items-center gap-1' },
-                              React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                              React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
                             )
                         )
                       );
@@ -42745,10 +42815,10 @@ useEffect(() => {
                       key: `top-track-skeleton-${i}`,
                       className: 'flex items-center gap-4 py-2 px-3 border-b border-gray-100'
                     },
-                      React.createElement('div', { className: 'w-8 h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer flex-shrink-0', style: { backgroundSize: '200% 100%' } }),
-                      React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer', style: { flex: '1 1 0', minWidth: 0, backgroundSize: '200% 100%' } }),
-                      React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer', style: { flex: '0.7 1 0', minWidth: 0, backgroundSize: '200% 100%' } }),
-                      React.createElement('div', { className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer flex-shrink-0', style: { width: '80px', backgroundSize: '200% 100%' } })
+                      React.createElement('div', { className: 'w-8 h-4 shimmer-light animate-shimmer flex-shrink-0', style: { backgroundSize: '200% 100%' } }),
+                      React.createElement('div', { className: 'h-4 shimmer-light animate-shimmer', style: { flex: '1 1 0', minWidth: 0, backgroundSize: '200% 100%' } }),
+                      React.createElement('div', { className: 'h-4 shimmer-light animate-shimmer', style: { flex: '0.7 1 0', minWidth: 0, backgroundSize: '200% 100%' } }),
+                      React.createElement('div', { className: 'h-4 shimmer-light animate-shimmer flex-shrink-0', style: { width: '80px', backgroundSize: '200% 100%' } })
                     )
                   )
                 )
@@ -42801,18 +42871,18 @@ useEffect(() => {
                         onClick: () => { const tracksAfter = filtered.slice(index + 1); const context = { type: 'history', name: 'Top Tracks' }; setQueueWithContext(tracksAfter, context); handlePlay(track); },
                         onContextMenu: (e) => { e.preventDefault(); if (window.electron?.contextMenu?.showTrackMenu) window.electron.contextMenu.showTrackMenu({ type: 'track', track }); }
                       },
-                        React.createElement('span', { className: 'flex-shrink-0 text-right', style: { width: '32px', fontSize: '12px', fontWeight: '500', color: '#9ca3af' } }, `#${track.rank}`),
-                        React.createElement('span', { className: 'truncate transition-colors', style: { flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: '400', color: hasResolved ? '#374151' : '#9ca3af' } }, track.title),
+                        React.createElement('span', { className: 'flex-shrink-0 text-right', style: { width: '32px', fontSize: '12px', fontWeight: '500', color: 'var(--text-tertiary)' } }, `#${track.rank}`),
+                        React.createElement('span', { className: 'truncate transition-colors', style: { flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: '400', color: hasResolved ? 'var(--text-primary)' : 'var(--text-tertiary)' } }, track.title),
                         React.createElement('span', {
                           className: 'truncate hover:text-purple-600 hover:underline cursor-pointer transition-colors',
-                          style: { flex: '0.7 1 0', minWidth: 0, fontSize: '12px', color: '#6b7280' },
+                          style: { flex: '0.7 1 0', minWidth: 0, fontSize: '12px', color: 'var(--text-secondary)' },
                           onClick: (e) => { e.stopPropagation(); fetchArtistData(track.artist); }
                         }, track.artist),
                         React.createElement('span', {
                           className: 'truncate',
-                          style: { pointerEvents: 'none', flex: '0.5 1 0', minWidth: 0, fontSize: '12px', color: '#9ca3af' }
+                          style: { pointerEvents: 'none', flex: '0.5 1 0', minWidth: 0, fontSize: '12px', color: 'var(--text-tertiary)' }
                         }, track.album || ''),
-                        React.createElement('span', { className: 'text-right tabular-nums flex-shrink-0', style: { width: '80px', fontSize: '12px', color: '#9ca3af' } }, `${track.playCount} plays`),
+                        React.createElement('span', { className: 'text-right tabular-nums flex-shrink-0', style: { width: '80px', fontSize: '12px', color: 'var(--text-tertiary)' } }, `${track.playCount} plays`),
                         React.createElement('div', { className: 'flex items-center gap-1 justify-end', style: { width: '140px', flexShrink: 0, minHeight: '24px' } },
                           hasResolved ?
                             Object.entries(resolvedSources).filter(([resolverId]) => activeResolvers.includes(resolverId)).sort(([aId], [bId]) => resolverOrder.indexOf(aId) - resolverOrder.indexOf(bId)).map(([resolverId, source]) => {
@@ -42830,8 +42900,8 @@ useEffect(() => {
                             })
                           :
                             React.createElement('div', { className: 'flex items-center gap-1' },
-                              React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer' }),
-                              React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer' }),
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
                             )
                         )
                       );
@@ -42854,16 +42924,16 @@ useEffect(() => {
                       className: 'bg-white rounded-lg overflow-hidden'
                     },
                       React.createElement('div', {
-                        className: 'aspect-square bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        className: 'aspect-square shimmer-light animate-shimmer',
                         style: { backgroundSize: '200% 100%', animationDelay: `${i * 50}ms` }
                       }),
                       React.createElement('div', { className: 'p-3' },
                         React.createElement('div', {
-                          className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-3/4 mb-2 animate-shimmer',
+                          className: 'h-4 shimmer-light rounded w-3/4 mb-2 animate-shimmer',
                           style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                         }),
                         React.createElement('div', {
-                          className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/2 animate-shimmer',
+                          className: 'h-3 shimmer-light rounded w-1/2 animate-shimmer',
                           style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                         })
                       )
@@ -42923,11 +42993,11 @@ useEffect(() => {
                       // Square image container - gray while loading, pattern only when imageLoaded && no image
                       React.createElement('div', {
                         className: 'aspect-square relative group/art',
-                        style: { background: artist.imageLoaded && !artist.image ? topArtistPattern.gradient : '#e5e7eb' }
+                        style: { background: artist.imageLoaded && !artist.image ? topArtistPattern.gradient : 'var(--placeholder-bg)' }
                       },
                         // Shimmer while loading (imageLoaded not yet true)
                         !artist.imageLoaded && React.createElement('div', {
-                          className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+                          className: 'absolute inset-0 shimmer-strong animate-shimmer',
                           style: { backgroundSize: '200% 100%' }
                         }),
                         // Initials fallback (only show when imageLoaded && no image)
@@ -43032,12 +43102,12 @@ useEffect(() => {
                       style: {
                         padding: '10px',
                         borderRadius: '10px',
-                        backgroundColor: '#ffffff',
-                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)'
+                        backgroundColor: 'var(--card-bg)',
+                        boxShadow: 'var(--card-shadow)'
                       }
                     },
                       React.createElement('div', {
-                        className: 'bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-shimmer',
+                        className: 'shimmer-light animate-shimmer',
                         style: {
                           aspectRatio: '1',
                           borderRadius: '6px',
@@ -43047,15 +43117,15 @@ useEffect(() => {
                         }
                       }),
                       React.createElement('div', {
-                        className: 'h-4 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-3/4 mb-2 animate-shimmer',
+                        className: 'h-4 shimmer-light rounded w-3/4 mb-2 animate-shimmer',
                         style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 25}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/2 mb-1 animate-shimmer',
+                        className: 'h-3 shimmer-light rounded w-1/2 mb-1 animate-shimmer',
                         style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 50}ms` }
                       }),
                       React.createElement('div', {
-                        className: 'h-3 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded w-1/3 animate-shimmer',
+                        className: 'h-3 shimmer-light rounded w-1/3 animate-shimmer',
                         style: { backgroundSize: '200% 100%', animationDelay: `${i * 50 + 75}ms` }
                       })
                     )
@@ -43083,8 +43153,8 @@ useEffect(() => {
                       style: {
                         padding: '10px',
                         borderRadius: '10px',
-                        backgroundColor: '#ffffff',
-                        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03)',
+                        backgroundColor: 'var(--card-bg)',
+                        boxShadow: 'var(--card-shadow)',
                         animationDelay: `${Math.min(index * 30, 300)}ms`
                       },
                       onClick: () => openTopAlbum(album),
@@ -43119,8 +43189,8 @@ useEffect(() => {
                           background: album.image === null || album.image === ''
                             ? 'linear-gradient(145deg, #1f1f1f 0%, #2d2d2d 50%, #1a1a1a 100%)'
                             : !album.image
-                              ? 'linear-gradient(to right, #f3f4f6, #e5e7eb, #f3f4f6)'
-                              : '#f3f4f6',
+                              ? 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))'
+                              : 'var(--placeholder-bg-light)',
                           backgroundSize: !album.image && album.image !== null && album.image !== '' ? '200% 100%' : undefined
                         }
                       },
@@ -43269,7 +43339,7 @@ useEffect(() => {
                           style: {
                             fontWeight: '500',
                             fontSize: '13px',
-                            color: '#1f2937',
+                            color: 'var(--text-primary)',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
@@ -43281,7 +43351,7 @@ useEffect(() => {
                         React.createElement('div', {
                           style: {
                             fontSize: '12px',
-                            color: '#6b7280',
+                            color: 'var(--text-secondary)',
                             overflow: 'hidden',
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
@@ -43295,7 +43365,7 @@ useEffect(() => {
                           }
                         }, album.artist),
                         React.createElement('div', {
-                          style: { fontSize: '11px', color: '#9ca3af', marginTop: '3px' }
+                          style: { fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '3px' }
                         }, `${album.playCount} plays`)
                       )
                     )
@@ -43566,11 +43636,10 @@ useEffect(() => {
               // Pin/Unpin button on right side of filter bar
               React.createElement('button', {
                 onClick: () => pinnedFriendIds.includes(currentFriend.id) ? unpinFriend(currentFriend.id) : pinFriend(currentFriend.id),
-                className: `flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-colors ${
-                  pinnedFriendIds.includes(currentFriend.id)
-                    ? 'bg-purple-100 text-purple-700'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`
+                className: 'flex items-center gap-2 px-3 py-1.5 text-sm rounded-full transition-colors',
+                style: pinnedFriendIds.includes(currentFriend.id)
+                  ? { backgroundColor: 'var(--accent-primary)', color: '#ffffff' }
+                  : { backgroundColor: 'var(--hover-bg-default)', color: 'var(--text-secondary)' }
               },
                 React.createElement('svg', {
                   className: 'w-4 h-4',
@@ -43658,24 +43727,24 @@ useEffect(() => {
                         },
                           React.createElement('span', {
                             className: 'flex-shrink-0 text-right',
-                            style: { pointerEvents: 'none', width: '32px', fontSize: '12px', fontWeight: '500', color: track.nowPlaying ? '#8b5cf6' : '#9ca3af' }
+                            style: { pointerEvents: 'none', width: '32px', fontSize: '12px', fontWeight: '500', color: track.nowPlaying ? 'var(--accent-secondary)' : 'var(--text-tertiary)' }
                           }, track.nowPlaying ? '▶' : String(index + 1).padStart(2, '0')),
                           React.createElement('span', {
                             className: 'truncate transition-colors',
-                            style: { pointerEvents: 'none', flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: track.nowPlaying ? '500' : '400', color: track.nowPlaying ? '#7c3aed' : hasResolved ? '#374151' : '#9ca3af' }
+                            style: { pointerEvents: 'none', flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: track.nowPlaying ? '500' : '400', color: track.nowPlaying ? 'var(--accent-primary)' : hasResolved ? 'var(--text-primary)' : 'var(--text-tertiary)' }
                           }, track.title),
                           React.createElement('span', {
                             className: 'truncate hover:text-purple-600 hover:underline cursor-pointer transition-colors',
-                            style: { flex: '0.7 1 0', minWidth: 0, fontSize: '12px', color: '#6b7280' },
+                            style: { flex: '0.7 1 0', minWidth: 0, fontSize: '12px', color: 'var(--text-secondary)' },
                             onClick: (e) => { e.stopPropagation(); fetchArtistData(track.artist); }
                           }, track.artist),
                           React.createElement('span', {
                             className: 'truncate',
-                            style: { pointerEvents: 'none', flex: '0.5 1 0', minWidth: 0, fontSize: '12px', color: '#9ca3af' }
+                            style: { pointerEvents: 'none', flex: '0.5 1 0', minWidth: 0, fontSize: '12px', color: 'var(--text-tertiary)' }
                           }, track.album || ''),
                           React.createElement('span', {
                             className: 'text-right tabular-nums flex-shrink-0',
-                            style: { pointerEvents: 'none', width: '80px', fontSize: '12px', color: '#9ca3af' }
+                            style: { pointerEvents: 'none', width: '80px', fontSize: '12px', color: 'var(--text-tertiary)' }
                           }, track.timestamp ? formatTimeAgo(track.timestamp) : ''),
                           React.createElement('div', {
                             className: 'flex items-center gap-1 justify-end',
@@ -43683,8 +43752,8 @@ useEffect(() => {
                           },
                             isResolving ?
                               React.createElement('div', { className: 'flex items-center gap-1' },
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
                               )
                             : hasResolved ?
                               Object.entries(resolvedSources).filter(([resolverId]) => activeResolvers.includes(resolverId)).sort(([aId], [bId]) => resolverOrder.indexOf(aId) - resolverOrder.indexOf(bId)).map(([resolverId, source]) => {
@@ -43702,8 +43771,8 @@ useEffect(() => {
                               })
                             :
                               React.createElement('div', { className: 'flex items-center gap-1' },
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
                               )
                           )
                       );
@@ -43759,24 +43828,24 @@ useEffect(() => {
                         },
                           React.createElement('span', {
                             className: 'flex-shrink-0 text-right',
-                            style: { width: '32px', fontSize: '12px', fontWeight: '500', color: '#9ca3af' }
+                            style: { width: '32px', fontSize: '12px', fontWeight: '500', color: 'var(--text-tertiary)' }
                           }, `#${track.rank || index + 1}`),
                           React.createElement('span', {
                             className: 'truncate transition-colors',
-                            style: { flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: '400', color: hasResolved ? '#374151' : '#9ca3af' }
+                            style: { flex: '1 1 0', minWidth: 0, fontSize: '13px', fontWeight: '400', color: hasResolved ? 'var(--text-primary)' : 'var(--text-tertiary)' }
                           }, track.title),
                           React.createElement('span', {
                             className: 'truncate hover:text-purple-600 hover:underline cursor-pointer transition-colors',
-                            style: { flex: '0.7 1 0', minWidth: 0, fontSize: '12px', color: '#6b7280' },
+                            style: { flex: '0.7 1 0', minWidth: 0, fontSize: '12px', color: 'var(--text-secondary)' },
                             onClick: (e) => { e.stopPropagation(); fetchArtistData(track.artist); }
                           }, track.artist),
                           React.createElement('span', {
                             className: 'truncate',
-                            style: { pointerEvents: 'none', flex: '0.5 1 0', minWidth: 0, fontSize: '12px', color: '#9ca3af' }
+                            style: { pointerEvents: 'none', flex: '0.5 1 0', minWidth: 0, fontSize: '12px', color: 'var(--text-tertiary)' }
                           }, track.album || ''),
                           React.createElement('span', {
                             className: 'text-right tabular-nums flex-shrink-0',
-                            style: { width: '80px', fontSize: '12px', color: '#9ca3af' }
+                            style: { width: '80px', fontSize: '12px', color: 'var(--text-tertiary)' }
                           }, `${track.playCount} plays`),
                           React.createElement('div', {
                             className: 'flex items-center gap-1 justify-end',
@@ -43784,8 +43853,8 @@ useEffect(() => {
                           },
                             isResolving ?
                               React.createElement('div', { className: 'flex items-center gap-1' },
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
                               )
                             : hasResolved ?
                               Object.entries(resolvedSources).filter(([resolverId]) => activeResolvers.includes(resolverId)).sort(([aId], [bId]) => resolverOrder.indexOf(aId) - resolverOrder.indexOf(bId)).map(([resolverId, source]) => {
@@ -43803,8 +43872,8 @@ useEffect(() => {
                               })
                             :
                               React.createElement('div', { className: 'flex items-center gap-1' },
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                                React.createElement('div', { className: 'w-5 h-5 rounded bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
                               )
                           )
                         );
@@ -43843,11 +43912,11 @@ useEffect(() => {
                         },
                           React.createElement('div', {
                             className: 'aspect-square relative group/art',
-                            style: { background: album.imageLoaded && !album.image ? albumPattern.gradient : '#e5e7eb' }
+                            style: { background: album.imageLoaded && !album.image ? albumPattern.gradient : 'var(--placeholder-bg)' }
                           },
                             // Shimmer while loading (imageLoaded not yet true)
                             !album.imageLoaded && React.createElement('div', {
-                              className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+                              className: 'absolute inset-0 shimmer-strong animate-shimmer',
                               style: { backgroundSize: '200% 100%' }
                             }),
                             // Initials fallback (only show when imageLoaded && no image)
@@ -43985,11 +44054,11 @@ useEffect(() => {
                         },
                           React.createElement('div', {
                             className: 'aspect-square relative group/art',
-                            style: { background: artist.imageLoaded && !artist.image ? artistPattern.gradient : '#e5e7eb' }
+                            style: { background: artist.imageLoaded && !artist.image ? artistPattern.gradient : 'var(--placeholder-bg)' }
                           },
                             // Shimmer while loading (imageLoaded not yet true)
                             !artist.imageLoaded && React.createElement('div', {
-                              className: 'absolute inset-0 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 animate-shimmer',
+                              className: 'absolute inset-0 shimmer-strong animate-shimmer',
                               style: { backgroundSize: '200% 100%' }
                             }),
                             // Initials fallback (only show when imageLoaded && no image)
@@ -44081,16 +44150,16 @@ useEffect(() => {
           React.createElement('div', {
             className: 'flex items-center justify-between px-8 py-4 flex-shrink-0',
             style: {
-              borderBottom: '1px solid rgba(0, 0, 0, 0.06)',
-              backgroundColor: 'rgba(255, 255, 255, 0.8)'
+              borderBottom: '1px solid var(--border-subtle)',
+              backgroundColor: 'var(--bg-secondary)'
             }
           },
             React.createElement('span', {
               style: {
                 fontSize: '11px',
                 fontWeight: '600',
-                letterSpacing: '0.1em',
-                color: '#9ca3af',
+                letterSpacing: '0.08em',
+                color: 'var(--text-tertiary)',
                 textTransform: 'uppercase'
               },
               onContextMenu: copyParachordLink
@@ -44102,15 +44171,15 @@ useEffect(() => {
                 padding: '6px 12px',
                 fontSize: '12px',
                 fontWeight: '500',
-                color: '#6b7280',
-                border: '1px solid rgba(0, 0, 0, 0.1)',
+                color: 'var(--text-secondary)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '6px',
                 backgroundColor: 'transparent',
                 cursor: 'pointer'
               }
             },
               'Close',
-              React.createElement('span', { style: { color: '#9ca3af' } }, '×')
+              React.createElement('span', { style: { color: 'var(--text-tertiary)' } }, '×')
             )
           ),
           // Wrapper for sidebar and content
@@ -44120,9 +44189,9 @@ useEffect(() => {
               className: 'flex-shrink-0',
               style: {
                 width: '200px',
-                borderRight: '1px solid rgba(0, 0, 0, 0.06)',
+                borderRight: '1px solid var(--border-subtle)',
                 padding: '24px 0',
-                backgroundColor: 'rgba(249, 250, 251, 0.5)'
+                backgroundColor: 'var(--bg-secondary)'
               }
             },
               React.createElement('nav', { style: { padding: '0 12px' } },
@@ -44135,12 +44204,12 @@ useEffect(() => {
                   marginBottom: '4px',
                   fontSize: '13px',
                   fontWeight: settingsTab === 'plugins' ? '500' : '400',
-                  color: settingsTab === 'plugins' ? '#1f2937' : '#6b7280',
-                  backgroundColor: settingsTab === 'plugins' ? 'rgba(124, 58, 237, 0.08)' : 'transparent',
+                  color: settingsTab === 'plugins' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  backgroundColor: settingsTab === 'plugins' ? 'var(--accent-primary-alpha-08)' : 'transparent',
                   borderRadius: '8px',
                   border: 'none',
                   cursor: 'pointer',
-                  borderLeft: settingsTab === 'plugins' ? '3px solid #7c3aed' : '3px solid transparent'
+                  borderLeft: settingsTab === 'plugins' ? '3px solid var(--accent-primary)' : '3px solid transparent'
                 }
               }, 'Plug-Ins'),
               // General tab
@@ -44152,12 +44221,12 @@ useEffect(() => {
                   marginBottom: '4px',
                   fontSize: '13px',
                   fontWeight: settingsTab === 'general' ? '500' : '400',
-                  color: settingsTab === 'general' ? '#1f2937' : '#6b7280',
-                  backgroundColor: settingsTab === 'general' ? 'rgba(124, 58, 237, 0.08)' : 'transparent',
+                  color: settingsTab === 'general' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  backgroundColor: settingsTab === 'general' ? 'var(--accent-primary-alpha-08)' : 'transparent',
                   borderRadius: '8px',
                   border: 'none',
                   cursor: 'pointer',
-                  borderLeft: settingsTab === 'general' ? '3px solid #7c3aed' : '3px solid transparent'
+                  borderLeft: settingsTab === 'general' ? '3px solid var(--accent-primary)' : '3px solid transparent'
                 }
               }, 'General'),
               // About tab
@@ -44169,12 +44238,12 @@ useEffect(() => {
                   marginBottom: '4px',
                   fontSize: '13px',
                   fontWeight: settingsTab === 'about' ? '500' : '400',
-                  color: settingsTab === 'about' ? '#1f2937' : '#6b7280',
-                  backgroundColor: settingsTab === 'about' ? 'rgba(124, 58, 237, 0.08)' : 'transparent',
+                  color: settingsTab === 'about' ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  backgroundColor: settingsTab === 'about' ? 'var(--accent-primary-alpha-08)' : 'transparent',
                   borderRadius: '8px',
                   border: 'none',
                   cursor: 'pointer',
-                  borderLeft: settingsTab === 'about' ? '3px solid #7c3aed' : '3px solid transparent'
+                  borderLeft: settingsTab === 'about' ? '3px solid var(--accent-primary)' : '3px solid transparent'
                 }
               }, 'About')
             )
@@ -44196,14 +44265,14 @@ useEffect(() => {
                     style: {
                       fontSize: '20px',
                       fontWeight: '600',
-                      color: '#1f2937',
+                      color: 'var(--text-primary)',
                       marginBottom: '6px'
                     }
                   }, 'Plug-Ins'),
                   React.createElement('p', {
                     style: {
                       fontSize: '13px',
-                      color: '#6b7280'
+                      color: 'var(--text-secondary)'
                     }
                   },
                     'Discover, install, and manage plug-ins for playback and services.'
@@ -44217,9 +44286,9 @@ useEffect(() => {
                     padding: '10px 16px',
                     fontSize: '13px',
                     fontWeight: '500',
-                    color: '#374151',
-                    backgroundColor: '#ffffff',
-                    border: '1px solid rgba(0, 0, 0, 0.1)',
+                    color: 'var(--text-primary)',
+                    backgroundColor: 'var(--card-bg)',
+                    border: '1px solid var(--border-subtle)',
                     borderRadius: '8px',
                     cursor: 'pointer',
                     boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
@@ -44235,8 +44304,8 @@ useEffect(() => {
               // Plug-in architecture description
               React.createElement('div', {
                 style: {
-                  background: 'linear-gradient(135deg, rgba(124, 58, 237, 0.06) 0%, rgba(99, 102, 241, 0.06) 100%)',
-                  border: '1px solid rgba(124, 58, 237, 0.12)',
+                  background: 'linear-gradient(135deg, var(--accent-primary-alpha-06) 0%, rgba(99, 102, 241, 0.06) 100%)',
+                  border: '1px solid var(--accent-primary-alpha-10)',
                   borderRadius: '12px',
                   padding: '20px',
                   marginBottom: '24px'
@@ -44349,7 +44418,7 @@ useEffect(() => {
                     style: {
                       fontSize: '11px',
                       fontWeight: '600',
-                      color: '#9ca3af',
+                      color: 'var(--text-tertiary)',
                       textTransform: 'uppercase',
                       letterSpacing: '0.08em'
                     }
@@ -44357,7 +44426,7 @@ useEffect(() => {
                   React.createElement('p', {
                     style: {
                       fontSize: '12px',
-                      color: '#9ca3af',
+                      color: 'var(--text-tertiary)',
                       marginTop: '4px'
                     }
                   },
@@ -44508,7 +44577,7 @@ useEffect(() => {
                     style: {
                       fontSize: '11px',
                       fontWeight: '600',
-                      color: '#9ca3af',
+                      color: 'var(--text-tertiary)',
                       textTransform: 'uppercase',
                       letterSpacing: '0.08em'
                     }
@@ -44516,7 +44585,7 @@ useEffect(() => {
                   React.createElement('p', {
                     style: {
                       fontSize: '12px',
-                      color: '#9ca3af',
+                      color: 'var(--text-tertiary)',
                       marginTop: '4px'
                     }
                   },
@@ -44637,7 +44706,7 @@ useEffect(() => {
                     style: {
                       fontSize: '11px',
                       fontWeight: '600',
-                      color: '#9ca3af',
+                      color: 'var(--text-tertiary)',
                       textTransform: 'uppercase',
                       letterSpacing: '0.08em'
                     }
@@ -44645,7 +44714,7 @@ useEffect(() => {
                   React.createElement('p', {
                     style: {
                       fontSize: '12px',
-                      color: '#9ca3af',
+                      color: 'var(--text-tertiary)',
                       marginTop: '4px'
                     }
                   },
@@ -44666,7 +44735,7 @@ useEffect(() => {
                         width: '120px',
                         height: '120px',
                         borderRadius: '16px',
-                        background: 'linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)',
+                        background: 'linear-gradient(135deg, var(--accent-primary) 0%, #a78bfa 100%)',
                         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1), 0 4px 16px rgba(0, 0, 0, 0.05)'
                       },
                       onClick: () => setExtensionInfoOpen(true)
@@ -44696,7 +44765,7 @@ useEffect(() => {
                           borderRadius: '6px',
                           fontSize: '12px',
                           fontWeight: '600',
-                          color: '#7c3aed'
+                          color: 'var(--accent-primary)'
                         }
                       }, 'i')
                     ),
@@ -44706,7 +44775,7 @@ useEffect(() => {
                         marginTop: '10px',
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         textAlign: 'center',
                         width: '120px'
                       }
@@ -44760,7 +44829,7 @@ useEffect(() => {
                         marginTop: '10px',
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#1f2937',
+                        color: 'var(--text-primary)',
                         textAlign: 'center',
                         width: '120px'
                       }
@@ -44778,14 +44847,14 @@ useEffect(() => {
                   style: {
                     fontSize: '20px',
                     fontWeight: '600',
-                    color: '#1f2937',
+                    color: 'var(--text-primary)',
                     marginBottom: '6px'
                   }
                 }, 'General'),
                 React.createElement('p', {
                   style: {
                     fontSize: '13px',
-                    color: '#6b7280'
+                    color: 'var(--text-secondary)'
                   }
                 },
                   'Configure application settings and preferences.'
@@ -44794,14 +44863,14 @@ useEffect(() => {
 
               // Settings sections - refined
               React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: '24px' } },
-                // Cache Management Section - refined card
+                // Appearance Section
                 React.createElement('div', {
                   style: {
-                    backgroundColor: '#ffffff',
-                    border: '1px solid rgba(0, 0, 0, 0.06)',
+                    backgroundColor: 'var(--card-bg)',
+                    border: '1px solid var(--border-subtle)',
                     borderRadius: '12px',
                     padding: '24px',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)'
+                    boxShadow: 'var(--card-shadow)'
                   }
                 },
                   React.createElement('div', { style: { marginBottom: '16px' } },
@@ -44809,7 +44878,104 @@ useEffect(() => {
                       style: {
                         fontSize: '11px',
                         fontWeight: '600',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em'
+                      }
+                    }, 'Appearance'),
+                    React.createElement('p', {
+                      style: {
+                        fontSize: '12px',
+                        color: 'var(--text-tertiary)',
+                        marginTop: '4px'
+                      }
+                    }, 'Choose your preferred color theme')
+                  ),
+                  React.createElement('div', { style: { display: 'flex', gap: '8px' } },
+                    // Light button
+                    React.createElement('button', {
+                      onClick: () => handleThemeChange('light'),
+                      style: {
+                        flex: 1,
+                        padding: '10px 16px',
+                        borderRadius: '8px',
+                        border: themePref === 'light' ? '2px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
+                        backgroundColor: themePref === 'light' ? 'var(--accent-primary-alpha-08)' : 'transparent',
+                        color: themePref === 'light' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                        fontSize: '13px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }
+                    },
+                      React.createElement('span', null, '\u2600\uFE0F'),
+                      'Light'
+                    ),
+                    // Dark button
+                    React.createElement('button', {
+                      onClick: () => handleThemeChange('dark'),
+                      style: {
+                        flex: 1,
+                        padding: '10px 16px',
+                        borderRadius: '8px',
+                        border: themePref === 'dark' ? '2px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
+                        backgroundColor: themePref === 'dark' ? 'var(--accent-primary-alpha-08)' : 'transparent',
+                        color: themePref === 'dark' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                        fontSize: '13px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }
+                    },
+                      React.createElement('span', null, '\uD83C\uDF19'),
+                      'Dark'
+                    ),
+                    // System button
+                    React.createElement('button', {
+                      onClick: () => handleThemeChange('system'),
+                      style: {
+                        flex: 1,
+                        padding: '10px 16px',
+                        borderRadius: '8px',
+                        border: themePref === 'system' ? '2px solid var(--accent-primary)' : '1px solid var(--border-subtle)',
+                        backgroundColor: themePref === 'system' ? 'var(--accent-primary-alpha-08)' : 'transparent',
+                        color: themePref === 'system' ? 'var(--accent-primary)' : 'var(--text-secondary)',
+                        fontSize: '13px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px'
+                      }
+                    },
+                      React.createElement('span', null, '\uD83D\uDCBB'),
+                      'System'
+                    )
+                  )
+                ),
+                // Cache Management Section - refined card
+                React.createElement('div', {
+                  style: {
+                    backgroundColor: 'var(--card-bg)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '12px',
+                    padding: '24px',
+                    boxShadow: 'var(--card-shadow)'
+                  }
+                },
+                  React.createElement('div', { style: { marginBottom: '16px' } },
+                    React.createElement('h3', {
+                      style: {
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        color: 'var(--text-tertiary)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.08em'
                       }
@@ -44817,7 +44983,7 @@ useEffect(() => {
                     React.createElement('p', {
                       style: {
                         fontSize: '12px',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         marginTop: '4px'
                       }
                     }, 'Clear cached data to free up space or fix display issues')
@@ -44825,7 +44991,7 @@ useEffect(() => {
                   React.createElement('p', {
                     style: {
                       fontSize: '13px',
-                      color: '#6b7280',
+                      color: 'var(--text-secondary)',
                       marginBottom: '20px',
                       lineHeight: '1.6'
                     }
@@ -44871,11 +45037,11 @@ useEffect(() => {
                 // Volume Normalization Section - refined card
                 React.createElement('div', {
                   style: {
-                    backgroundColor: '#ffffff',
-                    border: '1px solid rgba(0, 0, 0, 0.06)',
+                    backgroundColor: 'var(--card-bg)',
+                    border: '1px solid var(--border-subtle)',
                     borderRadius: '12px',
                     padding: '24px',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)'
+                    boxShadow: 'var(--card-shadow)'
                   }
                 },
                   React.createElement('div', { style: { marginBottom: '16px' } },
@@ -44883,7 +45049,7 @@ useEffect(() => {
                       style: {
                         fontSize: '11px',
                         fontWeight: '600',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.08em'
                       }
@@ -44891,7 +45057,7 @@ useEffect(() => {
                     React.createElement('p', {
                       style: {
                         fontSize: '12px',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         marginTop: '4px'
                       }
                     }, 'Balance loudness between different sources')
@@ -44899,7 +45065,7 @@ useEffect(() => {
                   React.createElement('p', {
                     style: {
                       fontSize: '13px',
-                      color: '#6b7280',
+                      color: 'var(--text-secondary)',
                       marginBottom: '24px',
                       lineHeight: '1.6'
                     }
@@ -44922,7 +45088,7 @@ useEffect(() => {
                           style: {
                             padding: '10px 12px',
                             borderRadius: '8px',
-                            backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                            backgroundColor: 'var(--hover-bg-default)',
                             opacity: isVolumeDisabled ? 0.5 : 1
                           }
                         },
@@ -44931,7 +45097,7 @@ useEffect(() => {
                               width: '100px',
                               fontSize: '13px',
                               fontWeight: '500',
-                              color: isVolumeDisabled ? '#9ca3af' : '#374151'
+                              color: isVolumeDisabled ? 'var(--text-tertiary)' : 'var(--text-primary)'
                             }
                           }, resolver.name),
                           React.createElement('input', {
@@ -44949,7 +45115,7 @@ useEffect(() => {
                             style: {
                               width: '56px',
                               fontSize: isVolumeDisabled ? '11px' : '12px',
-                              color: isVolumeDisabled ? '#9ca3af' : '#6b7280',
+                              color: isVolumeDisabled ? 'var(--text-tertiary)' : 'var(--text-secondary)',
                               textAlign: 'right',
                               fontFamily: isVolumeDisabled ? 'inherit' : 'monospace',
                               fontStyle: isVolumeDisabled ? 'italic' : 'normal'
@@ -44961,11 +45127,11 @@ useEffect(() => {
                   // Show message if no content resolvers are enabled
                   loadedResolvers.filter(r => r.capabilities?.resolve && activeResolvers.includes(r.id)).length === 0 &&
                     React.createElement('p', {
-                      style: { fontSize: '13px', color: '#9ca3af', fontStyle: 'italic', padding: '12px 0' }
+                      style: { fontSize: '13px', color: 'var(--text-tertiary)', fontStyle: 'italic', padding: '12px 0' }
                     }, 'No content resolvers enabled. Enable resolvers in Settings → Resolvers.'),
 
                   // Reset button - refined
-                  React.createElement('div', { style: { marginTop: '24px', paddingTop: '20px', borderTop: '1px solid rgba(0, 0, 0, 0.06)' } },
+                  React.createElement('div', { style: { marginTop: '24px', paddingTop: '20px', borderTop: '1px solid var(--border-subtle)' } },
                     React.createElement('button', {
                       onClick: () => setResolverVolumeOffsets({
                         spotify: 0,
@@ -44981,9 +45147,9 @@ useEffect(() => {
                         padding: '10px 16px',
                         fontSize: '13px',
                         fontWeight: '500',
-                        color: '#374151',
-                        backgroundColor: '#ffffff',
-                        border: '1px solid rgba(0, 0, 0, 0.1)',
+                        color: 'var(--text-primary)',
+                        backgroundColor: 'var(--card-bg)',
+                        border: '1px solid var(--border-subtle)',
                         borderRadius: '8px',
                         cursor: 'pointer'
                       }
@@ -44999,11 +45165,11 @@ useEffect(() => {
                 // Playback Behavior Section - refined card
                 React.createElement('div', {
                   style: {
-                    backgroundColor: '#ffffff',
-                    border: '1px solid rgba(0, 0, 0, 0.06)',
+                    backgroundColor: 'var(--card-bg)',
+                    border: '1px solid var(--border-subtle)',
                     borderRadius: '12px',
                     padding: '24px',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)'
+                    boxShadow: 'var(--card-shadow)'
                   }
                 },
                   React.createElement('div', { style: { marginBottom: '16px' } },
@@ -45011,7 +45177,7 @@ useEffect(() => {
                       style: {
                         fontSize: '11px',
                         fontWeight: '600',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.08em'
                       }
@@ -45019,7 +45185,7 @@ useEffect(() => {
                     React.createElement('p', {
                       style: {
                         fontSize: '12px',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         marginTop: '4px'
                       }
                     }, 'Configure how external tracks are handled')
@@ -45027,10 +45193,10 @@ useEffect(() => {
                   // Skip external prompt toggle - refined
                   React.createElement('div', { className: 'flex items-center justify-between', style: { padding: '12px 0' } },
                     React.createElement('div', null,
-                      React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: '#374151' } },
+                      React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)' } },
                         'Auto-open external tracks'
                       ),
-                      React.createElement('p', { style: { fontSize: '12px', color: '#9ca3af', marginTop: '2px' } },
+                      React.createElement('p', { style: { fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '2px' } },
                         'Skip the confirmation prompt for Bandcamp, YouTube, etc.'
                       )
                     ),
@@ -45054,11 +45220,11 @@ useEffect(() => {
                 // Media Keys Section
                 React.createElement('div', {
                   style: {
-                    backgroundColor: '#ffffff',
-                    border: '1px solid rgba(0, 0, 0, 0.06)',
+                    backgroundColor: 'var(--card-bg)',
+                    border: '1px solid var(--border-subtle)',
                     borderRadius: '12px',
                     padding: '24px',
-                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04)'
+                    boxShadow: 'var(--card-shadow)'
                   }
                 },
                   React.createElement('div', { style: { marginBottom: '16px' } },
@@ -45066,7 +45232,7 @@ useEffect(() => {
                       style: {
                         fontSize: '11px',
                         fontWeight: '600',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         textTransform: 'uppercase',
                         letterSpacing: '0.08em'
                       }
@@ -45074,7 +45240,7 @@ useEffect(() => {
                     React.createElement('p', {
                       style: {
                         fontSize: '12px',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         marginTop: '4px'
                       }
                     }, 'Control how Parachord responds to media keys')
@@ -45082,7 +45248,7 @@ useEffect(() => {
                   React.createElement('p', {
                     style: {
                       fontSize: '13px',
-                      color: '#6b7280',
+                      color: 'var(--text-secondary)',
                       marginBottom: '20px',
                       lineHeight: '1.6'
                     }
@@ -45097,9 +45263,9 @@ useEffect(() => {
                         gap: '12px',
                         padding: '12px',
                         borderRadius: '8px',
-                        backgroundColor: mediaKeyMode === 'always' ? 'rgba(124, 58, 237, 0.08)' : 'rgba(0, 0, 0, 0.02)',
+                        backgroundColor: mediaKeyMode === 'always' ? 'var(--accent-primary-alpha-08)' : 'var(--hover-bg-default)',
                         cursor: 'pointer',
-                        border: mediaKeyMode === 'always' ? '1px solid rgba(124, 58, 237, 0.3)' : '1px solid transparent'
+                        border: mediaKeyMode === 'always' ? '1px solid var(--accent-primary-alpha-30)' : '1px solid transparent'
                       }
                     },
                       React.createElement('input', {
@@ -45114,11 +45280,11 @@ useEffect(() => {
                             await window.electron.mediaKeys.setMode(mode);
                           }
                         },
-                        style: { marginTop: '2px', accentColor: '#7c3aed' }
+                        style: { marginTop: '2px', accentColor: 'var(--accent-primary)' }
                       }),
                       React.createElement('div', null,
-                        React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: '#374151' } }, 'Always capture'),
-                        React.createElement('p', { style: { fontSize: '12px', color: '#9ca3af', marginTop: '2px' } },
+                        React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)' } }, 'Always capture'),
+                        React.createElement('p', { style: { fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '2px' } },
                           'Parachord always handles media keys. May conflict with Spotify.'
                         )
                       )
@@ -45131,9 +45297,9 @@ useEffect(() => {
                         gap: '12px',
                         padding: '12px',
                         borderRadius: '8px',
-                        backgroundColor: mediaKeyMode === 'non-spotify' ? 'rgba(124, 58, 237, 0.08)' : 'rgba(0, 0, 0, 0.02)',
+                        backgroundColor: mediaKeyMode === 'non-spotify' ? 'var(--accent-primary-alpha-08)' : 'var(--hover-bg-default)',
                         cursor: 'pointer',
-                        border: mediaKeyMode === 'non-spotify' ? '1px solid rgba(124, 58, 237, 0.3)' : '1px solid transparent'
+                        border: mediaKeyMode === 'non-spotify' ? '1px solid var(--accent-primary-alpha-30)' : '1px solid transparent'
                       }
                     },
                       React.createElement('input', {
@@ -45152,11 +45318,11 @@ useEffect(() => {
                             }
                           }
                         },
-                        style: { marginTop: '2px', accentColor: '#7c3aed' }
+                        style: { marginTop: '2px', accentColor: 'var(--accent-primary)' }
                       }),
                       React.createElement('div', null,
-                        React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: '#374151' } }, 'Only when not using Spotify'),
-                        React.createElement('p', { style: { fontSize: '12px', color: '#9ca3af', marginTop: '2px' } },
+                        React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)' } }, 'Only when not using Spotify'),
+                        React.createElement('p', { style: { fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '2px' } },
                           'Let Spotify handle media keys when playing via Spotify Connect. Parachord handles them for other sources.'
                         )
                       )
@@ -45169,9 +45335,9 @@ useEffect(() => {
                         gap: '12px',
                         padding: '12px',
                         borderRadius: '8px',
-                        backgroundColor: mediaKeyMode === 'never' ? 'rgba(124, 58, 237, 0.08)' : 'rgba(0, 0, 0, 0.02)',
+                        backgroundColor: mediaKeyMode === 'never' ? 'var(--accent-primary-alpha-08)' : 'var(--hover-bg-default)',
                         cursor: 'pointer',
-                        border: mediaKeyMode === 'never' ? '1px solid rgba(124, 58, 237, 0.3)' : '1px solid transparent'
+                        border: mediaKeyMode === 'never' ? '1px solid var(--accent-primary-alpha-30)' : '1px solid transparent'
                       }
                     },
                       React.createElement('input', {
@@ -45186,11 +45352,11 @@ useEffect(() => {
                             await window.electron.mediaKeys.setMode(mode);
                           }
                         },
-                        style: { marginTop: '2px', accentColor: '#7c3aed' }
+                        style: { marginTop: '2px', accentColor: 'var(--accent-primary)' }
                       }),
                       React.createElement('div', null,
-                        React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: '#374151' } }, 'Never capture'),
-                        React.createElement('p', { style: { fontSize: '12px', color: '#9ca3af', marginTop: '2px' } },
+                        React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)' } }, 'Never capture'),
+                        React.createElement('p', { style: { fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '2px' } },
                           'Parachord never handles media keys. Use this if you prefer Spotify or other apps to control playback.'
                         )
                       )
@@ -45543,8 +45709,8 @@ useEffect(() => {
               // Centered card container
               React.createElement('div', {
                 style: {
-                  backgroundColor: '#ffffff',
-                  border: '1px solid rgba(0, 0, 0, 0.06)',
+                  backgroundColor: 'var(--card-bg)',
+                  border: '1px solid var(--border-subtle)',
                   borderRadius: '16px',
                   padding: '48px 56px',
                   boxShadow: '0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06)',
@@ -45554,7 +45720,7 @@ useEffect(() => {
               },
                 // Parachord Logo
                 React.createElement('div', { style: { marginBottom: '20px', display: 'flex', justifyContent: 'center' } },
-                  React.createElement(ParachordWordmark, { fill: '#333', height: 56 })
+                  React.createElement(ParachordWordmark, { fill: 'var(--text-primary)', height: 56 })
                 ),
 
                 // Version
@@ -45562,7 +45728,7 @@ useEffect(() => {
                   style: {
                     fontSize: '14px',
                     fontWeight: '500',
-                    color: '#374151',
+                    color: 'var(--text-primary)',
                     marginBottom: '8px'
                   }
                 }, appVersion ? `Version ${appVersion}` : 'Version'),
@@ -45571,7 +45737,7 @@ useEffect(() => {
                 React.createElement('p', {
                   style: {
                     fontSize: '13px',
-                    color: '#6b7280',
+                    color: 'var(--text-secondary)',
                     marginBottom: '32px',
                     lineHeight: '1.6',
                     maxWidth: '320px'
@@ -45587,7 +45753,7 @@ useEffect(() => {
                       }
                     },
                     style: {
-                      color: '#7c3aed',
+                      color: 'var(--accent-primary)',
                       textDecoration: 'none',
                       fontWeight: '500'
                     }
@@ -45600,7 +45766,7 @@ useEffect(() => {
                   style: {
                     width: '64px',
                     height: '1px',
-                    backgroundColor: 'rgba(0, 0, 0, 0.08)',
+                    backgroundColor: 'var(--border-subtle)',
                     margin: '0 auto 32px'
                   }
                 }),
@@ -45611,7 +45777,7 @@ useEffect(() => {
                     style: {
                       fontSize: '11px',
                       fontWeight: '600',
-                      color: '#9ca3af',
+                      color: 'var(--text-tertiary)',
                       textTransform: 'uppercase',
                       letterSpacing: '0.08em',
                       marginBottom: '8px'
@@ -45620,7 +45786,7 @@ useEffect(() => {
                   React.createElement('p', {
                     style: {
                       fontSize: '12px',
-                      color: '#6b7280',
+                      color: 'var(--text-secondary)',
                       marginBottom: '12px'
                     }
                   },
@@ -45636,7 +45802,7 @@ useEffect(() => {
                     },
                     style: {
                       fontSize: '12px',
-                      color: '#7c3aed',
+                      color: 'var(--accent-primary)',
                       fontWeight: '500',
                       textDecoration: 'none'
                     }
@@ -45647,7 +45813,7 @@ useEffect(() => {
                 React.createElement('p', {
                   style: {
                     fontSize: '11px',
-                    color: '#9ca3af'
+                    color: 'var(--text-tertiary)'
                   }
                 },
                   '© ', new Date().getFullYear(), ' Jason Herskowitz. All rights reserved.'
@@ -45657,7 +45823,7 @@ useEffect(() => {
                 React.createElement('p', {
                   style: {
                     fontSize: '11px',
-                    color: '#9ca3af',
+                    color: 'var(--text-tertiary)',
                     marginTop: '4px'
                   }
                 },
@@ -45676,8 +45842,8 @@ useEffect(() => {
     // Layout: [Left: transport + queue] [Center: track info] [Right: progress + shuffle + repeat + volume]
     // z-50 to stay above queue drawer
     React.createElement('div', {
-      className: 'bg-gray-800/95 backdrop-blur-xl border-t border-gray-700 py-3 no-drag flex-shrink-0 relative z-50',
-      style: { minHeight: '85px', paddingLeft: '26px', paddingRight: '26px' }
+      className: 'backdrop-blur-xl py-3 no-drag flex-shrink-0 relative z-50',
+      style: { minHeight: '85px', paddingLeft: '26px', paddingRight: '26px', backgroundColor: 'var(--surface-dark)', borderTop: '1px solid var(--surface-dark-border)' }
     },
       React.createElement('div', { className: 'flex items-center justify-between gap-4' },
         // LEFT: Transport controls + Queue button
@@ -45686,24 +45852,24 @@ useEffect(() => {
             React.createElement('button', {
               onClick: handlePrevious,
               disabled: !currentTrack,
-              className: `p-2 rounded hover:bg-white/10 transition-colors ${!currentTrack ? 'text-gray-600 cursor-not-allowed' : 'text-white'}`,
-              style: { display: 'flex', alignItems: 'center', justifyContent: 'center' }
+              className: 'p-2 rounded hover:bg-white/10 transition-colors',
+              style: { display: 'flex', alignItems: 'center', justifyContent: 'center', color: !currentTrack ? '#4b5563' : '#ffffff', cursor: !currentTrack ? 'not-allowed' : 'pointer' }
             }, React.createElement(SkipBack, { size: 18 }))
           ),
           React.createElement(Tooltip, { content: isPlaying ? 'Pause' : 'Play', position: 'top', variant: 'dark' },
             React.createElement('button', {
               onClick: handlePlayPause,
               disabled: !currentTrack,
-              className: `p-2 rounded hover:bg-white/10 transition-colors ${!currentTrack ? 'text-gray-600 cursor-not-allowed' : 'text-white'}`,
-              style: { width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center' }
+              className: 'p-2 rounded hover:bg-white/10 transition-colors',
+              style: { width: '38px', height: '38px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: !currentTrack ? '#4b5563' : '#ffffff', cursor: !currentTrack ? 'not-allowed' : 'pointer' }
             }, isPlaying ? React.createElement(Pause, { size: 22 }) : React.createElement(Play, { size: 22 }))
           ),
           React.createElement(Tooltip, { content: 'Next', position: 'top', variant: 'dark' },
             React.createElement('button', {
               onClick: () => handleNext(true),
               disabled: !currentTrack,
-              className: `p-2 rounded hover:bg-white/10 transition-colors ${!currentTrack ? 'text-gray-600 cursor-not-allowed' : 'text-white'}`,
-              style: { display: 'flex', alignItems: 'center', justifyContent: 'center' }
+              className: 'p-2 rounded hover:bg-white/10 transition-colors',
+              style: { display: 'flex', alignItems: 'center', justifyContent: 'center', color: !currentTrack ? '#4b5563' : '#ffffff', cursor: !currentTrack ? 'not-allowed' : 'pointer' }
             }, React.createElement(SkipForward, { size: 18 }))
           ),
           // Queue button (hamburger style)
@@ -45768,13 +45934,12 @@ useEffect(() => {
               React.createElement('button', {
                 onClick: handleClick,
                 disabled: !hasAnyAi,
-                className: `p-2 ml-1 rounded transition-colors ${
-                  isActive
-                    ? 'bg-purple-500/30 text-purple-300'
-                    : hasAnyAi
-                      ? 'text-gray-400 hover:bg-white/10 hover:text-white'
-                      : 'text-gray-600 cursor-not-allowed'
-                }`
+                className: 'p-2 ml-1 rounded transition-colors',
+                style: {
+                  color: isActive ? '#d8b4fe' : hasAnyAi ? '#9ca3af' : '#4b5563',
+                  backgroundColor: isActive ? 'rgba(168, 85, 247, 0.3)' : 'transparent',
+                  cursor: !hasAnyAi ? 'not-allowed' : 'pointer'
+                }
               },
                 React.createElement('svg', {
                   className: 'w-4 h-4',
@@ -46049,7 +46214,7 @@ useEffect(() => {
                           viewBox: '0 0 24 24',
                           stroke: 'currentColor',
                           strokeWidth: 2,
-                          style: { color: '#9ca3af' }
+                          style: { color: 'var(--text-tertiary)' }
                         },
                           React.createElement('path', {
                             strokeLinecap: 'round',
@@ -46266,24 +46431,24 @@ useEffect(() => {
           ] : React.createElement(React.Fragment, null,
             // Skeleton album art
             React.createElement('div', {
-              className: `flex-shrink-0 rounded ${trackLoading ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-shimmer' : 'bg-gray-700'}`,
+              className: `flex-shrink-0 rounded ${trackLoading ? 'shimmer-light animate-shimmer' : 'bg-gray-700'}`,
               style: { width: '61px', height: '61px', ...(trackLoading ? { backgroundSize: '200% 100%' } : {}) }
             }),
             // Skeleton track info - matches actual track info layout
             React.createElement('div', { className: 'min-w-0' },
               // Track title skeleton (text-sm = 14px, but skeleton slightly smaller)
               React.createElement('div', {
-                className: `h-3.5 rounded ${trackLoading ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-shimmer' : 'bg-gray-700'}`,
+                className: `h-3.5 rounded ${trackLoading ? 'shimmer-light animate-shimmer' : 'bg-gray-700'}`,
                 style: { width: '200px', ...(trackLoading ? { backgroundSize: '200% 100%' } : {}) }
               }),
               // Artist skeleton (text-xs = 12px)
               React.createElement('div', {
-                className: `h-3 rounded mt-1 ${trackLoading ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-shimmer' : 'bg-gray-700'}`,
+                className: `h-3 rounded mt-1 ${trackLoading ? 'shimmer-light animate-shimmer' : 'bg-gray-700'}`,
                 style: { width: '140px', ...(trackLoading ? { backgroundSize: '200% 100%' } : {}) }
               }),
               // Source skeleton (text-xs with mt-0.5)
               React.createElement('div', {
-                className: `h-3 rounded mt-1 ${trackLoading ? 'bg-gradient-to-r from-gray-700 via-gray-600 to-gray-700 animate-shimmer' : 'bg-gray-700'}`,
+                className: `h-3 rounded mt-1 ${trackLoading ? 'shimmer-light animate-shimmer' : 'bg-gray-700'}`,
                 style: { width: '80px', ...(trackLoading ? { backgroundSize: '200% 100%' } : {}) }
               })
             )
@@ -46309,12 +46474,14 @@ useEffect(() => {
                 }
               },
               disabled: !currentTrack || spinoffLoading || spinoffAvailable === false || spinoffAvailable === null,
-              className: `p-1.5 rounded-full transition-colors ${
-                !currentTrack || spinoffAvailable === false ? 'text-gray-600 cursor-not-allowed' :
-                spinoffLoading || spinoffAvailable === null ? 'text-gray-400' :
-                spinoffMode ? 'text-purple-400 hover:text-purple-300' :
-                'text-gray-400 hover:text-white'
-              }`
+              className: 'p-1.5 rounded-full transition-colors',
+              style: {
+                color: !currentTrack || spinoffAvailable === false ? '#4b5563' :
+                  spinoffLoading || spinoffAvailable === null ? '#9ca3af' :
+                  spinoffMode ? '#c084fc' : '#9ca3af',
+                cursor: !currentTrack || spinoffAvailable === false ? 'not-allowed' : 'pointer',
+                opacity: !currentTrack || spinoffAvailable === false ? 0.5 : 1
+              }
             },
               spinoffLoading
                 ? React.createElement('span', { className: 'animate-spin inline-block w-5 h-5' }, '◌')
@@ -46476,10 +46643,11 @@ useEffect(() => {
               React.createElement('button', {
                 onClick: shuffleDisabled ? undefined : toggleShuffle,
                 disabled: shuffleDisabled,
-                className: `p-2 rounded transition-colors ${
-                  shuffleDisabled ? 'text-gray-600 cursor-not-allowed' :
-                  shuffleMode ? 'text-purple-400 hover:text-purple-300' : 'text-gray-400 hover:text-white'
-                }`
+                className: 'p-2 rounded transition-colors',
+                style: {
+                  color: shuffleDisabled ? '#4b5563' : shuffleMode ? '#c084fc' : '#9ca3af',
+                  cursor: shuffleDisabled ? 'not-allowed' : 'pointer'
+                }
               },
                 React.createElement('svg', { className: 'w-4 h-4', viewBox: '0 0 24 24', fill: 'currentColor' },
                   React.createElement('path', { d: 'M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z' })
@@ -46574,7 +46742,8 @@ useEffect(() => {
                 variant: 'dark'
               },
                 React.createElement('button', {
-                  className: `${isDisabled ? 'text-gray-600 cursor-not-allowed' : 'text-gray-400 hover:text-white cursor-pointer'} transition-colors`,
+                  className: 'transition-colors',
+                  style: { color: isDisabled ? '#4b5563' : '#9ca3af', cursor: isDisabled ? 'not-allowed' : 'pointer' },
                   onClick: handleMuteToggle,
                   disabled: isDisabled
                 },
@@ -46638,9 +46807,9 @@ useEffect(() => {
       className: 'fixed bottom-24 left-4 z-50',
       style: {
         width: '380px',
-        backgroundColor: 'rgba(17, 24, 39, 0.95)',
+        backgroundColor: 'var(--surface-dark-solid)',
         backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
+        border: '1px solid var(--surface-dark-border)',
         borderRadius: '14px',
         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
         padding: '16px'
@@ -46659,9 +46828,9 @@ useEffect(() => {
             setAiError(null);
           },
           className: 'transition-colors',
-          style: { padding: '6px', color: '#6b7280', borderRadius: '8px' },
+          style: { padding: '6px', color: 'var(--text-secondary)', borderRadius: '8px' },
           onMouseEnter: (e) => { e.currentTarget.style.color = '#d1d5db'; e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'; },
-          onMouseLeave: (e) => { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.backgroundColor = 'transparent'; }
+          onMouseLeave: (e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.backgroundColor = 'transparent'; }
         },
           React.createElement('svg', { className: 'w-4 h-4', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
             React.createElement('path', { d: 'M6 18L18 6M6 6l12 12' })
@@ -46711,13 +46880,13 @@ useEffect(() => {
           style: {
             padding: '8px',
             borderRadius: '8px',
-            backgroundColor: !aiPrompt.trim() || aiLoading ? 'rgba(124, 58, 237, 0.3)' : '#7c3aed',
+            backgroundColor: !aiPrompt.trim() || aiLoading ? 'var(--accent-primary-alpha-30)' : 'var(--accent-primary)',
             color: '#ffffff',
             cursor: !aiPrompt.trim() || aiLoading ? 'not-allowed' : 'pointer',
             opacity: !aiPrompt.trim() || aiLoading ? '0.5' : '1'
           },
-          onMouseEnter: (e) => { if (aiPrompt.trim() && !aiLoading) e.currentTarget.style.backgroundColor = '#6d28d9'; },
-          onMouseLeave: (e) => { if (aiPrompt.trim() && !aiLoading) e.currentTarget.style.backgroundColor = '#7c3aed'; }
+          onMouseEnter: (e) => { if (aiPrompt.trim() && !aiLoading) e.currentTarget.style.backgroundColor = 'var(--accent-primary-hover)'; },
+          onMouseLeave: (e) => { if (aiPrompt.trim() && !aiLoading) e.currentTarget.style.backgroundColor = 'var(--accent-primary)'; }
         },
           aiLoading
             ? React.createElement('svg', { className: 'w-4 h-4 animate-spin', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
@@ -46735,7 +46904,7 @@ useEffect(() => {
         const aiResolvers = getAiServices();
         if (aiResolvers.length <= 1) return null;
         return React.createElement('div', { className: 'mt-3 flex items-center justify-end gap-2' },
-          React.createElement('span', { style: { fontSize: '12px', color: '#6b7280' } }, 'Provider:'),
+          React.createElement('span', { style: { fontSize: '12px', color: 'var(--text-secondary)' } }, 'Provider:'),
           React.createElement('select', {
             value: selectedAiResolver || aiResolvers[0]?.id || '',
             onChange: (e) => setSelectedAiResolver(e.target.value),
@@ -46769,8 +46938,8 @@ useEffect(() => {
             borderRadius: '10px',
             fontSize: '14px',
             fontWeight: '500',
-            background: aiLoading ? 'rgba(255, 255, 255, 0.05)' : 'linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c026d3 100%)',
-            color: aiLoading ? '#6b7280' : '#ffffff',
+            background: aiLoading ? 'rgba(255, 255, 255, 0.05)' : 'linear-gradient(135deg, var(--accent-primary) 0%, #a855f7 50%, #c026d3 100%)',
+            color: aiLoading ? 'var(--text-secondary)' : '#ffffff',
             cursor: aiLoading ? 'not-allowed' : 'pointer',
             opacity: aiLoading ? '0.6' : '1'
           },
@@ -46798,7 +46967,7 @@ useEffect(() => {
       !hasScrobblerConnected() && React.createElement('div', {
         className: 'mt-3 flex items-center justify-between'
       },
-        React.createElement('span', { style: { fontSize: '12px', color: '#6b7280' } },
+        React.createElement('span', { style: { fontSize: '12px', color: 'var(--text-secondary)' } },
           'Connect a scrobbler for personalized recommendations'
         ),
         React.createElement('button', {
@@ -46809,9 +46978,9 @@ useEffect(() => {
             navigateTo('settings');
           },
           className: 'transition-colors',
-          style: { fontSize: '12px', color: '#a78bfa' },
+          style: { fontSize: '12px', color: 'var(--accent-soft)' },
           onMouseEnter: (e) => e.currentTarget.style.color = '#c4b5fd',
-          onMouseLeave: (e) => e.currentTarget.style.color = '#a78bfa'
+          onMouseLeave: (e) => e.currentTarget.style.color = 'var(--accent-soft)'
         }, 'Browse →')
       ),
 
@@ -46829,7 +46998,7 @@ useEffect(() => {
       ),
 
       // Hint
-      !aiError && React.createElement('p', { style: { marginTop: '12px', fontSize: '12px', color: '#6b7280' } },
+      !aiError && React.createElement('p', { style: { marginTop: '12px', fontSize: '12px', color: 'var(--text-secondary)' } },
         'Try: "upbeat 90s hip hop" or "relaxing jazz for studying"'
       )
     ),
@@ -46856,8 +47025,8 @@ useEffect(() => {
           }
         },
         style: {
-          backgroundColor: 'rgba(17, 24, 39, 0.98)',
-          borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
+          backgroundColor: 'var(--surface-dark-solid)',
+          borderLeft: '1px solid var(--surface-dark-border)',
           boxShadow: '-10px 0 40px rgba(0, 0, 0, 0.3)',
           animation: sidebarClosing ? 'slideOutRight 0.2s ease-out forwards' : 'slideInRight 0.2s ease-out'
         }
@@ -46886,9 +47055,9 @@ useEffect(() => {
                 }
               },
               className: 'transition-colors',
-              style: { padding: '6px', color: '#6b7280', borderRadius: '8px' },
+              style: { padding: '6px', color: 'var(--text-secondary)', borderRadius: '8px' },
               onMouseEnter: (e) => { e.currentTarget.style.color = '#d1d5db'; e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'; },
-              onMouseLeave: (e) => { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.backgroundColor = 'transparent'; }
+              onMouseLeave: (e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.backgroundColor = 'transparent'; }
             },
               React.createElement('svg', { className: 'w-5 h-5', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
                 React.createElement('path', { d: 'M6 18L18 6M6 6l12 12' })
@@ -46899,7 +47068,7 @@ useEffect(() => {
           resultsSidebar.mode === 'chat'
             ? React.createElement('div', { 'data-provider-dropdown': true, style: { marginTop: '8px', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '8px' } },
                 // "powered by:" label
-                React.createElement('span', { style: { fontSize: '12px', color: '#6b7280' } }, 'powered by:'),
+                React.createElement('span', { style: { fontSize: '12px', color: 'var(--text-secondary)' } }, 'powered by:'),
                 // Custom dropdown button
                 (() => {
                   const enabledServices = getChatServices().filter(s => {
@@ -46952,7 +47121,7 @@ useEffect(() => {
                         top: '100%',
                         right: 0,
                         marginTop: '4px',
-                        backgroundColor: '#1f2937',
+                        backgroundColor: 'var(--tooltip-bg)',
                         border: '1px solid rgba(255, 255, 255, 0.1)',
                         borderRadius: '6px',
                         overflow: 'hidden',
@@ -46993,7 +47162,7 @@ useEffect(() => {
                             display: 'flex',
                             alignItems: 'center',
                             gap: '6px',
-                            backgroundColor: isSelected ? 'rgba(124, 58, 237, 0.2)' : 'transparent',
+                            backgroundColor: isSelected ? 'var(--accent-primary-alpha-20)' : 'transparent',
                             border: 'none',
                             color: '#e5e7eb',
                             fontSize: '12px',
@@ -47011,7 +47180,7 @@ useEffect(() => {
                             : React.createElement('span', { style: { fontSize: '12px' } }, service.icon || service.manifest?.icon || '🤖'),
                           service.name || service.manifest?.name,
                           isSelected && React.createElement('svg', {
-                            style: { width: '12px', height: '12px', marginLeft: 'auto', color: '#a78bfa' },
+                            style: { width: '12px', height: '12px', marginLeft: 'auto', color: 'var(--accent-soft)' },
                             viewBox: '0 0 24 24',
                             fill: 'none',
                             stroke: 'currentColor',
@@ -47026,7 +47195,7 @@ useEffect(() => {
                 })()
               )
             : (resultsSidebar.subtitle && React.createElement('p', {
-                style: { fontSize: '13px', color: '#9ca3af', marginTop: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
+                style: { fontSize: '13px', color: 'var(--text-tertiary)', marginTop: '4px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }
               }, resultsSidebar.subtitle))
         ),
 
@@ -47042,7 +47211,7 @@ useEffect(() => {
               },
                 // Welcome message if no messages
                 (!resultsSidebar.messages || resultsSidebar.messages.length === 0) && React.createElement('div', {
-                  style: { textAlign: 'center', padding: '24px 16px', color: '#6b7280' }
+                  style: { textAlign: 'center', padding: '24px 16px', color: 'var(--text-secondary)' }
                 },
                   React.createElement('div', { style: { marginBottom: '12px', display: 'flex', justifyContent: 'center' } },
                     React.createElement('svg', { viewBox: '0 0 122.88 89.38', style: { width: '48px', height: '48px' }, fill: '#9ca3af' },
@@ -47084,7 +47253,7 @@ useEffect(() => {
                           maxWidth: '85%',
                           padding: '10px 14px',
                           borderRadius: msg.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                          backgroundColor: msg.role === 'user' ? '#7c3aed' : 'rgba(255, 255, 255, 0.08)',
+                          backgroundColor: msg.role === 'user' ? 'var(--accent-primary)' : 'rgba(255, 255, 255, 0.08)',
                           color: msg.role === 'user' ? '#ffffff' : '#e5e7eb',
                           fontSize: '14px',
                           lineHeight: '1.5',
@@ -47114,7 +47283,7 @@ useEffect(() => {
                     // Show progress status text if available, otherwise show bouncing dots
                     resultsSidebar.progressStatus
                       ? React.createElement('span', {
-                          style: { fontSize: '13px', color: '#9ca3af' }
+                          style: { fontSize: '13px', color: 'var(--text-tertiary)' }
                         }, resultsSidebar.progressStatus)
                       : React.createElement(React.Fragment, null,
                           React.createElement('span', { className: 'animate-bounce', style: { animationDelay: '0ms', width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#9ca3af' } }),
@@ -47152,13 +47321,13 @@ useEffect(() => {
                       flex: 1,
                       backgroundColor: 'rgba(255, 255, 255, 0.05)',
                       border: '1px solid rgba(255, 255, 255, 0.1)',
-                      borderRadius: '20px',
+                      borderRadius: '16px',
                       padding: '10px 16px',
                       fontSize: '14px',
                       color: '#f3f4f6',
                       outline: 'none'
                     },
-                    onFocus: (e) => { e.target.style.borderColor = 'rgba(124, 58, 237, 0.5)'; },
+                    onFocus: (e) => { e.target.style.borderColor = 'var(--accent-primary-alpha-50)'; },
                     onBlur: (e) => { e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)'; }
                   }),
                   React.createElement('button', {
@@ -47169,7 +47338,7 @@ useEffect(() => {
                       width: '40px',
                       height: '40px',
                       borderRadius: '50%',
-                      backgroundColor: !aiChatInput.trim() || aiChatLoading ? 'rgba(124, 58, 237, 0.3)' : '#7c3aed',
+                      backgroundColor: !aiChatInput.trim() || aiChatLoading ? 'var(--accent-primary-alpha-30)' : 'var(--accent-primary)',
                       color: '#ffffff',
                       border: 'none',
                       cursor: !aiChatInput.trim() || aiChatLoading ? 'not-allowed' : 'pointer',
@@ -47199,14 +47368,14 @@ useEffect(() => {
                         onClick: clearAiChatHistory,
                         style: {
                           fontSize: '12px',
-                          color: '#6b7280',
+                          color: 'var(--text-secondary)',
                           background: 'none',
                           border: 'none',
                           cursor: 'pointer',
                           padding: '4px 8px'
                         },
-                        onMouseEnter: (e) => e.currentTarget.style.color = '#9ca3af',
-                        onMouseLeave: (e) => e.currentTarget.style.color = '#6b7280'
+                        onMouseEnter: (e) => e.currentTarget.style.color = 'var(--text-tertiary)',
+                        onMouseLeave: (e) => e.currentTarget.style.color = 'var(--text-secondary)'
                       }, 'Clear conversation')
                     : React.createElement('div'),
                   // Share my data toggle (right)
@@ -47215,7 +47384,7 @@ useEffect(() => {
                     title: aiIncludeHistory ? 'Sharing your data with AI' : 'Not sharing your data with AI'
                   },
                     React.createElement('span', {
-                      style: { fontSize: '12px', color: aiIncludeHistory ? '#c4b5fd' : '#6b7280', whiteSpace: 'nowrap' }
+                      style: { fontSize: '12px', color: aiIncludeHistory ? '#c4b5fd' : 'var(--text-secondary)', whiteSpace: 'nowrap' }
                     }, 'Share my data'),
                     React.createElement('input', {
                       type: 'checkbox',
@@ -47230,7 +47399,7 @@ useEffect(() => {
                         width: '28px',
                         height: '16px',
                         borderRadius: '8px',
-                        backgroundColor: aiIncludeHistory ? '#7c3aed' : 'rgba(255, 255, 255, 0.15)',
+                        backgroundColor: aiIncludeHistory ? 'var(--accent-primary)' : 'rgba(255, 255, 255, 0.15)',
                         transition: 'background-color 0.2s',
                         flexShrink: 0
                       }
@@ -47244,7 +47413,7 @@ useEffect(() => {
                           width: '12px',
                           height: '12px',
                           borderRadius: '50%',
-                          backgroundColor: '#ffffff',
+                          backgroundColor: 'var(--card-bg)',
                           boxShadow: '0 1px 2px rgba(0, 0, 0, 0.2)',
                           transition: 'left 0.2s'
                         }
@@ -47294,12 +47463,12 @@ useEffect(() => {
                         onMouseLeave: (e) => e.currentTarget.style.backgroundColor = 'transparent'
                       },
                         // Track number
-                        React.createElement('span', { style: { width: '24px', textAlign: 'center', fontSize: '12px', color: '#6b7280' } }, index + 1),
+                        React.createElement('span', { style: { width: '24px', textAlign: 'center', fontSize: '12px', color: 'var(--text-secondary)' } }, index + 1),
 
                         // Track info
                         React.createElement('div', { className: 'flex-1 min-w-0' },
                           React.createElement('div', { style: { fontSize: '14px', color: '#f3f4f6', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, track.title),
-                          React.createElement('div', { style: { fontSize: '12px', color: '#9ca3af', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, track.artist)
+                          React.createElement('div', { style: { fontSize: '12px', color: 'var(--text-tertiary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, track.artist)
                         ),
 
                         // Remove button
@@ -47311,9 +47480,9 @@ useEffect(() => {
                             }));
                           },
                           className: 'opacity-0 group-hover:opacity-100 transition-all',
-                          style: { padding: '4px', borderRadius: '6px', color: '#6b7280' },
+                          style: { padding: '4px', borderRadius: '6px', color: 'var(--text-secondary)' },
                           onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.15)'; e.currentTarget.style.color = '#f87171'; },
-                          onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#6b7280'; }
+                          onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = 'var(--text-secondary)'; }
                         },
                           React.createElement('svg', { className: 'w-4 h-4', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
                             React.createElement('path', { d: 'M6 18L18 6M6 6l12 12' })
@@ -47328,7 +47497,7 @@ useEffect(() => {
                 className: 'flex-1 flex items-center justify-center',
                 style: { padding: '16px' }
               },
-                React.createElement('p', { style: { fontSize: '14px', color: '#6b7280' } }, 'No tracks remaining')
+                React.createElement('p', { style: { fontSize: '14px', color: 'var(--text-secondary)' } }, 'No tracks remaining')
               ),
 
               // Actions - Three circular buttons
@@ -47410,11 +47579,11 @@ useEffect(() => {
       React.createElement('div', {
         className: 'max-w-md w-full mx-4',
         style: {
-          backgroundColor: 'rgba(17, 24, 39, 0.98)',
+          backgroundColor: 'var(--surface-dark-solid)',
           borderRadius: '16px',
           padding: '24px',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-          border: '1px solid rgba(255, 255, 255, 0.08)'
+          border: '1px solid var(--surface-dark-border)'
         }
       },
         // Header
@@ -47423,9 +47592,9 @@ useEffect(() => {
           React.createElement('button', {
             onClick: () => setAiSaveDialogOpen(false),
             className: 'transition-colors',
-            style: { padding: '6px', color: '#6b7280', borderRadius: '8px' },
+            style: { padding: '6px', color: 'var(--text-secondary)', borderRadius: '8px' },
             onMouseEnter: (e) => { e.currentTarget.style.color = '#d1d5db'; e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'; },
-            onMouseLeave: (e) => { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.backgroundColor = 'transparent'; }
+            onMouseLeave: (e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.backgroundColor = 'transparent'; }
           },
             React.createElement('svg', { className: 'w-5 h-5', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
               React.createElement('path', { d: 'M6 18L18 6M6 6l12 12' })
@@ -47435,14 +47604,14 @@ useEffect(() => {
 
         // Provider info
         resultsSidebar?.provider && React.createElement('p', {
-          style: { fontSize: '12px', color: '#6b7280', marginBottom: '16px' }
+          style: { fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '16px' }
         }, `Generated by ${resultsSidebar.provider.name}`),
 
         // Name input
         React.createElement('div', { style: { marginBottom: '20px' } },
           React.createElement('label', {
             htmlFor: 'playlist-name',
-            style: { display: 'block', fontSize: '13px', color: '#9ca3af', marginBottom: '8px' }
+            style: { display: 'block', fontSize: '13px', color: 'var(--text-tertiary)', marginBottom: '8px' }
           }, 'Playlist Name'),
           React.createElement('input', {
             id: 'playlist-name',
@@ -47497,13 +47666,13 @@ useEffect(() => {
               fontSize: '14px',
               fontWeight: '500',
               color: '#ffffff',
-              backgroundColor: !aiSavePlaylistName.trim() ? 'rgba(124, 58, 237, 0.3)' : '#7c3aed',
+              backgroundColor: !aiSavePlaylistName.trim() ? 'var(--accent-primary-alpha-30)' : 'var(--accent-primary)',
               borderRadius: '10px',
               cursor: !aiSavePlaylistName.trim() ? 'not-allowed' : 'pointer',
               opacity: !aiSavePlaylistName.trim() ? '0.5' : '1'
             },
-            onMouseEnter: (e) => { if (aiSavePlaylistName.trim()) e.currentTarget.style.backgroundColor = '#6d28d9'; },
-            onMouseLeave: (e) => { if (aiSavePlaylistName.trim()) e.currentTarget.style.backgroundColor = '#7c3aed'; }
+            onMouseEnter: (e) => { if (aiSavePlaylistName.trim()) e.currentTarget.style.backgroundColor = 'var(--accent-primary-hover)'; },
+            onMouseLeave: (e) => { if (aiSavePlaylistName.trim()) e.currentTarget.style.backgroundColor = 'var(--accent-primary)'; }
           }, 'Save')
         )
       )
@@ -47519,7 +47688,8 @@ useEffect(() => {
       }
     },
       React.createElement('div', {
-        className: 'bg-gray-900 rounded-xl p-6 max-w-md w-full mx-4 shadow-xl border border-gray-700'
+        className: 'rounded-xl p-6 max-w-md w-full mx-4 shadow-xl',
+        style: { backgroundColor: 'var(--surface-dark-solid)', border: '1px solid var(--surface-dark-border)' }
       },
         // Header
         React.createElement('div', { className: 'flex items-center justify-between mb-4' },
@@ -47591,7 +47761,7 @@ useEffect(() => {
       React.createElement('div', {
         className: 'max-w-md w-full mx-4 overflow-hidden',
         style: {
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--card-bg)',
           borderRadius: '16px',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
         },
@@ -47600,10 +47770,10 @@ useEffect(() => {
         // Header
         React.createElement('div', {
           className: 'flex items-center justify-between',
-          style: { padding: '20px 24px 16px', borderBottom: '1px solid rgba(0, 0, 0, 0.06)' }
+          style: { padding: '20px 24px 16px', borderBottom: '1px solid var(--border-subtle)' }
         },
           React.createElement('h3', {
-            style: { fontSize: '17px', fontWeight: '600', color: '#1f2937' }
+            style: { fontSize: '17px', fontWeight: '600', color: 'var(--text-primary)' }
           }, 'Import Playlist'),
           React.createElement('button', {
             onClick: () => {
@@ -47613,11 +47783,11 @@ useEffect(() => {
             className: 'transition-colors',
             style: {
               padding: '6px',
-              color: '#9ca3af',
+              color: 'var(--text-tertiary)',
               borderRadius: '8px'
             },
-            onMouseEnter: (e) => { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.05)'; },
-            onMouseLeave: (e) => { e.currentTarget.style.color = '#9ca3af'; e.currentTarget.style.backgroundColor = 'transparent'; }
+            onMouseEnter: (e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.backgroundColor = 'var(--hover-bg-default)'; },
+            onMouseLeave: (e) => { e.currentTarget.style.color = 'var(--text-tertiary)'; e.currentTarget.style.backgroundColor = 'transparent'; }
           },
             React.createElement('svg', { className: 'w-5 h-5', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
               React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M6 18L18 6M6 6l12 12' })
@@ -47631,9 +47801,9 @@ useEffect(() => {
           React.createElement('div', {
             style: {
               padding: '16px',
-              backgroundColor: '#faf5ff',
+              backgroundColor: 'var(--bg-inset)',
               borderRadius: '12px',
-              border: '1px solid #e9d5ff',
+              border: '1px solid var(--border-default)',
               marginBottom: '16px'
             }
           },
@@ -47644,7 +47814,7 @@ useEffect(() => {
                   width: '36px',
                   height: '36px',
                   borderRadius: '10px',
-                  backgroundColor: '#7c3aed',
+                  backgroundColor: 'var(--accent-primary)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -47658,10 +47828,10 @@ useEffect(() => {
               // Text
               React.createElement('div', { style: { flex: 1 } },
                 React.createElement('h4', {
-                  style: { fontSize: '14px', fontWeight: '600', color: '#1f2937', marginBottom: '4px' }
+                  style: { fontSize: '14px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '4px' }
                 }, 'Import from URL'),
                 React.createElement('p', {
-                  style: { fontSize: '13px', color: '#6b7280', lineHeight: '1.4' }
+                  style: { fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.4' }
                 }, 'Spotify, Apple Music, or hosted .xspf')
               )
             ),
@@ -47703,15 +47873,15 @@ useEffect(() => {
                   flex: 1,
                   padding: '10px 14px',
                   fontSize: '14px',
-                  color: '#1f2937',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid #d8b4fe',
+                  color: 'var(--text-primary)',
+                  backgroundColor: 'var(--card-bg)',
+                  border: '1px solid var(--border-default)',
                   borderRadius: '8px',
                   outline: 'none',
                   transition: 'border-color 150ms ease, box-shadow 150ms ease'
                 },
-                onFocus: (e) => { e.target.style.borderColor = '#a78bfa'; e.target.style.boxShadow = '0 0 0 3px rgba(167, 139, 250, 0.15)'; },
-                onBlur: (e) => { e.target.style.borderColor = '#d8b4fe'; e.target.style.boxShadow = 'none'; },
+                onFocus: (e) => { e.target.style.borderColor = 'var(--accent-primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(124, 58, 237, 0.15)'; },
+                onBlur: (e) => { e.target.style.borderColor = 'var(--border-default)'; e.target.style.boxShadow = 'none'; },
                 disabled: urlImportLoading,
                 autoFocus: true
               }),
@@ -47745,14 +47915,14 @@ useEffect(() => {
                   fontSize: '14px',
                   fontWeight: '500',
                   color: '#ffffff',
-                  backgroundColor: urlImportLoading || !urlImportValue.trim() ? '#c4b5fd' : '#7c3aed',
+                  backgroundColor: 'var(--accent-primary)',
                   borderRadius: '8px',
                   cursor: urlImportLoading || !urlImportValue.trim() ? 'not-allowed' : 'pointer',
                   opacity: urlImportLoading || !urlImportValue.trim() ? '0.6' : '1',
                   minWidth: '80px'
                 },
-                onMouseEnter: (e) => { if (!urlImportLoading && urlImportValue.trim()) e.currentTarget.style.backgroundColor = '#6d28d9'; },
-                onMouseLeave: (e) => { if (!urlImportLoading && urlImportValue.trim()) e.currentTarget.style.backgroundColor = '#7c3aed'; }
+                onMouseEnter: (e) => { if (!urlImportLoading && urlImportValue.trim()) e.currentTarget.style.backgroundColor = 'var(--accent-primary-hover)'; },
+                onMouseLeave: (e) => { if (!urlImportLoading && urlImportValue.trim()) e.currentTarget.style.backgroundColor = 'var(--accent-primary)'; }
               },
                 urlImportLoading ? React.createElement('svg', {
                   className: 'w-4 h-4 animate-spin',
@@ -47768,9 +47938,9 @@ useEffect(() => {
 
           // Divider
           React.createElement('div', { className: 'flex items-center gap-3', style: { marginBottom: '16px' } },
-            React.createElement('div', { style: { flex: 1, height: '1px', backgroundColor: 'rgba(0, 0, 0, 0.08)' } }),
-            React.createElement('span', { style: { fontSize: '12px', color: '#9ca3af', fontWeight: '500' } }, 'or'),
-            React.createElement('div', { style: { flex: 1, height: '1px', backgroundColor: 'rgba(0, 0, 0, 0.08)' } })
+            React.createElement('div', { style: { flex: 1, height: '1px', backgroundColor: 'var(--border-subtle)' } }),
+            React.createElement('span', { style: { fontSize: '12px', color: 'var(--text-tertiary)', fontWeight: '500' } }, 'or'),
+            React.createElement('div', { style: { flex: 1, height: '1px', backgroundColor: 'var(--border-subtle)' } })
           ),
 
           // Option 2: Load from file - Card style with dashed border
@@ -47782,19 +47952,19 @@ useEffect(() => {
             className: 'w-full transition-all',
             style: {
               padding: '20px',
-              backgroundColor: '#fafafa',
+              backgroundColor: 'var(--bg-tertiary)',
               borderRadius: '12px',
-              border: '2px dashed #d1d5db',
+              border: '2px dashed var(--border-default)',
               cursor: 'pointer',
               textAlign: 'center'
             },
             onMouseEnter: (e) => {
-              e.currentTarget.style.backgroundColor = '#f3f4f6';
-              e.currentTarget.style.borderColor = '#9ca3af';
+              e.currentTarget.style.backgroundColor = 'var(--hover-bg-default)';
+              e.currentTarget.style.borderColor = 'var(--text-tertiary)';
             },
             onMouseLeave: (e) => {
-              e.currentTarget.style.backgroundColor = '#fafafa';
-              e.currentTarget.style.borderColor = '#d1d5db';
+              e.currentTarget.style.backgroundColor = 'var(--bg-tertiary)';
+              e.currentTarget.style.borderColor = 'var(--border-default)';
             },
             disabled: urlImportLoading
           },
@@ -47805,22 +47975,22 @@ useEffect(() => {
                   width: '40px',
                   height: '40px',
                   borderRadius: '10px',
-                  backgroundColor: '#e5e7eb',
+                  backgroundColor: 'var(--placeholder-bg)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
                 }
               },
-                React.createElement('svg', { className: 'w-5 h-5', fill: 'none', viewBox: '0 0 24 24', stroke: '#6b7280', strokeWidth: 2 },
+                React.createElement('svg', { className: 'w-5 h-5', fill: 'none', viewBox: '0 0 24 24', stroke: 'var(--text-secondary)', strokeWidth: 2 },
                   React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z' })
                 )
               ),
               React.createElement('div', null,
                 React.createElement('p', {
-                  style: { fontSize: '14px', fontWeight: '500', color: '#374151', marginBottom: '2px' }
+                  style: { fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)', marginBottom: '2px' }
                 }, 'Load from File'),
                 React.createElement('p', {
-                  style: { fontSize: '12px', color: '#9ca3af' }
+                  style: { fontSize: '12px', color: 'var(--text-tertiary)' }
                 }, 'Choose an .xspf file from your computer')
               )
             )
@@ -47843,7 +48013,7 @@ useEffect(() => {
       React.createElement('div', {
         className: 'max-w-md w-full mx-4 overflow-hidden',
         style: {
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--card-bg)',
           borderRadius: '16px',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
         },
@@ -47852,10 +48022,10 @@ useEffect(() => {
         // Header
         React.createElement('div', {
           className: 'flex items-center justify-between',
-          style: { padding: '20px 24px 16px', borderBottom: '1px solid rgba(0, 0, 0, 0.06)' }
+          style: { padding: '20px 24px 16px', borderBottom: '1px solid var(--border-subtle)' }
         },
           React.createElement('h3', {
-            style: { fontSize: '17px', fontWeight: '600', color: '#1f2937' }
+            style: { fontSize: '17px', fontWeight: '600', color: 'var(--text-primary)' }
           }, 'Add Friend'),
           React.createElement('button', {
             onClick: () => {
@@ -47865,11 +48035,11 @@ useEffect(() => {
             className: 'transition-colors',
             style: {
               padding: '6px',
-              color: '#9ca3af',
+              color: 'var(--text-tertiary)',
               borderRadius: '8px'
             },
-            onMouseEnter: (e) => { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.05)'; },
-            onMouseLeave: (e) => { e.currentTarget.style.color = '#9ca3af'; e.currentTarget.style.backgroundColor = 'transparent'; }
+            onMouseEnter: (e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.backgroundColor = 'var(--hover-bg-default)'; },
+            onMouseLeave: (e) => { e.currentTarget.style.color = 'var(--text-tertiary)'; e.currentTarget.style.backgroundColor = 'transparent'; }
           },
             React.createElement('svg', { className: 'w-5 h-5', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
               React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M6 18L18 6M6 6l12 12' })
@@ -47879,7 +48049,7 @@ useEffect(() => {
         // Body
         React.createElement('div', { style: { padding: '20px 24px' } },
           React.createElement('p', {
-            style: { fontSize: '14px', color: '#4b5563', marginBottom: '16px', lineHeight: '1.5' }
+            style: { fontSize: '14px', color: 'var(--nav-inactive)', marginBottom: '16px', lineHeight: '1.5' }
           },
             'Enter a Last.fm or ListenBrainz username, or paste a profile URL.'
           ),
@@ -47899,19 +48069,19 @@ useEffect(() => {
               width: '100%',
               padding: '12px 16px',
               fontSize: '14px',
-              color: '#1f2937',
-              backgroundColor: '#ffffff',
-              border: '1px solid #e5e7eb',
+              color: 'var(--text-primary)',
+              backgroundColor: 'var(--card-bg)',
+              border: '1px solid var(--border-default)',
               borderRadius: '10px',
               outline: 'none',
               transition: 'border-color 150ms ease, box-shadow 150ms ease'
             },
-            onFocus: (e) => { e.target.style.borderColor = '#9ca3af'; e.target.style.boxShadow = '0 0 0 3px rgba(156, 163, 175, 0.1)'; },
-            onBlur: (e) => { e.target.style.borderColor = '#e5e7eb'; e.target.style.boxShadow = 'none'; },
+            onFocus: (e) => { e.target.style.borderColor = 'var(--accent-primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(124, 58, 237, 0.1)'; },
+            onBlur: (e) => { e.target.style.borderColor = 'var(--border-default)'; e.target.style.boxShadow = 'none'; },
             autoFocus: true
           }),
           // Example hints
-          React.createElement('div', { style: { marginTop: '12px', fontSize: '12px', color: '#9ca3af' } },
+          React.createElement('div', { style: { marginTop: '12px', fontSize: '12px', color: 'var(--text-tertiary)' } },
             React.createElement('p', null, 'Examples:'),
             React.createElement('p', { style: { marginTop: '4px' } }, '• username'),
             React.createElement('p', null, '• https://www.last.fm/user/username'),
@@ -47921,7 +48091,7 @@ useEffect(() => {
         // Footer
         React.createElement('div', {
           className: 'flex justify-end gap-3',
-          style: { padding: '16px 24px 20px', borderTop: '1px solid rgba(0, 0, 0, 0.06)' }
+          style: { padding: '16px 24px 20px', borderTop: '1px solid var(--border-subtle)' }
         },
           React.createElement('button', {
             onClick: () => {
@@ -47933,11 +48103,11 @@ useEffect(() => {
               padding: '10px 18px',
               fontSize: '14px',
               fontWeight: '500',
-              color: '#6b7280',
+              color: 'var(--text-secondary)',
               borderRadius: '10px'
             },
-            onMouseEnter: (e) => { e.currentTarget.style.color = '#374151'; e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.05)'; },
-            onMouseLeave: (e) => { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.backgroundColor = 'transparent'; }
+            onMouseEnter: (e) => { e.currentTarget.style.color = 'var(--text-primary)'; e.currentTarget.style.backgroundColor = 'var(--hover-bg-default)'; },
+            onMouseLeave: (e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.backgroundColor = 'transparent'; }
           }, 'Cancel'),
           React.createElement('button', {
             onClick: () => addFriend(addFriendInput),
@@ -47948,13 +48118,13 @@ useEffect(() => {
               fontSize: '14px',
               fontWeight: '500',
               color: '#ffffff',
-              backgroundColor: addFriendLoading || !addFriendInput.trim() ? '#c4b5fd' : '#7c3aed',
+              backgroundColor: 'var(--accent-primary)',
               borderRadius: '10px',
               cursor: addFriendLoading || !addFriendInput.trim() ? 'not-allowed' : 'pointer',
-              opacity: addFriendLoading || !addFriendInput.trim() ? '0.6' : '1'
+              opacity: addFriendLoading || !addFriendInput.trim() ? '0.35' : '1'
             },
-            onMouseEnter: (e) => { if (!addFriendLoading && addFriendInput.trim()) e.currentTarget.style.backgroundColor = '#6d28d9'; },
-            onMouseLeave: (e) => { if (!addFriendLoading && addFriendInput.trim()) e.currentTarget.style.backgroundColor = '#7c3aed'; }
+            onMouseEnter: (e) => { if (!addFriendLoading && addFriendInput.trim()) e.currentTarget.style.backgroundColor = 'var(--accent-primary-hover)'; },
+            onMouseLeave: (e) => { if (!addFriendLoading && addFriendInput.trim()) e.currentTarget.style.backgroundColor = 'var(--accent-primary)'; }
           },
             addFriendLoading && React.createElement('svg', {
               className: 'w-4 h-4 animate-spin',
@@ -47981,7 +48151,7 @@ useEffect(() => {
     },
       React.createElement('div', {
         style: {
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--card-bg)',
           borderRadius: '16px',
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15), 0 12px 48px rgba(0, 0, 0, 0.1)',
           maxWidth: '440px',
@@ -48060,7 +48230,7 @@ useEffect(() => {
           React.createElement('p', {
             style: {
               fontSize: '13px',
-              color: '#6b7280',
+              color: 'var(--text-secondary)',
               lineHeight: '1.6',
               marginBottom: '24px'
             }
@@ -48072,7 +48242,7 @@ useEffect(() => {
               style: {
                 fontSize: '11px',
                 fontWeight: '600',
-                color: '#9ca3af',
+                color: 'var(--text-tertiary)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
                 marginBottom: '12px'
@@ -48098,8 +48268,8 @@ useEffect(() => {
                   key: cap,
                   style: {
                     padding: '6px 12px',
-                    backgroundColor: 'rgba(124, 58, 237, 0.08)',
-                    color: '#7c3aed',
+                    backgroundColor: 'var(--accent-primary-alpha-08)',
+                    color: 'var(--accent-primary)',
                     borderRadius: '16px',
                     fontSize: '12px',
                     fontWeight: '500'
@@ -48114,7 +48284,7 @@ useEffect(() => {
             className: 'flex items-center justify-between',
             style: {
               padding: '16px 0',
-              borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+              borderTop: '1px solid var(--border-subtle)'
             }
           },
             React.createElement('div', null,
@@ -48122,29 +48292,26 @@ useEffect(() => {
                 style: {
                   fontSize: '13px',
                   fontWeight: '500',
-                  color: '#1f2937'
+                  color: 'var(--text-primary)'
                 }
               }, 'Enable Resolver'),
               React.createElement('p', {
                 style: {
                   fontSize: '12px',
-                  color: '#6b7280',
+                  color: 'var(--text-secondary)',
                   marginTop: '2px'
                 }
               }, 'Include in search and playback')
             ),
-            React.createElement('label', { className: 'relative inline-block w-12 h-6' },
-              React.createElement('input', {
-                type: 'checkbox',
-                checked: activeResolvers.includes(selectedResolver.id),
-                onChange: () => toggleResolver(selectedResolver.id),
-                className: 'sr-only peer'
+            React.createElement('div', {
+              className: 'relative w-11 h-6 cursor-pointer',
+              onClick: () => toggleResolver(selectedResolver.id)
+            },
+              React.createElement('div', {
+                className: `w-full h-full rounded-full transition-colors ${activeResolvers.includes(selectedResolver.id) ? 'bg-purple-600' : 'bg-gray-300'}`
               }),
               React.createElement('div', {
-                className: 'w-full h-full bg-gray-300 rounded-full peer-checked:bg-purple-600 transition-colors'
-              }),
-              React.createElement('div', {
-                className: 'absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow transition-transform peer-checked:translate-x-6'
+                className: `absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${activeResolvers.includes(selectedResolver.id) ? 'translate-x-5' : 'translate-x-0'}`
               })
             )
           ),
@@ -48153,7 +48320,7 @@ useEffect(() => {
           selectedResolver.id === 'spotify' && React.createElement('div', {
             style: {
               padding: '16px 0',
-              borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+              borderTop: '1px solid var(--border-subtle)'
             }
           },
             React.createElement('div', { className: 'flex items-center justify-between' },
@@ -48162,13 +48329,13 @@ useEffect(() => {
                   style: {
                     fontSize: '13px',
                     fontWeight: '500',
-                    color: '#1f2937'
+                    color: 'var(--text-primary)'
                   }
                 }, 'Spotify Account'),
                 React.createElement('p', {
                   style: {
                     fontSize: '12px',
-                    color: '#6b7280',
+                    color: 'var(--text-secondary)',
                     marginTop: '2px'
                   }
                 },
@@ -48221,7 +48388,7 @@ useEffect(() => {
               style: {
                 marginTop: '16px',
                 padding: '12px',
-                backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                backgroundColor: 'var(--hover-bg-default)',
                 borderRadius: '8px'
               }
             },
@@ -48230,7 +48397,7 @@ useEffect(() => {
                     style: { fontSize: '11px', color: '#22c55e', marginBottom: '8px', lineHeight: '1.5' }
                   }, 'Using Client ID from environment variable.')
                 : React.createElement('p', {
-                    style: { fontSize: '11px', color: '#6b7280', marginBottom: '12px', lineHeight: '1.5' }
+                    style: { fontSize: '11px', color: 'var(--text-secondary)', marginBottom: '12px', lineHeight: '1.5' }
                   },
                     'Spotify requires your own API credentials. Create a free app at ',
                     React.createElement('a', {
@@ -48244,9 +48411,9 @@ useEffect(() => {
               spotifyCredentialsSource === 'none' && React.createElement('div', {
                 style: {
                   fontSize: '11px',
-                  color: '#6b7280',
+                  color: 'var(--text-secondary)',
                   marginBottom: '12px',
-                  lineHeight: '1.8',
+                  lineHeight: '1.6',
                   paddingLeft: '4px'
                 }
               },
@@ -48255,7 +48422,7 @@ useEffect(() => {
                   React.createElement('code', {
                     onClick: () => navigator.clipboard.writeText('http://127.0.0.1:8888/callback'),
                     title: 'Click to copy',
-                    style: { cursor: 'pointer', backgroundColor: 'rgba(0,0,0,0.05)', padding: '1px 4px', borderRadius: '3px' }
+                    style: { cursor: 'pointer', backgroundColor: 'var(--hover-bg-default)', padding: '1px 4px', borderRadius: '3px' }
                   }, 'http://127.0.0.1:8888/callback')
                 ),
                 React.createElement('div', null, '3. Copy your Client ID and paste it below')
@@ -48263,7 +48430,7 @@ useEffect(() => {
               // Client ID input
               React.createElement('div', { style: { marginBottom: '10px' } },
                 React.createElement('label', {
-                  style: { fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '4px' }
+                  style: { fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }
                 }, 'Client ID'),
                 React.createElement('input', {
                   type: 'password',
@@ -48274,9 +48441,9 @@ useEffect(() => {
                     width: '100%',
                     padding: '8px 10px',
                     fontSize: '12px',
-                    color: '#1f2937',
-                    backgroundColor: '#ffffff',
-                    border: '1px solid rgba(0, 0, 0, 0.1)',
+                    color: 'var(--text-primary)',
+                    backgroundColor: 'var(--card-bg)',
+                    border: '1px solid var(--border-subtle)',
                     borderRadius: '6px',
                     outline: 'none'
                   }
@@ -48285,7 +48452,7 @@ useEffect(() => {
               // Redirect URI (always visible for reference)
               React.createElement('div', { style: { marginBottom: '12px' } },
                 React.createElement('label', {
-                  style: { fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '4px' }
+                  style: { fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }
                 }, 'Redirect URI'),
                 React.createElement('div', { style: { display: 'flex', gap: '6px' } },
                   React.createElement('input', {
@@ -48296,9 +48463,9 @@ useEffect(() => {
                       flex: 1,
                       padding: '8px 10px',
                       fontSize: '12px',
-                      color: '#6b7280',
-                      backgroundColor: '#f9fafb',
-                      border: '1px solid rgba(0, 0, 0, 0.1)',
+                      color: 'var(--text-secondary)',
+                      backgroundColor: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-subtle)',
                       borderRadius: '6px',
                       outline: 'none'
                     }
@@ -48312,16 +48479,16 @@ useEffect(() => {
                     style: {
                       padding: '8px 10px',
                       fontSize: '12px',
-                      color: '#6b7280',
-                      backgroundColor: '#f9fafb',
-                      border: '1px solid rgba(0, 0, 0, 0.1)',
+                      color: 'var(--text-secondary)',
+                      backgroundColor: 'var(--bg-secondary)',
+                      border: '1px solid var(--border-subtle)',
                       borderRadius: '6px',
                       cursor: 'pointer'
                     }
                   }, 'Copy')
                 ),
                 React.createElement('p', {
-                  style: { fontSize: '10px', color: '#9ca3af', marginTop: '4px' }
+                  style: { fontSize: '10px', color: 'var(--text-tertiary)', marginTop: '4px' }
                 }, 'Add this exact URL to your Spotify app\'s Redirect URIs')
               ),
               // Save / Clear buttons
@@ -48350,9 +48517,9 @@ useEffect(() => {
                     padding: '6px 12px',
                     fontSize: '12px',
                     fontWeight: '500',
-                    color: '#6b7280',
+                    color: 'var(--text-secondary)',
                     backgroundColor: 'transparent',
-                    border: '1px solid rgba(0, 0, 0, 0.1)',
+                    border: '1px solid var(--border-subtle)',
                     borderRadius: '6px',
                     cursor: 'pointer'
                   }
@@ -48366,7 +48533,7 @@ useEffect(() => {
               style: {
                 marginTop: '12px',
                 fontSize: '11px',
-                color: '#6b7280',
+                color: 'var(--text-secondary)',
                 backgroundColor: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
@@ -48379,11 +48546,11 @@ useEffect(() => {
               'Change Client ID'
             ),
             spotifyConnected && spotifyAdvancedOpen && React.createElement('div', {
-              style: { marginTop: '8px', padding: '12px', backgroundColor: 'rgba(0, 0, 0, 0.02)', borderRadius: '8px' }
+              style: { marginTop: '8px', padding: '12px', backgroundColor: 'var(--hover-bg-default)', borderRadius: '8px' }
             },
               React.createElement('div', { style: { marginBottom: '10px' } },
                 React.createElement('label', {
-                  style: { fontSize: '11px', color: '#6b7280', display: 'block', marginBottom: '4px' }
+                  style: { fontSize: '11px', color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }
                 }, 'Client ID'),
                 React.createElement('input', {
                   type: 'password',
@@ -48391,8 +48558,8 @@ useEffect(() => {
                   onChange: (e) => setSpotifyClientIdInput(e.target.value),
                   placeholder: 'Your Spotify Client ID',
                   style: {
-                    width: '100%', padding: '8px 10px', fontSize: '12px', color: '#1f2937',
-                    backgroundColor: '#ffffff', border: '1px solid rgba(0, 0, 0, 0.1)',
+                    width: '100%', padding: '8px 10px', fontSize: '12px', color: 'var(--text-primary)',
+                    backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-subtle)',
                     borderRadius: '6px', outline: 'none'
                   }
                 })
@@ -48415,16 +48582,16 @@ useEffect(() => {
             style: {
               marginTop: '20px',
               padding: '16px',
-              backgroundColor: 'rgba(0, 0, 0, 0.02)',
+              backgroundColor: 'var(--hover-bg-default)',
               borderRadius: '12px',
-              border: '1px solid rgba(0, 0, 0, 0.04)'
+              border: '1px solid var(--border-subtle)'
             }
           },
             React.createElement('h4', {
               style: {
                 fontSize: '11px',
                 fontWeight: '600',
-                color: '#9ca3af',
+                color: 'var(--text-tertiary)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
                 marginBottom: '14px'
@@ -48439,7 +48606,7 @@ useEffect(() => {
                     style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }
                   },
                     React.createElement('span', {
-                      style: { color: '#6b7280' }
+                      style: { color: 'var(--text-secondary)' }
                     }, 'Status'),
                     React.createElement('span', {
                       style: { color: '#22c55e', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '500' }
@@ -48455,10 +48622,10 @@ useEffect(() => {
                     style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '13px' }
                   },
                     React.createElement('span', {
-                      style: { color: '#6b7280' }
+                      style: { color: 'var(--text-secondary)' }
                     }, 'Last synced'),
                     React.createElement('span', {
-                      style: { color: '#1f2937' }
+                      style: { color: 'var(--text-primary)' }
                     },
                       resolverSyncSettings[selectedResolver.id]?.lastSyncAt
                         ? new Date(resolverSyncSettings[selectedResolver.id].lastSyncAt).toLocaleString()
@@ -48473,24 +48640,24 @@ useEffect(() => {
                       onClick: () => openSyncSetupModal(selectedResolver.id),
                       style: {
                         padding: '8px 14px',
-                        backgroundColor: 'rgba(0, 0, 0, 0.04)',
-                        color: '#1f2937',
+                        backgroundColor: 'var(--hover-bg-default)',
+                        color: 'var(--text-primary)',
                         fontSize: '13px',
                         fontWeight: '500',
                         borderRadius: '8px',
-                        border: '1px solid rgba(0, 0, 0, 0.06)',
+                        border: '1px solid var(--border-subtle)',
                         cursor: 'pointer',
-                        transition: 'all 150ms ease'
+                        transition: 'background-color 150ms ease'
                       },
-                      onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.08)'; },
-                      onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.04)'; }
+                      onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = 'var(--hover-bg-subtle)'; },
+                      onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = 'var(--hover-bg-default)'; }
                     }, 'Manage Sync'),
                     React.createElement('button', {
                       onClick: () => setStopSyncDialog({ open: true, providerId: selectedResolver.id }),
                       style: {
                         padding: '8px 14px',
                         backgroundColor: 'transparent',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         fontSize: '13px',
                         fontWeight: '500',
                         border: 'none',
@@ -48498,7 +48665,7 @@ useEffect(() => {
                         transition: 'color 150ms ease'
                       },
                       onMouseEnter: (e) => e.currentTarget.style.color = '#dc2626',
-                      onMouseLeave: (e) => e.currentTarget.style.color = '#9ca3af'
+                      onMouseLeave: (e) => e.currentTarget.style.color = 'var(--text-tertiary)'
                     }, 'Stop Syncing')
                   )
                 )
@@ -48526,16 +48693,16 @@ useEffect(() => {
             style: {
               marginTop: '20px',
               padding: '16px',
-              backgroundColor: 'rgba(0, 0, 0, 0.02)',
+              backgroundColor: 'var(--hover-bg-default)',
               borderRadius: '12px',
-              border: '1px solid rgba(0, 0, 0, 0.04)'
+              border: '1px solid var(--border-subtle)'
             }
           },
             React.createElement('h4', {
               style: {
                 fontSize: '11px',
                 fontWeight: '600',
-                color: '#9ca3af',
+                color: 'var(--text-tertiary)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
                 marginBottom: '14px'
@@ -48543,10 +48710,10 @@ useEffect(() => {
             }, 'Startup'),
             React.createElement('div', { className: 'flex items-center justify-between' },
               React.createElement('div', null,
-                React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: '#374151' } },
+                React.createElement('p', { style: { fontSize: '13px', fontWeight: '500', color: 'var(--text-primary)' } },
                   'Auto-launch Spotify'
                 ),
-                React.createElement('p', { style: { fontSize: '12px', color: '#6b7280', marginTop: '2px', lineHeight: '1.5' } },
+                React.createElement('p', { style: { fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px', lineHeight: '1.5' } },
                   'Start Spotify in background when Parachord opens. Ensures a device is always available for playback.'
                 )
               ),
@@ -48579,7 +48746,7 @@ useEffect(() => {
             return React.createElement('div', {
               style: {
                 padding: '16px 0',
-                borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+                borderTop: '1px solid var(--border-subtle)'
               }
             },
               React.createElement('div', { className: 'flex items-center justify-between' },
@@ -48588,13 +48755,13 @@ useEffect(() => {
                     style: {
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#1f2937'
+                      color: 'var(--text-primary)'
                     }
                   }, 'SoundCloud Account'),
                   React.createElement('p', {
                     style: {
                       fontSize: '12px',
-                      color: '#6b7280',
+                      color: 'var(--text-secondary)',
                       marginTop: '2px'
                     }
                   },
@@ -48647,7 +48814,7 @@ useEffect(() => {
               soundcloudConnected && React.createElement('p', {
                 style: {
                   fontSize: '11px',
-                  color: '#9ca3af',
+                  color: 'var(--text-tertiary)',
                   marginTop: '12px',
                   lineHeight: '1.5'
                 }
@@ -48664,7 +48831,7 @@ useEffect(() => {
                   className: 'flex items-center gap-1',
                   style: {
                     fontSize: '12px',
-                    color: '#6b7280',
+                    color: 'var(--text-secondary)',
                     backgroundColor: 'transparent',
                     border: 'none',
                     cursor: 'pointer',
@@ -48680,14 +48847,14 @@ useEffect(() => {
                   style: {
                     marginTop: '12px',
                     padding: '12px',
-                    backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                    backgroundColor: 'var(--hover-bg-default)',
                     borderRadius: '8px'
                   }
                 },
                   React.createElement('p', {
                     style: {
                       fontSize: '11px',
-                      color: soundcloudCredentialsSource === 'user' || soundcloudCredentialsSource === 'env' ? '#22c55e' : '#6b7280',
+                      color: soundcloudCredentialsSource === 'user' || soundcloudCredentialsSource === 'env' ? '#22c55e' : 'var(--text-secondary)',
                       marginBottom: '12px',
                       lineHeight: '1.5'
                     }
@@ -48704,7 +48871,7 @@ useEffect(() => {
                         display: 'block',
                         fontSize: '11px',
                         fontWeight: '500',
-                        color: '#374151',
+                        color: 'var(--text-primary)',
                         marginBottom: '4px'
                       }
                     }, 'Client ID'),
@@ -48717,9 +48884,9 @@ useEffect(() => {
                         width: '100%',
                         padding: '8px 10px',
                         fontSize: '12px',
-                        color: '#1f2937',
-                        backgroundColor: '#ffffff',
-                        border: '1px solid rgba(0, 0, 0, 0.1)',
+                        color: 'var(--text-primary)',
+                        backgroundColor: 'var(--card-bg)',
+                        border: '1px solid var(--border-subtle)',
                         borderRadius: '6px',
                         outline: 'none'
                       }
@@ -48731,7 +48898,7 @@ useEffect(() => {
                         display: 'block',
                         fontSize: '11px',
                         fontWeight: '500',
-                        color: '#374151',
+                        color: 'var(--text-primary)',
                         marginBottom: '4px'
                       }
                     }, 'Client Secret'),
@@ -48744,9 +48911,9 @@ useEffect(() => {
                         width: '100%',
                         padding: '8px 10px',
                         fontSize: '12px',
-                        color: '#1f2937',
-                        backgroundColor: '#ffffff',
-                        border: '1px solid rgba(0, 0, 0, 0.1)',
+                        color: 'var(--text-primary)',
+                        backgroundColor: 'var(--card-bg)',
+                        border: '1px solid var(--border-subtle)',
                         borderRadius: '6px',
                         outline: 'none'
                       }
@@ -48756,7 +48923,7 @@ useEffect(() => {
                     React.createElement('label', {
                       style: {
                         fontSize: '11px',
-                        color: '#6b7280',
+                        color: 'var(--text-secondary)',
                         display: 'block',
                         marginBottom: '4px'
                       }
@@ -48775,9 +48942,9 @@ useEffect(() => {
                           flex: 1,
                           padding: '8px 10px',
                           fontSize: '12px',
-                          color: '#6b7280',
-                          backgroundColor: '#f9fafb',
-                          border: '1px solid rgba(0, 0, 0, 0.1)',
+                          color: 'var(--text-secondary)',
+                          backgroundColor: 'var(--bg-secondary)',
+                          border: '1px solid var(--border-subtle)',
                           borderRadius: '6px',
                           outline: 'none'
                         }
@@ -48791,9 +48958,9 @@ useEffect(() => {
                         style: {
                           padding: '8px 10px',
                           fontSize: '12px',
-                          color: '#6b7280',
-                          backgroundColor: '#f9fafb',
-                          border: '1px solid rgba(0, 0, 0, 0.1)',
+                          color: 'var(--text-secondary)',
+                          backgroundColor: 'var(--bg-secondary)',
+                          border: '1px solid var(--border-subtle)',
                           borderRadius: '6px',
                           cursor: 'pointer'
                         }
@@ -48802,7 +48969,7 @@ useEffect(() => {
                     React.createElement('p', {
                       style: {
                         fontSize: '10px',
-                        color: '#9ca3af',
+                        color: 'var(--text-tertiary)',
                         marginTop: '4px'
                       }
                     }, 'Add this to your SoundCloud app\'s Redirect URI')
@@ -48841,8 +49008,8 @@ useEffect(() => {
                         padding: '8px 14px',
                         fontSize: '12px',
                         fontWeight: '500',
-                        color: '#6b7280',
-                        backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                        color: 'var(--text-secondary)',
+                        backgroundColor: 'var(--hover-bg-default)',
                         border: 'none',
                         borderRadius: '6px',
                         cursor: 'pointer'
@@ -48858,7 +49025,7 @@ useEffect(() => {
           selectedResolver.id === 'qobuz' && React.createElement('div', {
             style: {
               padding: '16px 0',
-              borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+              borderTop: '1px solid var(--border-subtle)'
             }
           },
             React.createElement('div', null,
@@ -48866,13 +49033,13 @@ useEffect(() => {
                 style: {
                   fontSize: '13px',
                   fontWeight: '500',
-                  color: '#1f2937'
+                  color: 'var(--text-primary)'
                 }
               }, 'Qobuz Streaming'),
               React.createElement('p', {
                 style: {
                   fontSize: '12px',
-                  color: '#6b7280',
+                  color: 'var(--text-secondary)',
                   marginTop: '4px',
                   lineHeight: '1.5'
                 }
@@ -48886,7 +49053,7 @@ useEffect(() => {
           selectedResolver.id === 'applemusic' && React.createElement('div', {
             style: {
               padding: '16px 0',
-              borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+              borderTop: '1px solid var(--border-subtle)'
             }
           },
             // Native MusicKit availability notice
@@ -48924,13 +49091,13 @@ useEffect(() => {
                   style: {
                     fontSize: '13px',
                     fontWeight: '500',
-                    color: '#1f2937'
+                    color: 'var(--text-primary)'
                   }
                 }, 'Apple Music Account'),
                 React.createElement('p', {
                   style: {
                     fontSize: '12px',
-                    color: '#6b7280',
+                    color: 'var(--text-secondary)',
                     marginTop: '2px'
                   }
                 },
@@ -48992,7 +49159,7 @@ useEffect(() => {
                 className: 'flex items-center gap-1',
                 style: {
                   fontSize: '12px',
-                  color: '#6b7280',
+                  color: 'var(--text-secondary)',
                   backgroundColor: 'transparent',
                   border: 'none',
                   cursor: 'pointer',
@@ -49008,14 +49175,14 @@ useEffect(() => {
                 style: {
                   marginTop: '12px',
                   padding: '12px',
-                  backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                  backgroundColor: 'var(--hover-bg-default)',
                   borderRadius: '8px'
                 }
               },
                 React.createElement('p', {
                   style: {
                     fontSize: '11px',
-                    color: '#6b7280',
+                    color: 'var(--text-secondary)',
                     marginBottom: '12px',
                     lineHeight: '1.5'
                   }
@@ -49028,7 +49195,7 @@ useEffect(() => {
                   React.createElement('label', {
                     style: {
                       fontSize: '11px',
-                      color: '#6b7280',
+                      color: 'var(--text-secondary)',
                       display: 'block',
                       marginBottom: '4px'
                     }
@@ -49042,9 +49209,9 @@ useEffect(() => {
                       width: '100%',
                       padding: '8px 10px',
                       fontSize: '12px',
-                      color: '#1f2937',
-                      backgroundColor: '#ffffff',
-                      border: '1px solid rgba(0, 0, 0, 0.1)',
+                      color: 'var(--text-primary)',
+                      backgroundColor: 'var(--card-bg)',
+                      border: '1px solid var(--border-subtle)',
                       borderRadius: '6px',
                       outline: 'none'
                     }
@@ -49053,7 +49220,7 @@ useEffect(() => {
                 React.createElement('p', {
                   style: {
                     fontSize: '10px',
-                    color: '#9ca3af',
+                    color: 'var(--text-tertiary)',
                     marginBottom: '12px',
                     lineHeight: '1.4'
                   }
@@ -49079,7 +49246,7 @@ useEffect(() => {
           selectedResolver.id === 'lastfm' && React.createElement('div', {
             style: {
               padding: '16px 0',
-              borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+              borderTop: '1px solid var(--border-subtle)'
             }
           },
             // Connected state
@@ -49091,13 +49258,13 @@ useEffect(() => {
                         style: {
                           fontSize: '13px',
                           fontWeight: '500',
-                          color: '#1f2937'
+                          color: 'var(--text-primary)'
                         }
                       }, 'Last.fm Account'),
                       React.createElement('p', {
                         style: {
                           fontSize: '12px',
-                          color: '#6b7280',
+                          color: 'var(--text-secondary)',
                           marginTop: '2px'
                         }
                       },
@@ -49137,7 +49304,7 @@ useEffect(() => {
                       className: 'flex items-center gap-1',
                       style: {
                         fontSize: '12px',
-                        color: '#6b7280',
+                        color: 'var(--text-secondary)',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
@@ -49153,14 +49320,14 @@ useEffect(() => {
                       style: {
                         marginTop: '12px',
                         padding: '12px',
-                        backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                        backgroundColor: 'var(--hover-bg-default)',
                         borderRadius: '8px'
                       }
                     },
                       React.createElement('p', {
                         style: {
                           fontSize: '11px',
-                          color: metaServiceConfigs.lastfm.apiKey ? '#22c55e' : '#6b7280',
+                          color: metaServiceConfigs.lastfm.apiKey ? '#22c55e' : 'var(--text-secondary)',
                           marginBottom: '12px',
                           lineHeight: '1.5'
                         }
@@ -49175,7 +49342,7 @@ useEffect(() => {
                             display: 'block',
                             fontSize: '11px',
                             fontWeight: '500',
-                            color: '#374151',
+                            color: 'var(--text-primary)',
                             marginBottom: '4px'
                           }
                         }, 'API Key'),
@@ -49188,9 +49355,9 @@ useEffect(() => {
                             width: '100%',
                             padding: '8px 10px',
                             fontSize: '12px',
-                            color: '#1f2937',
-                            backgroundColor: '#ffffff',
-                            border: '1px solid rgba(0, 0, 0, 0.1)',
+                            color: 'var(--text-primary)',
+                            backgroundColor: 'var(--card-bg)',
+                            border: '1px solid var(--border-subtle)',
                             borderRadius: '6px',
                             outline: 'none'
                           }
@@ -49202,7 +49369,7 @@ useEffect(() => {
                             display: 'block',
                             fontSize: '11px',
                             fontWeight: '500',
-                            color: '#374151',
+                            color: 'var(--text-primary)',
                             marginBottom: '4px'
                           }
                         }, 'API Secret'),
@@ -49215,9 +49382,9 @@ useEffect(() => {
                             width: '100%',
                             padding: '8px 10px',
                             fontSize: '12px',
-                            color: '#1f2937',
-                            backgroundColor: '#ffffff',
-                            border: '1px solid rgba(0, 0, 0, 0.1)',
+                            color: 'var(--text-primary)',
+                            backgroundColor: 'var(--card-bg)',
+                            border: '1px solid var(--border-subtle)',
                             borderRadius: '6px',
                             outline: 'none'
                           }
@@ -49264,8 +49431,8 @@ useEffect(() => {
                             padding: '8px 14px',
                             fontSize: '12px',
                             fontWeight: '500',
-                            color: '#6b7280',
-                            backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                            color: 'var(--text-secondary)',
+                            backgroundColor: 'var(--hover-bg-default)',
                             border: 'none',
                             borderRadius: '6px',
                             cursor: 'pointer'
@@ -49280,7 +49447,7 @@ useEffect(() => {
                     style: {
                       marginTop: '16px',
                       paddingTop: '16px',
-                      borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+                      borderTop: '1px solid var(--border-subtle)'
                     }
                   },
                     React.createElement('div', { className: 'flex items-center justify-between', style: { marginBottom: '12px' } },
@@ -49289,13 +49456,13 @@ useEffect(() => {
                           style: {
                             fontSize: '13px',
                             fontWeight: '500',
-                            color: '#1f2937'
+                            color: 'var(--text-primary)'
                           }
                         }, 'Scrobbling'),
                         React.createElement('p', {
                           style: {
                             fontSize: '12px',
-                            color: '#6b7280',
+                            color: 'var(--text-secondary)',
                             marginTop: '2px'
                           }
                         },
@@ -49320,13 +49487,13 @@ useEffect(() => {
                     style: {
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#1f2937'
+                      color: 'var(--text-primary)'
                     }
                   }, 'Last.fm Account'),
                   React.createElement('p', {
                     style: {
                       fontSize: '12px',
-                      color: '#6b7280',
+                      color: 'var(--text-secondary)',
                       marginTop: '4px',
                       marginBottom: '16px',
                       lineHeight: '1.5'
@@ -49341,7 +49508,7 @@ useEffect(() => {
                         display: 'block',
                         fontSize: '12px',
                         fontWeight: '500',
-                        color: '#374151',
+                        color: 'var(--text-primary)',
                         marginBottom: '6px'
                       }
                     }, 'Username'),
@@ -49354,9 +49521,9 @@ useEffect(() => {
                         width: '100%',
                         padding: '10px 12px',
                         fontSize: '13px',
-                        color: '#1f2937',
-                        backgroundColor: '#ffffff',
-                        border: '1px solid rgba(0, 0, 0, 0.1)',
+                        color: 'var(--text-primary)',
+                        backgroundColor: 'var(--card-bg)',
+                        border: '1px solid var(--border-subtle)',
                         borderRadius: '8px',
                         outline: 'none'
                       }
@@ -49369,7 +49536,7 @@ useEffect(() => {
                       className: 'flex items-center gap-1',
                       style: {
                         fontSize: '12px',
-                        color: '#6b7280',
+                        color: 'var(--text-secondary)',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
@@ -49385,14 +49552,14 @@ useEffect(() => {
                       style: {
                         marginTop: '12px',
                         padding: '12px',
-                        backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                        backgroundColor: 'var(--hover-bg-default)',
                         borderRadius: '8px'
                       }
                     },
                       React.createElement('p', {
                         style: {
                           fontSize: '11px',
-                          color: '#6b7280',
+                          color: 'var(--text-secondary)',
                           marginBottom: '12px',
                           lineHeight: '1.5'
                         }
@@ -49405,7 +49572,7 @@ useEffect(() => {
                             display: 'block',
                             fontSize: '11px',
                             fontWeight: '500',
-                            color: '#374151',
+                            color: 'var(--text-primary)',
                             marginBottom: '4px'
                           }
                         }, 'API Key'),
@@ -49418,9 +49585,9 @@ useEffect(() => {
                             width: '100%',
                             padding: '8px 10px',
                             fontSize: '12px',
-                            color: '#1f2937',
-                            backgroundColor: '#ffffff',
-                            border: '1px solid rgba(0, 0, 0, 0.1)',
+                            color: 'var(--text-primary)',
+                            backgroundColor: 'var(--card-bg)',
+                            border: '1px solid var(--border-subtle)',
                             borderRadius: '6px',
                             outline: 'none'
                           }
@@ -49432,7 +49599,7 @@ useEffect(() => {
                             display: 'block',
                             fontSize: '11px',
                             fontWeight: '500',
-                            color: '#374151',
+                            color: 'var(--text-primary)',
                             marginBottom: '4px'
                           }
                         }, 'API Secret'),
@@ -49445,9 +49612,9 @@ useEffect(() => {
                             width: '100%',
                             padding: '8px 10px',
                             fontSize: '12px',
-                            color: '#1f2937',
-                            backgroundColor: '#ffffff',
-                            border: '1px solid rgba(0, 0, 0, 0.1)',
+                            color: 'var(--text-primary)',
+                            backgroundColor: 'var(--card-bg)',
+                            border: '1px solid var(--border-subtle)',
                             borderRadius: '6px',
                             outline: 'none'
                           }
@@ -49480,7 +49647,7 @@ useEffect(() => {
           selectedResolver.id === 'listenbrainz' && React.createElement('div', {
             style: {
               padding: '16px 0',
-              borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+              borderTop: '1px solid var(--border-subtle)'
             }
           },
             // Connected state
@@ -49492,13 +49659,13 @@ useEffect(() => {
                         style: {
                           fontSize: '13px',
                           fontWeight: '500',
-                          color: '#1f2937'
+                          color: 'var(--text-primary)'
                         }
                       }, 'ListenBrainz Account'),
                       React.createElement('p', {
                         style: {
                           fontSize: '12px',
-                          color: '#6b7280',
+                          color: 'var(--text-secondary)',
                           marginTop: '2px'
                         }
                       },
@@ -49542,7 +49709,7 @@ useEffect(() => {
                         display: 'block',
                         fontSize: '11px',
                         fontWeight: '500',
-                        color: '#374151',
+                        color: 'var(--text-primary)',
                         marginBottom: '4px'
                       }
                     }, 'User Token'),
@@ -49554,9 +49721,9 @@ useEffect(() => {
                         width: '100%',
                         padding: '8px 10px',
                         fontSize: '12px',
-                        color: '#1f2937',
-                        backgroundColor: '#f9fafb',
-                        border: '1px solid rgba(0, 0, 0, 0.1)',
+                        color: 'var(--text-primary)',
+                        backgroundColor: 'var(--bg-secondary)',
+                        border: '1px solid var(--border-subtle)',
                         borderRadius: '6px',
                         outline: 'none'
                       }
@@ -49568,7 +49735,7 @@ useEffect(() => {
                     style: {
                       marginTop: '16px',
                       paddingTop: '16px',
-                      borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+                      borderTop: '1px solid var(--border-subtle)'
                     }
                   },
                     React.createElement('div', { className: 'flex items-center justify-between', style: { marginBottom: '12px' } },
@@ -49577,13 +49744,13 @@ useEffect(() => {
                           style: {
                             fontSize: '13px',
                             fontWeight: '500',
-                            color: '#1f2937'
+                            color: 'var(--text-primary)'
                           }
                         }, 'Scrobbling'),
                         React.createElement('p', {
                           style: {
                             fontSize: '12px',
-                            color: '#6b7280',
+                            color: 'var(--text-secondary)',
                             marginTop: '2px'
                           }
                         },
@@ -49608,13 +49775,13 @@ useEffect(() => {
                     style: {
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#1f2937'
+                      color: 'var(--text-primary)'
                     }
                   }, 'ListenBrainz Account'),
                   React.createElement('p', {
                     style: {
                       fontSize: '12px',
-                      color: '#6b7280',
+                      color: 'var(--text-secondary)',
                       marginTop: '4px',
                       marginBottom: '16px',
                       lineHeight: '1.5'
@@ -49629,7 +49796,7 @@ useEffect(() => {
                         display: 'block',
                         fontSize: '12px',
                         fontWeight: '500',
-                        color: '#374151',
+                        color: 'var(--text-primary)',
                         marginBottom: '6px'
                       }
                     }, 'Username'),
@@ -49642,9 +49809,9 @@ useEffect(() => {
                         width: '100%',
                         padding: '10px 12px',
                         fontSize: '13px',
-                        color: '#1f2937',
-                        backgroundColor: '#ffffff',
-                        border: '1px solid rgba(0, 0, 0, 0.1)',
+                        color: 'var(--text-primary)',
+                        backgroundColor: 'var(--card-bg)',
+                        border: '1px solid var(--border-subtle)',
                         borderRadius: '8px',
                         outline: 'none'
                       }
@@ -49657,7 +49824,7 @@ useEffect(() => {
                       className: 'flex items-center gap-1',
                       style: {
                         fontSize: '12px',
-                        color: '#6b7280',
+                        color: 'var(--text-secondary)',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer',
@@ -49673,14 +49840,14 @@ useEffect(() => {
                       style: {
                         marginTop: '12px',
                         padding: '12px',
-                        backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                        backgroundColor: 'var(--hover-bg-default)',
                         borderRadius: '8px'
                       }
                     },
                       React.createElement('p', {
                         style: {
                           fontSize: '11px',
-                          color: '#6b7280',
+                          color: 'var(--text-secondary)',
                           marginBottom: '12px',
                           lineHeight: '1.5'
                         }
@@ -49693,7 +49860,7 @@ useEffect(() => {
                             display: 'block',
                             fontSize: '11px',
                             fontWeight: '500',
-                            color: '#374151',
+                            color: 'var(--text-primary)',
                             marginBottom: '4px'
                           }
                         }, 'User Token'),
@@ -49706,9 +49873,9 @@ useEffect(() => {
                             width: '100%',
                             padding: '8px 10px',
                             fontSize: '12px',
-                            color: '#1f2937',
-                            backgroundColor: '#ffffff',
-                            border: '1px solid rgba(0, 0, 0, 0.1)',
+                            color: 'var(--text-primary)',
+                            backgroundColor: 'var(--card-bg)',
+                            border: '1px solid var(--border-subtle)',
                             borderRadius: '6px',
                             outline: 'none'
                           }
@@ -49743,20 +49910,20 @@ useEffect(() => {
            (selectedResolver.type === 'meta-service' && (selectedResolver.capabilities?.generate || selectedResolver.capabilities?.chat) && selectedResolver.id !== 'ollama')) && React.createElement('div', {
             style: {
               padding: '16px 0',
-              borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+              borderTop: '1px solid var(--border-subtle)'
             }
           },
             React.createElement('span', {
               style: {
                 fontSize: '13px',
                 fontWeight: '500',
-                color: '#1f2937'
+                color: 'var(--text-primary)'
               }
             }, 'API Configuration'),
             React.createElement('p', {
               style: {
                 fontSize: '12px',
-                color: '#6b7280',
+                color: 'var(--text-secondary)',
                 marginTop: '4px',
                 marginBottom: '16px',
                 lineHeight: '1.5'
@@ -49769,7 +49936,7 @@ useEffect(() => {
                   display: 'block',
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: '#374151',
+                  color: 'var(--text-primary)',
                   marginBottom: '6px'
                 }
               }, selectedResolver.settings?.configurable?.apiKey?.label || 'API Key'),
@@ -49788,9 +49955,9 @@ useEffect(() => {
                   width: '100%',
                   padding: '10px 12px',
                   fontSize: '13px',
-                  color: '#1f2937',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid rgba(0, 0, 0, 0.1)',
+                  color: 'var(--text-primary)',
+                  backgroundColor: 'var(--card-bg)',
+                  border: '1px solid var(--border-subtle)',
                   borderRadius: '8px',
                   outline: 'none'
                 }
@@ -49810,7 +49977,7 @@ useEffect(() => {
                   display: 'inline-block',
                   marginTop: '6px',
                   fontSize: '12px',
-                  color: '#7c3aed',
+                  color: 'var(--accent-primary)',
                   fontWeight: '500',
                   textDecoration: 'none'
                 }
@@ -49823,7 +49990,7 @@ useEffect(() => {
                   display: 'block',
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: '#374151',
+                  color: 'var(--text-primary)',
                   marginBottom: '6px'
                 }
               }, selectedResolver.settings?.configurable?.model?.label || 'Model'),
@@ -49839,9 +50006,9 @@ useEffect(() => {
                   width: '100%',
                   padding: '10px 12px',
                   fontSize: '13px',
-                  color: '#1f2937',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid rgba(0, 0, 0, 0.1)',
+                  color: 'var(--text-primary)',
+                  backgroundColor: 'var(--card-bg)',
+                  border: '1px solid var(--border-subtle)',
                   borderRadius: '8px',
                   outline: 'none',
                   cursor: 'pointer'
@@ -49875,20 +50042,20 @@ useEffect(() => {
           selectedResolver.id === 'ollama' && React.createElement('div', {
             style: {
               padding: '16px 0',
-              borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+              borderTop: '1px solid var(--border-subtle)'
             }
           },
             React.createElement('span', {
               style: {
                 fontSize: '13px',
                 fontWeight: '500',
-                color: '#1f2937'
+                color: 'var(--text-primary)'
               }
             }, 'Ollama Configuration'),
             React.createElement('p', {
               style: {
                 fontSize: '12px',
-                color: '#6b7280',
+                color: 'var(--text-secondary)',
                 marginTop: '4px',
                 marginBottom: '12px',
                 lineHeight: '1.5'
@@ -49898,17 +50065,17 @@ useEffect(() => {
             React.createElement('div', {
               style: {
                 padding: '12px 14px',
-                backgroundColor: 'rgba(124, 58, 237, 0.06)',
+                backgroundColor: 'var(--accent-primary-alpha-06)',
                 borderRadius: '10px',
                 marginBottom: '16px',
-                border: '1px solid rgba(124, 58, 237, 0.12)'
+                border: '1px solid var(--accent-primary-alpha-10)'
               }
             },
               React.createElement('p', {
-                style: { fontSize: '12px', fontWeight: '500', color: '#374151', marginBottom: '6px' }
+                style: { fontSize: '12px', fontWeight: '500', color: 'var(--text-primary)', marginBottom: '6px' }
               }, 'Ollama must be installed separately'),
               React.createElement('p', {
-                style: { fontSize: '11px', color: '#6b7280', lineHeight: '1.5', marginBottom: '8px' }
+                style: { fontSize: '11px', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '8px' }
               }, 'Download and install Ollama, then pull a model (e.g. ollama pull llama3.1) before enabling.'),
               React.createElement('button', {
                 onClick: (e) => {
@@ -49918,7 +50085,7 @@ useEffect(() => {
                 style: {
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: '#7c3aed',
+                  color: 'var(--accent-primary)',
                   backgroundColor: 'transparent',
                   border: 'none',
                   cursor: 'pointer',
@@ -49933,7 +50100,7 @@ useEffect(() => {
                   display: 'block',
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: '#374151',
+                  color: 'var(--text-primary)',
                   marginBottom: '6px'
                 }
               }, 'Ollama URL'),
@@ -49952,9 +50119,9 @@ useEffect(() => {
                   width: '100%',
                   padding: '10px 12px',
                   fontSize: '13px',
-                  color: '#1f2937',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid rgba(0, 0, 0, 0.1)',
+                  color: 'var(--text-primary)',
+                  backgroundColor: 'var(--card-bg)',
+                  border: '1px solid var(--border-subtle)',
                   borderRadius: '8px',
                   outline: 'none'
                 }
@@ -49967,7 +50134,7 @@ useEffect(() => {
                   display: 'block',
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: '#374151',
+                  color: 'var(--text-primary)',
                   marginBottom: '6px'
                 }
               }, 'Model'),
@@ -49983,9 +50150,9 @@ useEffect(() => {
                   width: '100%',
                   padding: '10px 12px',
                   fontSize: '13px',
-                  color: '#1f2937',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid rgba(0, 0, 0, 0.1)',
+                  color: 'var(--text-primary)',
+                  backgroundColor: 'var(--card-bg)',
+                  border: '1px solid var(--border-subtle)',
                   borderRadius: '8px',
                   outline: 'none',
                   cursor: 'pointer'
@@ -50002,7 +50169,7 @@ useEffect(() => {
             ),
             // Enable toggle
             React.createElement('div', { className: 'flex items-center justify-between' },
-              React.createElement('span', { style: { fontSize: '13px', color: '#374151' } }, 'Enable Ollama'),
+              React.createElement('span', { style: { fontSize: '13px', color: 'var(--text-primary)' } }, 'Enable Ollama'),
               React.createElement('label', { className: 'relative inline-block w-10 h-5 cursor-pointer' },
                 React.createElement('input', {
                   type: 'checkbox',
@@ -50033,7 +50200,7 @@ useEffect(() => {
                 }),
                 React.createElement('div', {
                   className: 'w-full h-full rounded-full transition-colors',
-                  style: { backgroundColor: metaServiceConfigs[selectedResolver.id]?.enabled === true ? '#7c3aed' : 'rgba(0, 0, 0, 0.15)' }
+                  style: { backgroundColor: metaServiceConfigs[selectedResolver.id]?.enabled === true ? 'var(--accent-primary)' : 'rgba(0, 0, 0, 0.15)' }
                 }),
                 React.createElement('div', {
                   className: 'absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform',
@@ -50083,21 +50250,21 @@ useEffect(() => {
           selectedResolver.id === 'localfiles' && React.createElement('div', {
             style: {
               padding: '16px 0',
-              borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+              borderTop: '1px solid var(--border-subtle)'
             }
           },
             React.createElement('h3', {
               style: {
                 fontSize: '13px',
                 fontWeight: '500',
-                color: '#1f2937',
+                color: 'var(--text-primary)',
                 marginBottom: '8px'
               }
             }, 'Watch Folders'),
             React.createElement('p', {
               style: {
                 fontSize: '12px',
-                color: '#6b7280',
+                color: 'var(--text-secondary)',
                 marginBottom: '16px',
                 lineHeight: '1.5'
               }
@@ -50111,7 +50278,7 @@ useEffect(() => {
                 ? React.createElement('p', {
                     style: {
                       fontSize: '13px',
-                      color: '#9ca3af',
+                      color: 'var(--text-tertiary)',
                       fontStyle: 'italic'
                     }
                   }, 'No watch folders configured')
@@ -50121,7 +50288,7 @@ useEffect(() => {
                       className: 'flex items-center justify-between',
                       style: {
                         padding: '12px',
-                        backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                        backgroundColor: 'var(--hover-bg-default)',
                         borderRadius: '8px',
                         marginBottom: '8px'
                       }
@@ -50132,13 +50299,13 @@ useEffect(() => {
                           style: {
                             fontSize: '13px',
                             fontWeight: '500',
-                            color: '#1f2937'
+                            color: 'var(--text-primary)'
                           }
                         }, folder.path),
                         React.createElement('p', {
                           style: {
                             fontSize: '11px',
-                            color: '#6b7280',
+                            color: 'var(--text-secondary)',
                             marginTop: '2px'
                           }
                         },
@@ -50153,7 +50320,7 @@ useEffect(() => {
                           style: {
                             padding: '6px',
                             fontSize: '14px',
-                            color: '#6b7280',
+                            color: 'var(--text-secondary)',
                             backgroundColor: 'transparent',
                             border: 'none',
                             borderRadius: '6px',
@@ -50168,7 +50335,7 @@ useEffect(() => {
                           style: {
                             padding: '6px',
                             fontSize: '14px',
-                            color: '#6b7280',
+                            color: 'var(--text-secondary)',
                             backgroundColor: 'transparent',
                             border: 'none',
                             borderRadius: '6px',
@@ -50191,9 +50358,9 @@ useEffect(() => {
                 padding: '10px 16px',
                 fontSize: '13px',
                 fontWeight: '500',
-                color: '#6b7280',
+                color: 'var(--text-secondary)',
                 backgroundColor: 'transparent',
-                border: '1px dashed rgba(0, 0, 0, 0.15)',
+                border: '1px dashed var(--border-subtle)',
                 borderRadius: '8px',
                 cursor: isScanning ? 'not-allowed' : 'pointer',
                 opacity: isScanning ? 0.5 : 1
@@ -50211,7 +50378,7 @@ useEffect(() => {
                   style: {
                     width: '14px',
                     height: '14px',
-                    border: '2px solid #7c3aed',
+                    border: '2px solid var(--accent-primary)',
                     borderTopColor: 'transparent',
                     borderRadius: '50%'
                   }
@@ -50219,14 +50386,14 @@ useEffect(() => {
                 React.createElement('span', {
                   style: {
                     fontSize: '13px',
-                    color: '#6b7280'
+                    color: 'var(--text-secondary)'
                   }
                 }, 'Scanning...')
               ),
               React.createElement('div', {
                 style: {
                   width: '100%',
-                  backgroundColor: 'rgba(0, 0, 0, 0.06)',
+                  backgroundColor: 'var(--border-subtle)',
                   borderRadius: '4px',
                   height: '6px'
                 }
@@ -50234,7 +50401,7 @@ useEffect(() => {
                 React.createElement('div', {
                   style: {
                     width: `${scanProgress.total > 0 ? (scanProgress.current / scanProgress.total) * 100 : 0}%`,
-                    backgroundColor: '#7c3aed',
+                    backgroundColor: 'var(--accent-primary)',
                     height: '6px',
                     borderRadius: '4px',
                     transition: 'width 0.3s ease'
@@ -50245,7 +50412,7 @@ useEffect(() => {
                 className: 'truncate',
                 style: {
                   fontSize: '11px',
-                  color: '#9ca3af',
+                  color: 'var(--text-tertiary)',
                   marginTop: '6px'
                 }
               },
@@ -50258,14 +50425,14 @@ useEffect(() => {
               style: {
                 marginTop: '24px',
                 paddingTop: '16px',
-                borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+                borderTop: '1px solid var(--border-subtle)'
               }
             },
               React.createElement('h4', {
                 style: {
                   fontSize: '11px',
                   fontWeight: '600',
-                  color: '#9ca3af',
+                  color: 'var(--text-tertiary)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.08em',
                   marginBottom: '12px'
@@ -50276,14 +50443,14 @@ useEffect(() => {
                   React.createElement('p', {
                     style: {
                       fontSize: '12px',
-                      color: '#6b7280'
+                      color: 'var(--text-secondary)'
                     }
                   }, 'Total Tracks'),
                   React.createElement('p', {
                     style: {
                       fontSize: '14px',
                       fontWeight: '500',
-                      color: '#1f2937',
+                      color: 'var(--text-primary)',
                       marginTop: '2px'
                     }
                   }, localFilesStats.totalTracks.toLocaleString())
@@ -50292,14 +50459,14 @@ useEffect(() => {
                   React.createElement('p', {
                     style: {
                       fontSize: '12px',
-                      color: '#6b7280'
+                      color: 'var(--text-secondary)'
                     }
                   }, 'Last Scan'),
                   React.createElement('p', {
                     style: {
                       fontSize: '14px',
                       fontWeight: '500',
-                      color: '#1f2937',
+                      color: 'var(--text-primary)',
                       marginTop: '2px'
                     }
                   },
@@ -50323,8 +50490,8 @@ useEffect(() => {
           className: 'flex items-center justify-between',
           style: {
             padding: '16px 24px',
-            backgroundColor: 'rgba(0, 0, 0, 0.02)',
-            borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+            backgroundColor: 'var(--hover-bg-default)',
+            borderTop: '1px solid var(--border-subtle)'
           }
         },
           // Left side: Remove button (only for user-installed resolvers)
@@ -50442,8 +50609,8 @@ useEffect(() => {
                   padding: '8px 16px',
                   fontSize: '13px',
                   fontWeight: '500',
-                  color: showEnable ? '#ffffff' : '#374151',
-                  backgroundColor: showEnable ? '#7c3aed' : 'rgba(0, 0, 0, 0.04)',
+                  color: showEnable ? '#ffffff' : 'var(--text-primary)',
+                  backgroundColor: showEnable ? 'var(--accent-primary)' : 'var(--hover-bg-default)',
                   border: 'none',
                   borderRadius: '8px',
                   cursor: 'pointer'
@@ -50466,7 +50633,7 @@ useEffect(() => {
     },
       React.createElement('div', {
         style: {
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--card-bg)',
           borderRadius: '16px',
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15), 0 12px 48px rgba(0, 0, 0, 0.1)',
           maxWidth: '440px',
@@ -50540,7 +50707,7 @@ useEffect(() => {
           React.createElement('p', {
             style: {
               fontSize: '13px',
-              color: '#6b7280',
+              color: 'var(--text-secondary)',
               lineHeight: '1.6',
               marginBottom: '24px'
             }
@@ -50552,7 +50719,7 @@ useEffect(() => {
               style: {
                 fontSize: '11px',
                 fontWeight: '600',
-                color: '#9ca3af',
+                color: 'var(--text-tertiary)',
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
                 marginBottom: '12px'
@@ -50578,8 +50745,8 @@ useEffect(() => {
                   key: cap,
                   style: {
                     padding: '6px 12px',
-                    backgroundColor: 'rgba(124, 58, 237, 0.08)',
-                    color: '#7c3aed',
+                    backgroundColor: 'var(--accent-primary-alpha-08)',
+                    color: 'var(--accent-primary)',
                     borderRadius: '16px',
                     fontSize: '12px',
                     fontWeight: '500'
@@ -50662,7 +50829,7 @@ useEffect(() => {
               className: 'flex items-center gap-2',
               style: {
                 padding: '12px 0',
-                borderTop: '1px solid rgba(0, 0, 0, 0.06)',
+                borderTop: '1px solid var(--border-subtle)',
                 fontSize: '12px',
                 color: '#f97316'
               }
@@ -50676,8 +50843,8 @@ useEffect(() => {
           className: 'flex items-center justify-between',
           style: {
             padding: '16px 24px',
-            backgroundColor: 'rgba(0, 0, 0, 0.02)',
-            borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+            backgroundColor: 'var(--hover-bg-default)',
+            borderTop: '1px solid var(--border-subtle)'
           }
         },
           selectedMarketplaceItem.isInstalled
@@ -50736,8 +50903,8 @@ useEffect(() => {
                       padding: '8px 16px',
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#374151',
-                      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                      color: 'var(--text-primary)',
+                      backgroundColor: 'var(--hover-bg-default)',
                       border: 'none',
                       borderRadius: '8px',
                       cursor: 'pointer'
@@ -50762,7 +50929,7 @@ useEffect(() => {
                       fontSize: '13px',
                       fontWeight: '500',
                       color: '#ffffff',
-                      backgroundColor: installingResolvers.has(selectedMarketplaceItem.id) ? '#9ca3af' : '#7c3aed',
+                      backgroundColor: installingResolvers.has(selectedMarketplaceItem.id) ? '#9ca3af' : 'var(--accent-primary)',
                       border: 'none',
                       borderRadius: '8px',
                       cursor: installingResolvers.has(selectedMarketplaceItem.id) ? 'not-allowed' : 'pointer',
@@ -50776,8 +50943,8 @@ useEffect(() => {
                       padding: '8px 16px',
                       fontSize: '13px',
                       fontWeight: '500',
-                      color: '#374151',
-                      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                      color: 'var(--text-primary)',
+                      backgroundColor: 'var(--hover-bg-default)',
                       border: 'none',
                       borderRadius: '8px',
                       cursor: 'pointer'
@@ -50804,7 +50971,7 @@ useEffect(() => {
         React.createElement('div', {
           style: {
             padding: '24px',
-            background: 'linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%)',
+            background: 'linear-gradient(135deg, var(--accent-primary) 0%, #a78bfa 100%)',
             display: 'flex',
             alignItems: 'center',
             gap: '16px'
@@ -50870,13 +51037,13 @@ useEffect(() => {
           style: { padding: '24px', maxHeight: '50vh', overflowY: 'auto' }
         },
           React.createElement('p', {
-            style: { fontSize: '14px', color: '#4b5563', lineHeight: '1.6', marginBottom: '20px' }
+            style: { fontSize: '14px', color: 'var(--nav-inactive)', lineHeight: '1.6', marginBottom: '20px' }
           }, 'The Parachord browser extension lets you add tracks and albums to your library directly from music websites like Spotify, Bandcamp, SoundCloud, and more.'),
 
           // Features
           React.createElement('div', { style: { marginBottom: '24px' } },
             React.createElement('h4', {
-              style: { fontSize: '12px', fontWeight: '600', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }
+              style: { fontSize: '12px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }
             }, 'Features'),
             [
               { icon: '🎵', text: 'Add tracks to your queue with one click' },
@@ -50888,7 +51055,7 @@ useEffect(() => {
                 style: { display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }
               },
                 React.createElement('span', { style: { fontSize: '16px' } }, item.icon),
-                React.createElement('span', { style: { fontSize: '13px', color: '#374151' } }, item.text)
+                React.createElement('span', { style: { fontSize: '13px', color: 'var(--text-primary)' } }, item.text)
               )
             )
           ),
@@ -50896,11 +51063,11 @@ useEffect(() => {
           // Installation instructions
           React.createElement('div', null,
             React.createElement('h4', {
-              style: { fontSize: '12px', fontWeight: '600', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }
+              style: { fontSize: '12px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }
             }, 'Installation (Chrome/Edge)'),
             React.createElement('div', {
               style: {
-                backgroundColor: '#f9fafb',
+                backgroundColor: 'var(--bg-secondary)',
                 borderRadius: '12px',
                 padding: '16px'
               }
@@ -50922,7 +51089,7 @@ useEffect(() => {
                       width: '22px',
                       height: '22px',
                       borderRadius: '50%',
-                      backgroundColor: '#7c3aed',
+                      backgroundColor: 'var(--accent-primary)',
                       color: '#ffffff',
                       display: 'flex',
                       alignItems: 'center',
@@ -50932,13 +51099,13 @@ useEffect(() => {
                       flexShrink: 0
                     }
                   }, item.step),
-                  React.createElement('span', { style: { fontSize: '13px', color: '#374151', lineHeight: '22px' } }, item.text)
+                  React.createElement('span', { style: { fontSize: '13px', color: 'var(--text-primary)', lineHeight: '22px' } }, item.text)
                 )
               )
             ),
             // Note about developer mode
             React.createElement('p', {
-              style: { fontSize: '12px', color: '#9ca3af', marginTop: '12px', lineHeight: '1.5' }
+              style: { fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '12px', lineHeight: '1.5' }
             }, 'Note: Extensions loaded in developer mode will show a warning on browser startup. This is normal for extensions not yet in the Chrome Web Store.')
           )
         ),
@@ -50946,8 +51113,8 @@ useEffect(() => {
         React.createElement('div', {
           style: {
             padding: '16px 24px',
-            backgroundColor: 'rgba(0, 0, 0, 0.02)',
-            borderTop: '1px solid rgba(0, 0, 0, 0.06)',
+            backgroundColor: 'var(--hover-bg-default)',
+            borderTop: '1px solid var(--border-subtle)',
             display: 'flex',
             justifyContent: 'flex-end',
             gap: '12px'
@@ -50967,7 +51134,7 @@ useEffect(() => {
               fontSize: '13px',
               fontWeight: '500',
               color: '#ffffff',
-              backgroundColor: '#7c3aed',
+              backgroundColor: 'var(--accent-primary)',
               border: 'none',
               borderRadius: '8px',
               cursor: 'pointer'
@@ -50980,8 +51147,8 @@ useEffect(() => {
               padding: '10px 16px',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#374151',
-              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              color: 'var(--text-primary)',
+              backgroundColor: 'var(--hover-bg-default)',
               border: 'none',
               borderRadius: '8px',
               cursor: 'pointer'
@@ -51068,7 +51235,7 @@ useEffect(() => {
           style: { padding: '24px', maxHeight: '50vh', overflowY: 'auto' }
         },
           React.createElement('p', {
-            style: { fontSize: '14px', color: '#4b5563', lineHeight: '1.6', marginBottom: '20px' }
+            style: { fontSize: '14px', color: 'var(--nav-inactive)', lineHeight: '1.6', marginBottom: '20px' }
           },
             'The Parachord ',
             React.createElement('a', {
@@ -51089,7 +51256,7 @@ useEffect(() => {
           // Features
           React.createElement('div', { style: { marginBottom: '24px' } },
             React.createElement('h4', {
-              style: { fontSize: '12px', fontWeight: '600', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }
+              style: { fontSize: '12px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }
             }, 'Commands'),
             [
               { iconPath: 'M8 5v14l11-7z', filled: true, text: 'Play/Pause, Next, Previous track' },
@@ -51104,14 +51271,14 @@ useEffect(() => {
               },
                 React.createElement('svg', {
                   style: { width: '18px', height: '18px', flexShrink: 0 },
-                  fill: item.filled ? '#6b7280' : 'none',
+                  fill: item.filled ? 'var(--text-secondary)' : 'none',
                   viewBox: '0 0 24 24',
-                  stroke: item.filled ? 'none' : '#6b7280',
+                  stroke: item.filled ? 'none' : 'var(--text-secondary)',
                   strokeWidth: item.filled ? 0 : 1.5
                 },
                   React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', d: item.iconPath })
                 ),
-                React.createElement('span', { style: { fontSize: '13px', color: '#374151' } }, item.text)
+                React.createElement('span', { style: { fontSize: '13px', color: 'var(--text-primary)' } }, item.text)
               )
             )
           ),
@@ -51119,11 +51286,11 @@ useEffect(() => {
           // Installation instructions
           React.createElement('div', null,
             React.createElement('h4', {
-              style: { fontSize: '12px', fontWeight: '600', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }
+              style: { fontSize: '12px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }
             }, 'Installation'),
             React.createElement('div', {
               style: {
-                backgroundColor: '#f9fafb',
+                backgroundColor: 'var(--bg-secondary)',
                 borderRadius: '12px',
                 padding: '16px'
               }
@@ -51153,13 +51320,13 @@ useEffect(() => {
                       flexShrink: 0
                     }
                   }, item.step),
-                  React.createElement('span', { style: { fontSize: '13px', color: '#374151', lineHeight: '22px' } }, item.text)
+                  React.createElement('span', { style: { fontSize: '13px', color: 'var(--text-primary)', lineHeight: '22px' } }, item.text)
                 )
               )
             ),
             // Note
             React.createElement('p', {
-              style: { fontSize: '12px', color: '#9ca3af', marginTop: '12px', lineHeight: '1.5' }
+              style: { fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '12px', lineHeight: '1.5' }
             }, 'Requires Raycast to be installed on your Mac. The extension will be available in the Raycast Store soon.')
           )
         ),
@@ -51167,8 +51334,8 @@ useEffect(() => {
         React.createElement('div', {
           style: {
             padding: '16px 24px',
-            backgroundColor: 'rgba(0, 0, 0, 0.02)',
-            borderTop: '1px solid rgba(0, 0, 0, 0.06)',
+            backgroundColor: 'var(--hover-bg-default)',
+            borderTop: '1px solid var(--border-subtle)',
             display: 'flex',
             justifyContent: 'flex-end',
             gap: '12px'
@@ -51201,8 +51368,8 @@ useEffect(() => {
               padding: '10px 16px',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#374151',
-              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              color: 'var(--text-primary)',
+              backgroundColor: 'var(--hover-bg-default)',
               border: 'none',
               borderRadius: '8px',
               cursor: 'pointer'
@@ -51330,10 +51497,10 @@ useEffect(() => {
               ),
               React.createElement('div', { style: { flex: 1 } },
                 React.createElement('p', {
-                  style: { fontSize: '13px', fontWeight: '600', color: '#111827', marginBottom: '2px' }
+                  style: { fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '2px' }
                 }, item.title),
                 React.createElement('p', {
-                  style: { fontSize: '12px', color: '#6b7280', lineHeight: '1.4' }
+                  style: { fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.4' }
                 }, item.text)
               )
             )
@@ -51343,8 +51510,8 @@ useEffect(() => {
         React.createElement('div', {
           style: {
             padding: '16px 24px',
-            backgroundColor: 'rgba(0, 0, 0, 0.02)',
-            borderTop: '1px solid rgba(0, 0, 0, 0.06)',
+            backgroundColor: 'var(--hover-bg-default)',
+            borderTop: '1px solid var(--border-subtle)',
             display: 'flex',
             justifyContent: 'flex-end',
             gap: '12px'
@@ -51385,8 +51552,8 @@ useEffect(() => {
               padding: '10px 16px',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#374151',
-              backgroundColor: 'rgba(0, 0, 0, 0.04)',
+              color: 'var(--text-primary)',
+              backgroundColor: 'var(--hover-bg-default)',
               border: 'none',
               borderRadius: '8px',
               cursor: 'pointer'
@@ -51434,7 +51601,7 @@ useEffect(() => {
           bottom: '85px',
           width: '384px',
           pointerEvents: 'auto',
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--card-bg)',
           borderRadius: '0 16px 16px 0',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
           overflow: 'hidden'
@@ -51452,7 +51619,7 @@ useEffect(() => {
           style: {
             padding: '20px 24px',
             background: 'linear-gradient(135deg, #f43f5e 0%, #ec4899 50%, #c026d3 100%)',
-            borderBottom: '1px solid rgba(0, 0, 0, 0.1)'
+            borderBottom: '1px solid var(--border-subtle)'
           }
         },
           React.createElement('div', {
@@ -51500,8 +51667,8 @@ useEffect(() => {
         React.createElement('div', {
           style: {
             padding: '16px 20px',
-            backgroundColor: 'rgba(0, 0, 0, 0.02)',
-            borderBottom: '1px solid rgba(0, 0, 0, 0.06)'
+            backgroundColor: 'var(--hover-bg-default)',
+            borderBottom: '1px solid var(--border-subtle)'
           }
         },
           React.createElement('div', {
@@ -51518,7 +51685,7 @@ useEffect(() => {
               }
             },
               // Placeholder always rendered behind
-              React.createElement(Music, { size: 20, style: { color: '#4b5563' } }),
+              React.createElement(Music, { size: 20, style: { color: 'var(--nav-inactive)' } }),
               addToPlaylistPanel.tracks[0]?.albumArt && React.createElement('img', {
                 src: addToPlaylistPanel.tracks[0].albumArt,
                 className: 'absolute inset-0 w-full h-full object-cover',
@@ -51535,13 +51702,13 @@ useEffect(() => {
                 style: {
                   fontSize: '13px',
                   fontWeight: '500',
-                  color: '#1f2937'
+                  color: 'var(--text-primary)'
                 }
               }, addToPlaylistPanel.sourceName),
               React.createElement('p', {
                 style: {
                   fontSize: '12px',
-                  color: '#6b7280',
+                  color: 'var(--text-secondary)',
                   marginTop: '2px'
                 }
               }, addToPlaylistPanel.tracks[0]?.artist || `${addToPlaylistPanel.tracks.length} tracks`)
@@ -51594,7 +51761,7 @@ useEffect(() => {
                 fontSize: '13px',
                 fontWeight: '500',
                 color: '#ffffff',
-                backgroundColor: selectedPlaylistsForAdd.length > 0 ? '#7c3aed' : 'rgba(0, 0, 0, 0.04)',
+                backgroundColor: selectedPlaylistsForAdd.length > 0 ? 'var(--accent-primary)' : 'var(--hover-bg-default)',
                 border: 'none',
                 borderRadius: '8px',
                 cursor: 'pointer'
@@ -51608,7 +51775,7 @@ useEffect(() => {
         // Filter bar (sticky) - sort dropdown and search
         React.createElement('div', {
           className: 'flex items-center px-5 py-2 bg-white',
-          style: { flexShrink: 0, borderBottom: '1px solid rgba(0, 0, 0, 0.06)' }
+          style: { flexShrink: 0, borderBottom: '1px solid var(--border-subtle)' }
         },
           // Sort dropdown
           React.createElement('div', { className: 'relative' },
@@ -51623,7 +51790,7 @@ useEffect(() => {
             ),
             addToPlaylistSortDropdownOpen && React.createElement('div', {
               className: 'absolute left-0 top-full mt-1 bg-white py-1 min-w-[140px] z-30',
-              style: { borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', border: '1px solid rgba(0, 0, 0, 0.1)' }
+              style: { borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)', border: '1px solid var(--border-subtle)' }
             },
               playlistsSortOptions.map(option =>
                 React.createElement('button', {
@@ -51654,7 +51821,7 @@ useEffect(() => {
           // Search
           React.createElement('div', { className: 'flex items-center' },
             addToPlaylistSearchOpen ?
-              React.createElement('div', { className: 'flex items-center px-2 py-1', style: { border: '1px solid rgba(0, 0, 0, 0.1)', borderRadius: '8px' } },
+              React.createElement('div', { className: 'flex items-center px-2 py-1', style: { border: '1px solid var(--border-subtle)', borderRadius: '8px' } },
                 React.createElement('input', {
                   type: 'text',
                   value: addToPlaylistSearch,
@@ -52080,7 +52247,7 @@ useEffect(() => {
     },
       React.createElement('div', {
         style: {
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--card-bg)',
           borderRadius: '16px',
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15), 0 12px 48px rgba(0, 0, 0, 0.1)',
           maxWidth: '440px',
@@ -52094,7 +52261,7 @@ useEffect(() => {
         React.createElement('div', {
           style: {
             padding: '20px 24px',
-            background: 'linear-gradient(135deg, #7c3aed 0%, #6366f1 100%)'
+            background: 'linear-gradient(135deg, var(--accent-primary) 0%, #6366f1 100%)'
           }
         },
           React.createElement('h2', {
@@ -52131,7 +52298,7 @@ useEffect(() => {
                 display: 'block',
                 fontSize: '12px',
                 fontWeight: '500',
-                color: '#374151',
+                color: 'var(--text-primary)',
                 marginBottom: '6px'
               }
             }, 'Title'),
@@ -52144,9 +52311,9 @@ useEffect(() => {
                 width: '100%',
                 padding: '10px 12px',
                 fontSize: '13px',
-                color: '#1f2937',
-                backgroundColor: '#ffffff',
-                border: '1px solid rgba(0, 0, 0, 0.1)',
+                color: 'var(--text-primary)',
+                backgroundColor: 'var(--card-bg)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '8px',
                 outline: 'none'
               }
@@ -52159,7 +52326,7 @@ useEffect(() => {
                 display: 'block',
                 fontSize: '12px',
                 fontWeight: '500',
-                color: '#374151',
+                color: 'var(--text-primary)',
                 marginBottom: '6px'
               }
             }, 'Artist'),
@@ -52172,9 +52339,9 @@ useEffect(() => {
                 width: '100%',
                 padding: '10px 12px',
                 fontSize: '13px',
-                color: '#1f2937',
-                backgroundColor: '#ffffff',
-                border: '1px solid rgba(0, 0, 0, 0.1)',
+                color: 'var(--text-primary)',
+                backgroundColor: 'var(--card-bg)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '8px',
                 outline: 'none'
               }
@@ -52187,7 +52354,7 @@ useEffect(() => {
                 display: 'block',
                 fontSize: '12px',
                 fontWeight: '500',
-                color: '#374151',
+                color: 'var(--text-primary)',
                 marginBottom: '6px'
               }
             }, 'Album'),
@@ -52200,9 +52367,9 @@ useEffect(() => {
                 width: '100%',
                 padding: '10px 12px',
                 fontSize: '13px',
-                color: '#1f2937',
-                backgroundColor: '#ffffff',
-                border: '1px solid rgba(0, 0, 0, 0.1)',
+                color: 'var(--text-primary)',
+                backgroundColor: 'var(--card-bg)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '8px',
                 outline: 'none'
               }
@@ -52217,7 +52384,7 @@ useEffect(() => {
                   display: 'block',
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: '#374151',
+                  color: 'var(--text-primary)',
                   marginBottom: '6px'
                 }
               }, 'Track #'),
@@ -52230,9 +52397,9 @@ useEffect(() => {
                   width: '100%',
                   padding: '10px 12px',
                   fontSize: '13px',
-                  color: '#1f2937',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid rgba(0, 0, 0, 0.1)',
+                  color: 'var(--text-primary)',
+                  backgroundColor: 'var(--card-bg)',
+                  border: '1px solid var(--border-subtle)',
                   borderRadius: '8px',
                   outline: 'none'
                 }
@@ -52245,7 +52412,7 @@ useEffect(() => {
                   display: 'block',
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: '#374151',
+                  color: 'var(--text-primary)',
                   marginBottom: '6px'
                 }
               }, 'Year'),
@@ -52258,9 +52425,9 @@ useEffect(() => {
                   width: '100%',
                   padding: '10px 12px',
                   fontSize: '13px',
-                  color: '#1f2937',
-                  backgroundColor: '#ffffff',
-                  border: '1px solid rgba(0, 0, 0, 0.1)',
+                  color: 'var(--text-primary)',
+                  backgroundColor: 'var(--card-bg)',
+                  border: '1px solid var(--border-subtle)',
                   borderRadius: '8px',
                   outline: 'none'
                 }
@@ -52272,7 +52439,7 @@ useEffect(() => {
           React.createElement('div', {
             style: {
               paddingTop: '20px',
-              borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+              borderTop: '1px solid var(--border-subtle)'
             }
           },
             React.createElement('div', { className: 'flex items-center justify-between', style: { marginBottom: '12px' } },
@@ -52280,14 +52447,14 @@ useEffect(() => {
                 style: {
                   fontSize: '12px',
                   fontWeight: '500',
-                  color: '#374151'
+                  color: 'var(--text-primary)'
                 }
               }, 'Album Art'),
               id3ArtLoading && React.createElement('span', {
                 className: 'flex items-center gap-1',
                 style: {
                   fontSize: '12px',
-                  color: '#7c3aed'
+                  color: 'var(--accent-primary)'
                 }
               },
                 React.createElement('span', { className: 'animate-spin' }, '⟳'),
@@ -52322,7 +52489,7 @@ useEffect(() => {
                   style: {
                     fontSize: '13px',
                     fontWeight: '500',
-                    color: '#166534'
+                    color: 'var(--success)'
                   }
                 }, id3SelectedArt.releaseName),
                 React.createElement('div', {
@@ -52397,7 +52564,7 @@ useEffect(() => {
                 textAlign: 'center',
                 padding: '16px 0',
                 fontSize: '13px',
-                color: '#9ca3af'
+                color: 'var(--text-tertiary)'
               }
             },
               (!id3EditorValues.artist || !id3EditorValues.album)
@@ -52411,8 +52578,8 @@ useEffect(() => {
           className: 'flex justify-end gap-3',
           style: {
             padding: '16px 24px',
-            backgroundColor: 'rgba(0, 0, 0, 0.02)',
-            borderTop: '1px solid rgba(0, 0, 0, 0.06)'
+            backgroundColor: 'var(--hover-bg-default)',
+            borderTop: '1px solid var(--border-subtle)'
           }
         },
           React.createElement('button', {
@@ -52426,9 +52593,9 @@ useEffect(() => {
               padding: '10px 16px',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#374151',
-              backgroundColor: '#ffffff',
-              border: '1px solid rgba(0, 0, 0, 0.1)',
+              color: 'var(--text-primary)',
+              backgroundColor: 'var(--card-bg)',
+              border: '1px solid var(--border-subtle)',
               borderRadius: '8px',
               cursor: id3EditorSaving ? 'not-allowed' : 'pointer',
               opacity: id3EditorSaving ? 0.5 : 1
@@ -52493,7 +52660,7 @@ useEffect(() => {
               fontSize: '13px',
               fontWeight: '500',
               color: '#ffffff',
-              backgroundColor: id3EditorSaving ? '#9ca3af' : '#7c3aed',
+              backgroundColor: id3EditorSaving ? '#9ca3af' : 'var(--accent-primary)',
               border: 'none',
               borderRadius: '8px',
               cursor: id3EditorSaving ? 'not-allowed' : 'pointer',
@@ -52532,7 +52699,7 @@ useEffect(() => {
           fontSize: '12px',
           fontWeight: '500',
           color: '#ffffff',
-          backgroundColor: '#1f2937',
+          backgroundColor: 'var(--tooltip-bg)',
           borderRadius: '8px',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1)',
           whiteSpace: 'nowrap',
@@ -52540,8 +52707,8 @@ useEffect(() => {
           userSelect: 'none',
           zIndex: 9999
         },
-        onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = '#374151'; },
-        onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = '#1f2937'; }
+        onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = 'var(--tooltip-bg)'; },
+        onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = 'var(--tooltip-bg)'; }
       },
         React.createElement('span', { style: { display: 'flex', alignItems: 'center', gap: '8px' } },
           React.createElement('svg', {
@@ -52570,7 +52737,7 @@ useEffect(() => {
     },
       React.createElement('div', {
         style: {
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--card-bg)',
           borderRadius: '16px',
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15), 0 12px 48px rgba(0, 0, 0, 0.1)',
           maxWidth: '360px',
@@ -52594,7 +52761,7 @@ useEffect(() => {
               borderRadius: '50%',
               backgroundColor: confirmDialog.type === 'success' ? 'rgba(34, 197, 94, 0.1)' :
                 confirmDialog.type === 'error' ? 'rgba(220, 38, 38, 0.1)' :
-                'rgba(124, 58, 237, 0.1)',
+                'var(--accent-primary-alpha-10)',
               marginBottom: '16px'
             }
           },
@@ -52603,7 +52770,7 @@ useEffect(() => {
                 fontSize: '24px',
                 color: confirmDialog.type === 'success' ? '#22c55e' :
                   confirmDialog.type === 'error' ? '#dc2626' :
-                  '#7c3aed'
+                  'var(--accent-primary)'
               }
             }, confirmDialog.type === 'success' ? '✓' :
                confirmDialog.type === 'error' ? '✕' : 'ℹ')
@@ -52613,9 +52780,9 @@ useEffect(() => {
             style: {
               fontSize: '16px',
               fontWeight: '600',
-              color: confirmDialog.type === 'success' ? '#166534' :
-                confirmDialog.type === 'error' ? '#991b1b' :
-                '#1f2937',
+              color: confirmDialog.type === 'success' ? 'var(--success)' :
+                confirmDialog.type === 'error' ? 'var(--error)' :
+                'var(--text-primary)',
               marginBottom: '8px'
             }
           }, confirmDialog.title),
@@ -52623,7 +52790,7 @@ useEffect(() => {
           confirmDialog.message && React.createElement('p', {
             style: {
               fontSize: '13px',
-              color: '#6b7280',
+              color: 'var(--text-secondary)',
               lineHeight: '1.5'
             }
           }, confirmDialog.message)
@@ -52643,7 +52810,7 @@ useEffect(() => {
               color: '#ffffff',
               backgroundColor: confirmDialog.type === 'success' ? '#22c55e' :
                 confirmDialog.type === 'error' ? '#dc2626' :
-                '#7c3aed',
+                'var(--accent-primary)',
               border: 'none',
               borderRadius: '10px',
               cursor: 'pointer'
@@ -52664,7 +52831,7 @@ useEffect(() => {
     },
       React.createElement('div', {
         style: {
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--card-bg)',
           borderRadius: '16px',
           boxShadow: '0 4px 24px rgba(0, 0, 0, 0.15), 0 12px 48px rgba(0, 0, 0, 0.1)',
           maxWidth: '400px',
@@ -52694,10 +52861,10 @@ useEffect(() => {
             }, '✕')
           ),
           React.createElement('h3', {
-            style: { fontSize: '16px', fontWeight: '600', color: '#1f2937', marginBottom: '8px' }
+            style: { fontSize: '16px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }
           }, `Delete "${syncDeleteDialog.playlist?.title}"?`),
           React.createElement('p', {
-            style: { fontSize: '13px', color: '#6b7280', lineHeight: '1.5' }
+            style: { fontSize: '13px', color: 'var(--text-secondary)', lineHeight: '1.5' }
           }, `This playlist is synced from ${syncDeleteDialog.playlist?.syncedFrom?.resolver === 'spotify' ? 'Spotify' : 'Apple Music'}. What would you like to do?`)
         ),
         // Actions
@@ -52711,7 +52878,7 @@ useEffect(() => {
               fontSize: '13px',
               fontWeight: '500',
               color: '#ffffff',
-              backgroundColor: '#7c3aed',
+              backgroundColor: 'var(--accent-primary)',
               border: 'none',
               borderRadius: '10px',
               cursor: 'pointer'
@@ -52740,7 +52907,7 @@ useEffect(() => {
               padding: '12px 16px',
               fontSize: '13px',
               fontWeight: '500',
-              color: '#6b7280',
+              color: 'var(--text-secondary)',
               backgroundColor: 'transparent',
               border: '1px solid #e5e7eb',
               borderRadius: '10px',
@@ -52761,7 +52928,7 @@ useEffect(() => {
       React.createElement('div', {
         className: 'relative w-full max-w-lg mx-4 overflow-hidden',
         style: {
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--card-bg)',
           borderRadius: '16px',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
         },
@@ -52776,7 +52943,7 @@ useEffect(() => {
         }),
         React.createElement('div', {
           className: 'flex items-center justify-between',
-          style: { padding: '20px 24px 16px', borderBottom: '1px solid rgba(0, 0, 0, 0.06)' }
+          style: { padding: '20px 24px 16px', borderBottom: '1px solid var(--border-subtle)' }
         },
           React.createElement('div', { className: 'flex items-center gap-3' },
             React.createElement('div', {
@@ -52788,10 +52955,10 @@ useEffect(() => {
             ),
             React.createElement('div', null,
               React.createElement('h2', {
-                style: { fontSize: '17px', fontWeight: '600', color: '#1f2937' }
+                style: { fontSize: '17px', fontWeight: '600', color: 'var(--text-primary)' }
               }, syncSetupModal.step === 'complete' ? 'Sync Complete' : `Sync Your ${syncProviderConfig[syncSetupModal.providerId]?.name || 'Music'} Library`),
               React.createElement('p', {
-                style: { fontSize: '13px', color: '#6b7280', marginTop: '2px' }
+                style: { fontSize: '13px', color: 'var(--text-secondary)', marginTop: '2px' }
               },
                 syncSetupModal.step === 'options' && 'Choose what to sync',
                 syncSetupModal.step === 'playlists' && 'Select playlists to sync',
@@ -52804,9 +52971,9 @@ useEffect(() => {
           !syncSetupModal.progress && React.createElement('button', {
             onClick: () => setSyncSetupModal(prev => ({ ...prev, open: false })),
             className: 'transition-colors',
-            style: { padding: '6px', color: '#9ca3af', borderRadius: '8px' },
-            onMouseEnter: (e) => { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.05)'; },
-            onMouseLeave: (e) => { e.currentTarget.style.color = '#9ca3af'; e.currentTarget.style.backgroundColor = 'transparent'; }
+            style: { padding: '6px', color: 'var(--text-tertiary)', borderRadius: '8px' },
+            onMouseEnter: (e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.backgroundColor = 'var(--hover-bg-default)'; },
+            onMouseLeave: (e) => { e.currentTarget.style.color = 'var(--text-tertiary)'; e.currentTarget.style.backgroundColor = 'transparent'; }
           },
             React.createElement('svg', { className: 'w-5 h-5', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
               React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M6 18L18 6M6 6l12 12' })
@@ -52851,9 +53018,9 @@ useEffect(() => {
                   className: 'flex items-center gap-3 cursor-pointer transition-colors',
                   style: {
                     padding: '14px 16px',
-                    backgroundColor: syncSetupModal.settings[option.key] ? `${providerColor}10` : 'rgba(0, 0, 0, 0.02)',
+                    backgroundColor: syncSetupModal.settings[option.key] ? `${providerColor}10` : 'var(--hover-bg-default)',
                     borderRadius: '12px',
-                    border: syncSetupModal.settings[option.key] ? `1px solid ${providerColor}4D` : '1px solid rgba(0, 0, 0, 0.06)'
+                    border: syncSetupModal.settings[option.key] ? `1px solid ${providerColor}4D` : '1px solid var(--border-subtle)'
                   }
                 },
                   React.createElement('input', {
@@ -52871,8 +53038,8 @@ useEffect(() => {
                     }
                   }),
                   React.createElement('div', null,
-                    React.createElement('div', { style: { fontSize: '14px', fontWeight: '500', color: '#1f2937' } }, option.label),
-                    React.createElement('div', { style: { fontSize: '12px', color: '#6b7280', marginTop: '2px' } }, option.desc)
+                    React.createElement('div', { style: { fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)' } }, option.label),
+                    React.createElement('div', { style: { fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' } }, option.desc)
                   )
                 )
               );
@@ -52923,7 +53090,7 @@ useEffect(() => {
                       display: 'flex',
                       gap: '4px',
                       padding: '4px',
-                      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+                      backgroundColor: 'var(--hover-bg-default)',
                       borderRadius: '10px',
                       marginBottom: '4px'
                     }
@@ -52941,12 +53108,12 @@ useEffect(() => {
                           padding: '8px 12px',
                           fontSize: '13px',
                           fontWeight: '500',
-                          color: syncSetupModal.playlistFilter === filter.key ? '#1f2937' : '#6b7280',
+                          color: syncSetupModal.playlistFilter === filter.key ? 'var(--text-primary)' : 'var(--text-secondary)',
                           backgroundColor: syncSetupModal.playlistFilter === filter.key ? '#ffffff' : 'transparent',
                           border: 'none',
                           borderRadius: '8px',
                           cursor: 'pointer',
-                          transition: 'all 150ms ease',
+                          transition: 'background-color 150ms ease, color 150ms ease, box-shadow 150ms ease',
                           boxShadow: syncSetupModal.playlistFilter === filter.key ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
                         }
                       }, filter.label)
@@ -52990,7 +53157,7 @@ useEffect(() => {
                       style: {
                         fontSize: '12px',
                         fontWeight: '500',
-                        color: '#6b7280',
+                        color: 'var(--text-secondary)',
                         backgroundColor: 'transparent',
                         border: 'none',
                         cursor: 'pointer'
@@ -53016,7 +53183,7 @@ useEffect(() => {
                             borderRadius: '10px',
                             backgroundColor: syncSetupModal.selectedPlaylists.includes(playlist.externalId) ? `${syncProviderConfig[syncSetupModal.providerId]?.color || '#1DB954'}10` : 'transparent'
                           },
-                          onMouseEnter: (e) => { if (!syncSetupModal.selectedPlaylists.includes(playlist.externalId)) e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.03)'; },
+                          onMouseEnter: (e) => { if (!syncSetupModal.selectedPlaylists.includes(playlist.externalId)) e.currentTarget.style.backgroundColor = 'var(--hover-bg-default)'; },
                           onMouseLeave: (e) => { if (!syncSetupModal.selectedPlaylists.includes(playlist.externalId)) e.currentTarget.style.backgroundColor = 'transparent'; }
                         },
                           React.createElement('input', {
@@ -53038,8 +53205,8 @@ useEffect(() => {
                             alt: ''
                           }),
                           React.createElement('div', { style: { flex: 1, minWidth: 0 } },
-                            React.createElement('div', { style: { fontSize: '14px', color: '#1f2937', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, playlist.name),
-                            React.createElement('div', { style: { fontSize: '12px', color: '#9ca3af' } },
+                            React.createElement('div', { style: { fontSize: '14px', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, playlist.name),
+                            React.createElement('div', { style: { fontSize: '12px', color: 'var(--text-tertiary)' } },
                               `${playlist.trackCount} tracks`,
                               !playlist.isOwnedByUser && ' · Following'
                             )
@@ -53052,7 +53219,7 @@ useEffect(() => {
                     syncSetupModal.playlistFilter === 'all' ? true :
                     syncSetupModal.playlistFilter === 'owned' ? p.isOwnedByUser : !p.isOwnedByUser
                   ).length === 0 && React.createElement('div', {
-                    style: { textAlign: 'center', padding: '24px 0', color: '#9ca3af', fontSize: '13px' }
+                    style: { textAlign: 'center', padding: '24px 0', color: 'var(--text-tertiary)', fontSize: '13px' }
                   }, syncSetupModal.playlistFilter === 'owned' ? 'No playlists created by you' : 'No playlists you\'re following')
                 )
           ),
@@ -53085,13 +53252,13 @@ useEffect(() => {
               )
             ),
             React.createElement('div', {
-              style: { fontSize: '15px', fontWeight: '500', color: '#1f2937' }
+              style: { fontSize: '15px', fontWeight: '500', color: 'var(--text-primary)' }
             }, syncSetupModal.progress.message),
             syncSetupModal.progress.total > 0 && React.createElement('div', {
-              style: { fontSize: '13px', color: '#6b7280', marginTop: '4px' }
+              style: { fontSize: '13px', color: 'var(--text-secondary)', marginTop: '4px' }
             }, `${syncSetupModal.progress.current} of ${syncSetupModal.progress.total}`),
             syncSetupModal.progress.total > 0 && React.createElement('div', {
-              style: { height: '6px', backgroundColor: 'rgba(0, 0, 0, 0.06)', borderRadius: '3px', overflow: 'hidden', marginTop: '16px' }
+              style: { height: '6px', backgroundColor: 'var(--border-subtle)', borderRadius: '3px', overflow: 'hidden', marginTop: '16px' }
             },
               React.createElement('div', {
                 style: {
@@ -53134,34 +53301,34 @@ useEffect(() => {
             // Results
             React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: '12px' } },
               syncSetupModal.results.tracks && React.createElement('div', {
-                style: { display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '10px 14px', backgroundColor: 'rgba(0, 0, 0, 0.02)', borderRadius: '8px' }
+                style: { display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '10px 14px', backgroundColor: 'var(--hover-bg-default)', borderRadius: '8px' }
               },
-                React.createElement('span', { style: { color: '#6b7280' } }, 'Tracks'),
-                React.createElement('span', { style: { color: '#1f2937', fontWeight: '500' } },
+                React.createElement('span', { style: { color: 'var(--text-secondary)' } }, 'Tracks'),
+                React.createElement('span', { style: { color: 'var(--text-primary)', fontWeight: '500' } },
                   `+${syncSetupModal.results.tracks.added} added, -${syncSetupModal.results.tracks.removed} removed`
                 )
               ),
               syncSetupModal.results.albums && React.createElement('div', {
-                style: { display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '10px 14px', backgroundColor: 'rgba(0, 0, 0, 0.02)', borderRadius: '8px' }
+                style: { display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '10px 14px', backgroundColor: 'var(--hover-bg-default)', borderRadius: '8px' }
               },
-                React.createElement('span', { style: { color: '#6b7280' } }, 'Albums'),
-                React.createElement('span', { style: { color: '#1f2937', fontWeight: '500' } },
+                React.createElement('span', { style: { color: 'var(--text-secondary)' } }, 'Albums'),
+                React.createElement('span', { style: { color: 'var(--text-primary)', fontWeight: '500' } },
                   `+${syncSetupModal.results.albums.added} added, -${syncSetupModal.results.albums.removed} removed`
                 )
               ),
               syncSetupModal.results.artists && React.createElement('div', {
-                style: { display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '10px 14px', backgroundColor: 'rgba(0, 0, 0, 0.02)', borderRadius: '8px' }
+                style: { display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '10px 14px', backgroundColor: 'var(--hover-bg-default)', borderRadius: '8px' }
               },
-                React.createElement('span', { style: { color: '#6b7280' } }, 'Artists'),
-                React.createElement('span', { style: { color: '#1f2937', fontWeight: '500' } },
+                React.createElement('span', { style: { color: 'var(--text-secondary)' } }, 'Artists'),
+                React.createElement('span', { style: { color: 'var(--text-primary)', fontWeight: '500' } },
                   `+${syncSetupModal.results.artists.added} added, -${syncSetupModal.results.artists.removed} removed`
                 )
               ),
               syncSetupModal.results.playlists && React.createElement('div', {
-                style: { display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '10px 14px', backgroundColor: 'rgba(0, 0, 0, 0.02)', borderRadius: '8px' }
+                style: { display: 'flex', justifyContent: 'space-between', fontSize: '13px', padding: '10px 14px', backgroundColor: 'var(--hover-bg-default)', borderRadius: '8px' }
               },
-                React.createElement('span', { style: { color: '#6b7280' } }, 'Playlists'),
-                React.createElement('span', { style: { color: '#1f2937', fontWeight: '500' } },
+                React.createElement('span', { style: { color: 'var(--text-secondary)' } }, 'Playlists'),
+                React.createElement('span', { style: { color: 'var(--text-primary)', fontWeight: '500' } },
                   `+${syncSetupModal.results.playlists.added} added` +
                   (syncSetupModal.results.playlists.updated > 0 ? `, ${syncSetupModal.results.playlists.updated} with updates` : '')
                 )
@@ -53173,7 +53340,7 @@ useEffect(() => {
         // Footer
         React.createElement('div', {
           className: 'flex justify-end gap-3',
-          style: { padding: '16px 24px 20px', borderTop: '1px solid rgba(0, 0, 0, 0.06)' }
+          style: { padding: '16px 24px 20px', borderTop: '1px solid var(--border-subtle)' }
         },
           // Options step buttons
           syncSetupModal.step === 'options' && React.createElement(React.Fragment, null,
@@ -53183,14 +53350,14 @@ useEffect(() => {
                 padding: '10px 20px',
                 fontSize: '14px',
                 fontWeight: '500',
-                color: '#6b7280',
+                color: 'var(--text-secondary)',
                 backgroundColor: 'transparent',
                 border: 'none',
                 borderRadius: '10px',
                 cursor: 'pointer'
               },
-              onMouseEnter: (e) => e.currentTarget.style.color = '#1f2937',
-              onMouseLeave: (e) => e.currentTarget.style.color = '#6b7280'
+              onMouseEnter: (e) => e.currentTarget.style.color = 'var(--text-primary)',
+              onMouseLeave: (e) => e.currentTarget.style.color = 'var(--text-secondary)'
             }, 'Cancel'),
             React.createElement('button', {
               onClick: async () => {
@@ -53240,14 +53407,14 @@ useEffect(() => {
                 padding: '10px 20px',
                 fontSize: '14px',
                 fontWeight: '500',
-                color: '#6b7280',
+                color: 'var(--text-secondary)',
                 backgroundColor: 'transparent',
                 border: 'none',
                 borderRadius: '10px',
                 cursor: 'pointer'
               },
-              onMouseEnter: (e) => e.currentTarget.style.color = '#1f2937',
-              onMouseLeave: (e) => e.currentTarget.style.color = '#6b7280'
+              onMouseEnter: (e) => e.currentTarget.style.color = 'var(--text-primary)',
+              onMouseLeave: (e) => e.currentTarget.style.color = 'var(--text-secondary)'
             }, 'Back'),
             React.createElement('button', {
               onClick: startSync,
@@ -53298,7 +53465,7 @@ useEffect(() => {
       React.createElement('div', {
         className: 'relative w-full max-w-md mx-4 overflow-hidden',
         style: {
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--card-bg)',
           borderRadius: '16px',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
         },
@@ -53307,17 +53474,17 @@ useEffect(() => {
         // Header with close button
         React.createElement('div', {
           className: 'flex items-center justify-between',
-          style: { padding: '20px 24px 16px', borderBottom: '1px solid rgba(0, 0, 0, 0.06)' }
+          style: { padding: '20px 24px 16px', borderBottom: '1px solid var(--border-subtle)' }
         },
           React.createElement('h2', {
-            style: { fontSize: '17px', fontWeight: '600', color: '#1f2937' }
+            style: { fontSize: '17px', fontWeight: '600', color: 'var(--text-primary)' }
           }, 'Library Sync'),
           React.createElement('button', {
             onClick: () => setSyncStatusModal({ open: false }),
             className: 'transition-colors',
-            style: { padding: '6px', color: '#9ca3af', borderRadius: '8px' },
-            onMouseEnter: (e) => { e.currentTarget.style.color = '#6b7280'; e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.05)'; },
-            onMouseLeave: (e) => { e.currentTarget.style.color = '#9ca3af'; e.currentTarget.style.backgroundColor = 'transparent'; }
+            style: { padding: '6px', color: 'var(--text-tertiary)', borderRadius: '8px' },
+            onMouseEnter: (e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.backgroundColor = 'var(--hover-bg-default)'; },
+            onMouseLeave: (e) => { e.currentTarget.style.color = 'var(--text-tertiary)'; e.currentTarget.style.backgroundColor = 'transparent'; }
           },
             React.createElement('svg', { className: 'w-5 h-5', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
               React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M6 18L18 6M6 6l12 12' })
@@ -53342,9 +53509,9 @@ useEffect(() => {
                   key: providerId,
                   style: {
                     padding: '14px 16px',
-                    backgroundColor: 'rgba(0, 0, 0, 0.02)',
+                    backgroundColor: 'var(--hover-bg-default)',
                     borderRadius: '12px',
-                    border: '1px solid rgba(0, 0, 0, 0.04)'
+                    border: '1px solid var(--border-subtle)'
                   }
                 },
                   React.createElement('div', {
@@ -53363,10 +53530,10 @@ useEffect(() => {
                     }),
                     React.createElement('div', { style: { flex: 1 } },
                       React.createElement('div', {
-                        style: { fontSize: '14px', fontWeight: '500', color: '#1f2937' }
+                        style: { fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)' }
                       }, syncProviderConfig[providerId]?.name || providerId),
                       React.createElement('div', {
-                        style: { fontSize: '12px', color: '#6b7280', marginTop: '2px' }
+                        style: { fontSize: '12px', color: 'var(--text-secondary)', marginTop: '2px' }
                       }, isInProgress
                         ? (progress?.phase === 'tracks' ? `Syncing tracks... ${progress.current || 0}/${progress.total || '?'}` :
                            progress?.phase === 'albums' ? `Syncing albums... ${progress.current || 0}/${progress.total || '?'}` :
@@ -53382,7 +53549,7 @@ useEffect(() => {
                   isInProgress && progress?.total > 0 && React.createElement('div', {
                     style: {
                       height: '4px',
-                      backgroundColor: 'rgba(0, 0, 0, 0.06)',
+                      backgroundColor: 'var(--border-subtle)',
                       borderRadius: '2px',
                       overflow: 'hidden',
                       marginTop: '10px',
@@ -53406,20 +53573,20 @@ useEffect(() => {
           // No providers message
           Object.keys(resolverSyncSettings).filter(id => resolverSyncSettings[id]?.enabled).length === 0 &&
             React.createElement('div', {
-              style: { textAlign: 'center', padding: '24px 0', color: '#6b7280', fontSize: '14px' }
+              style: { textAlign: 'center', padding: '24px 0', color: 'var(--text-secondary)', fontSize: '14px' }
             }, 'No sync providers enabled'),
 
           // Message about closing safely - only show when sync is in progress
           Object.values(syncStatus).some(s => s?.inProgress) &&
             React.createElement('div', {
-              style: { fontSize: '12px', color: '#9ca3af', textAlign: 'center', marginTop: '16px' }
+              style: { fontSize: '12px', color: 'var(--text-tertiary)', textAlign: 'center', marginTop: '16px' }
             }, 'Sync continues in the background. Safe to close this window.')
         ),
 
         // Footer
         React.createElement('div', {
           className: 'flex justify-between',
-          style: { padding: '16px 24px 20px', borderTop: '1px solid rgba(0, 0, 0, 0.06)' }
+          style: { padding: '16px 24px 20px', borderTop: '1px solid var(--border-subtle)' }
         },
           React.createElement('button', {
             onClick: () => {
@@ -53429,13 +53596,13 @@ useEffect(() => {
             style: {
               fontSize: '13px',
               fontWeight: '500',
-              color: '#6b7280',
+              color: 'var(--text-secondary)',
               backgroundColor: 'transparent',
               border: 'none',
               cursor: 'pointer'
             },
-            onMouseEnter: (e) => e.currentTarget.style.color = '#1f2937',
-            onMouseLeave: (e) => e.currentTarget.style.color = '#6b7280'
+            onMouseEnter: (e) => e.currentTarget.style.color = 'var(--text-primary)',
+            onMouseLeave: (e) => e.currentTarget.style.color = 'var(--text-secondary)'
           }, 'Manage settings'),
           React.createElement('button', {
             onClick: async () => {
@@ -53483,8 +53650,8 @@ useEffect(() => {
               padding: '8px 16px',
               fontSize: '13px',
               fontWeight: '500',
-              color: Object.values(syncStatus).some(s => s?.inProgress) ? '#9ca3af' : '#ffffff',
-              backgroundColor: Object.values(syncStatus).some(s => s?.inProgress) ? 'rgba(0, 0, 0, 0.04)' : '#22c55e',
+              color: Object.values(syncStatus).some(s => s?.inProgress) ? 'var(--text-tertiary)' : '#ffffff',
+              backgroundColor: Object.values(syncStatus).some(s => s?.inProgress) ? 'var(--hover-bg-default)' : '#22c55e',
               border: 'none',
               borderRadius: '8px',
               cursor: Object.values(syncStatus).some(s => s?.inProgress) ? 'not-allowed' : 'pointer',
@@ -53507,7 +53674,7 @@ useEffect(() => {
       React.createElement('div', {
         className: 'relative w-full max-w-sm mx-4 overflow-hidden',
         style: {
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--card-bg)',
           borderRadius: '16px',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
         },
@@ -53518,10 +53685,10 @@ useEffect(() => {
           style: { padding: '24px' }
         },
           React.createElement('h2', {
-            style: { fontSize: '17px', fontWeight: '600', color: '#1f2937', marginBottom: '8px' }
+            style: { fontSize: '17px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '8px' }
           }, 'Stop Syncing?'),
           React.createElement('p', {
-            style: { fontSize: '14px', color: '#6b7280', marginBottom: '20px', lineHeight: '1.5' }
+            style: { fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '20px', lineHeight: '1.5' }
           }, 'What would you like to do with your synced items?'),
 
           // Options
@@ -53535,20 +53702,20 @@ useEffect(() => {
                 width: '100%',
                 padding: '14px 16px',
                 textAlign: 'left',
-                backgroundColor: 'rgba(0, 0, 0, 0.02)',
-                border: '1px solid rgba(0, 0, 0, 0.06)',
+                backgroundColor: 'var(--hover-bg-default)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '12px',
                 cursor: 'pointer',
-                transition: 'all 150ms ease'
+                transition: 'background-color 150ms ease, border-color 150ms ease'
               },
-              onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.04)'; e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.1)'; },
-              onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = 'rgba(0, 0, 0, 0.02)'; e.currentTarget.style.borderColor = 'rgba(0, 0, 0, 0.06)'; }
+              onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = 'var(--hover-bg-default)'; e.currentTarget.style.borderColor = 'var(--border-subtle)'; },
+              onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.borderColor = 'var(--border-subtle)'; }
             },
               React.createElement('div', {
-                style: { fontSize: '14px', fontWeight: '500', color: '#1f2937' }
+                style: { fontSize: '14px', fontWeight: '500', color: 'var(--text-primary)' }
               }, 'Keep imported items'),
               React.createElement('div', {
-                style: { fontSize: '12px', color: '#6b7280', marginTop: '4px' }
+                style: { fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }
               }, 'Items stay in your Collection as local items')
             ),
             // Remove items option
@@ -53562,7 +53729,7 @@ useEffect(() => {
                 border: '1px solid rgba(239, 68, 68, 0.15)',
                 borderRadius: '12px',
                 cursor: 'pointer',
-                transition: 'all 150ms ease'
+                transition: 'background-color 150ms ease, border-color 150ms ease'
               },
               onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.08)'; e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.25)'; },
               onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.04)'; e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.15)'; }
@@ -53571,7 +53738,7 @@ useEffect(() => {
                 style: { fontSize: '14px', fontWeight: '500', color: '#dc2626' }
               }, 'Remove synced items'),
               React.createElement('div', {
-                style: { fontSize: '12px', color: '#6b7280', marginTop: '4px' }
+                style: { fontSize: '12px', color: 'var(--text-secondary)', marginTop: '4px' }
               }, 'Remove everything synced from this provider')
             )
           )
@@ -53579,21 +53746,21 @@ useEffect(() => {
 
         // Footer
         React.createElement('div', {
-          style: { padding: '16px 24px 20px', borderTop: '1px solid rgba(0, 0, 0, 0.06)', textAlign: 'center' }
+          style: { padding: '16px 24px 20px', borderTop: '1px solid var(--border-subtle)', textAlign: 'center' }
         },
           React.createElement('button', {
             onClick: () => setStopSyncDialog({ open: false, providerId: null }),
             style: {
               fontSize: '14px',
               fontWeight: '500',
-              color: '#6b7280',
+              color: 'var(--text-secondary)',
               backgroundColor: 'transparent',
               border: 'none',
               cursor: 'pointer',
               padding: '8px 16px'
             },
-            onMouseEnter: (e) => e.currentTarget.style.color = '#1f2937',
-            onMouseLeave: (e) => e.currentTarget.style.color = '#6b7280'
+            onMouseEnter: (e) => e.currentTarget.style.color = 'var(--text-primary)',
+            onMouseLeave: (e) => e.currentTarget.style.color = 'var(--text-secondary)'
           }, 'Cancel')
         )
       )
@@ -53608,7 +53775,7 @@ useEffect(() => {
       React.createElement('div', {
         className: 'relative w-full max-w-xl mx-4 overflow-hidden',
         style: {
-          backgroundColor: '#ffffff',
+          backgroundColor: 'var(--card-bg)',
           borderRadius: '16px',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
         },
@@ -53620,7 +53787,7 @@ useEffect(() => {
           React.createElement('div', {
             style: {
               height: '4px',
-              backgroundColor: '#7c3aed'
+              backgroundColor: 'var(--accent-primary)'
             }
           }),
           // Header
@@ -53628,17 +53795,17 @@ useEffect(() => {
             style: {
               padding: '32px 32px 24px',
               textAlign: 'center',
-              borderBottom: '1px solid rgba(0, 0, 0, 0.06)'
+              borderBottom: '1px solid var(--border-subtle)'
             }
           },
             // Parachord wordmark logo - centered
             React.createElement('div', {
               style: { marginBottom: '12px', display: 'flex', justifyContent: 'center' }
             },
-              React.createElement(ParachordWordmark, { fill: '#1f2937', height: 44 })
+              React.createElement(ParachordWordmark, { fill: 'var(--text-primary)', height: 44 })
             ),
             React.createElement('p', {
-              style: { fontSize: '15px', color: '#6b7280', lineHeight: '1.5' }
+              style: { fontSize: '15px', color: 'var(--text-secondary)', lineHeight: '1.5' }
             }, 'Your music is everywhere, but you shouldn\'t have to be.')
           ),
           // Content
@@ -53646,29 +53813,29 @@ useEffect(() => {
             style: { padding: '24px 32px' }
           },
             React.createElement('p', {
-              style: { fontSize: '14px', color: '#4b5563', lineHeight: '1.7', marginBottom: '20px' }
+              style: { fontSize: '14px', color: 'var(--nav-inactive)', lineHeight: '1.6', marginBottom: '20px' }
             }, 'Parachord brings all your music together in one place. Search across multiple services, build unified playlists, and enjoy your music from wherever it lives.'),
             // Feature highlights with SVG icons
             React.createElement('div', {
               style: { display: 'flex', flexDirection: 'column', gap: '12px' }
             },
               [
-                { icon: React.createElement('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: '#7c3aed', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+                { icon: React.createElement('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'var(--accent-primary)', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
                   React.createElement('path', { d: 'M9 18V5l12-2v13' }),
                   React.createElement('circle', { cx: 6, cy: 18, r: 3 }),
                   React.createElement('circle', { cx: 18, cy: 16, r: 3 })
                 ), text: 'Play from Spotify, YouTube, Bandcamp, and more' },
-                { icon: React.createElement('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: '#7c3aed', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+                { icon: React.createElement('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'var(--accent-primary)', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
                   React.createElement('circle', { cx: 11, cy: 11, r: 8 }),
                   React.createElement('path', { d: 'M21 21l-4.35-4.35' })
                 ), text: 'Search all your sources at once' },
-                { icon: React.createElement('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: '#7c3aed', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+                { icon: React.createElement('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'var(--accent-primary)', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
                   React.createElement('path', { d: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z' }),
                   React.createElement('path', { d: 'M14 2v6h6' }),
                   React.createElement('line', { x1: 16, y1: 13, x2: 8, y2: 13 }),
                   React.createElement('line', { x1: 16, y1: 17, x2: 8, y2: 17 })
                 ), text: 'Create playlists that span services' },
-                { icon: React.createElement('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: '#7c3aed', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+                { icon: React.createElement('svg', { width: 18, height: 18, viewBox: '0 0 24 24', fill: 'none', stroke: 'var(--accent-primary)', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
                   React.createElement('path', { d: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2' }),
                   React.createElement('circle', { cx: 9, cy: 7, r: 4 }),
                   React.createElement('path', { d: 'M23 21v-2a4 4 0 0 0-3-3.87' }),
@@ -53680,10 +53847,10 @@ useEffect(() => {
                   style: { display: 'flex', alignItems: 'center', gap: '12px' }
                 },
                   React.createElement('div', {
-                    style: { width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'rgba(124, 58, 237, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }
+                    style: { width: '32px', height: '32px', borderRadius: '8px', backgroundColor: 'var(--accent-primary-alpha-08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }
                   }, item.icon),
                   React.createElement('span', {
-                    style: { fontSize: '13px', color: '#374151' }
+                    style: { fontSize: '13px', color: 'var(--text-primary)' }
                   }, item.text)
                 )
               )
@@ -53693,7 +53860,7 @@ useEffect(() => {
           React.createElement('div', {
             style: {
               padding: '16px 32px 24px',
-              borderTop: '1px solid rgba(0,0,0,0.06)',
+              borderTop: '1px solid var(--border-subtle)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center'
@@ -53707,15 +53874,15 @@ useEffect(() => {
               style: {
                 fontSize: '14px',
                 fontWeight: '500',
-                color: '#6b7280',
+                color: 'var(--text-secondary)',
                 backgroundColor: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
                 padding: '10px 16px',
                 borderRadius: '10px'
               },
-              onMouseEnter: (e) => e.currentTarget.style.color = '#1f2937',
-              onMouseLeave: (e) => e.currentTarget.style.color = '#6b7280'
+              onMouseEnter: (e) => e.currentTarget.style.color = 'var(--text-primary)',
+              onMouseLeave: (e) => e.currentTarget.style.color = 'var(--text-secondary)'
             }, 'Skip tutorial'),
             React.createElement('button', {
               onClick: () => setFirstRunTutorial(prev => ({ ...prev, step: 'sources' })),
@@ -53724,14 +53891,14 @@ useEffect(() => {
                 fontSize: '14px',
                 fontWeight: '500',
                 color: '#ffffff',
-                backgroundColor: '#7c3aed',
+                backgroundColor: 'var(--accent-primary)',
                 border: 'none',
                 borderRadius: '10px',
                 cursor: 'pointer',
                 transition: 'background-color 150ms ease'
               },
-              onMouseEnter: (e) => e.currentTarget.style.backgroundColor = '#6d28d9',
-              onMouseLeave: (e) => e.currentTarget.style.backgroundColor = '#7c3aed'
+              onMouseEnter: (e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary-hover)',
+              onMouseLeave: (e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'
             }, 'Get Started')
           )
         ),
@@ -53740,20 +53907,20 @@ useEffect(() => {
         firstRunTutorial.step === 'sources' && React.createElement(React.Fragment, null,
           // Accent bar
           React.createElement('div', {
-            style: { height: '4px', backgroundColor: '#7c3aed' }
+            style: { height: '4px', backgroundColor: 'var(--accent-primary)' }
           }),
           // Header
           React.createElement('div', {
             style: {
               padding: '24px 32px 20px',
-              borderBottom: '1px solid rgba(0,0,0,0.06)'
+              borderBottom: '1px solid var(--border-subtle)'
             }
           },
             React.createElement('h2', {
-              style: { fontSize: '18px', fontWeight: '600', color: '#1f2937', marginBottom: '4px' }
+              style: { fontSize: '18px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '4px' }
             }, 'Enable Your Music Sources'),
             React.createElement('p', {
-              style: { fontSize: '14px', color: '#6b7280' }
+              style: { fontSize: '14px', color: 'var(--text-secondary)' }
             }, 'Click to enable or disable sources. You can configure them in Settings.')
           ),
           // Content - Resolver cards grid (same design as Settings > Installed)
@@ -53806,21 +53973,21 @@ useEffect(() => {
                   ),
                   // Name
                   React.createElement('span', {
-                    style: { fontSize: '12px', fontWeight: '500', color: '#374151', textAlign: 'center' }
+                    style: { fontSize: '12px', fontWeight: '500', color: 'var(--text-primary)', textAlign: 'center' }
                   }, resolver.name)
                 );
               })
             ),
             // Info text
             React.createElement('p', {
-              style: { fontSize: '12px', color: '#9ca3af', textAlign: 'center', marginTop: '20px' }
+              style: { fontSize: '12px', color: 'var(--text-tertiary)', textAlign: 'center', marginTop: '20px' }
             }, 'Some sources may require login or configuration after setup.')
           ),
           // Footer
           React.createElement('div', {
             style: {
               padding: '16px 32px 20px',
-              borderTop: '1px solid rgba(0,0,0,0.06)',
+              borderTop: '1px solid var(--border-subtle)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center'
@@ -53831,7 +53998,7 @@ useEffect(() => {
               style: {
                 fontSize: '14px',
                 fontWeight: '500',
-                color: '#6b7280',
+                color: 'var(--text-secondary)',
                 backgroundColor: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
@@ -53841,8 +54008,8 @@ useEffect(() => {
                 alignItems: 'center',
                 gap: '6px'
               },
-              onMouseEnter: (e) => e.currentTarget.style.color = '#1f2937',
-              onMouseLeave: (e) => e.currentTarget.style.color = '#6b7280'
+              onMouseEnter: (e) => e.currentTarget.style.color = 'var(--text-primary)',
+              onMouseLeave: (e) => e.currentTarget.style.color = 'var(--text-secondary)'
             },
               React.createElement('svg', { width: 16, height: 16, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 },
                 React.createElement('path', { d: 'M19 12H5M12 19l-7-7 7-7' })
@@ -53856,14 +54023,14 @@ useEffect(() => {
                 fontSize: '14px',
                 fontWeight: '500',
                 color: '#ffffff',
-                backgroundColor: '#7c3aed',
+                backgroundColor: 'var(--accent-primary)',
                 border: 'none',
                 borderRadius: '10px',
                 cursor: 'pointer',
                 transition: 'background-color 150ms ease'
               },
-              onMouseEnter: (e) => e.currentTarget.style.backgroundColor = '#6d28d9',
-              onMouseLeave: (e) => e.currentTarget.style.backgroundColor = '#7c3aed'
+              onMouseEnter: (e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary-hover)',
+              onMouseLeave: (e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'
             }, 'Continue')
           )
         ),
@@ -53879,7 +54046,7 @@ useEffect(() => {
             style: {
               padding: '32px 32px 24px',
               textAlign: 'center',
-              borderBottom: '1px solid rgba(0,0,0,0.06)'
+              borderBottom: '1px solid var(--border-subtle)'
             }
           },
             React.createElement('div', {
@@ -53908,10 +54075,10 @@ useEffect(() => {
               )
             ),
             React.createElement('h1', {
-              style: { fontSize: '20px', fontWeight: '600', color: '#1f2937', marginBottom: '6px' }
+              style: { fontSize: '20px', fontWeight: '600', color: 'var(--text-primary)', marginBottom: '6px' }
             }, 'You\'re All Set!'),
             React.createElement('p', {
-              style: { fontSize: '14px', color: '#6b7280' }
+              style: { fontSize: '14px', color: 'var(--text-secondary)' }
             }, 'Click below to configure your plugins and start listening.')
           ),
           // Content - Show active sources
@@ -53923,7 +54090,7 @@ useEffect(() => {
               style: { marginBottom: '16px' }
             },
               React.createElement('div', {
-                style: { fontSize: '12px', fontWeight: '600', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }
+                style: { fontSize: '12px', fontWeight: '600', color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }
               }, 'Active Sources'),
               React.createElement('div', {
                 style: { display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }
@@ -53945,14 +54112,14 @@ useEffect(() => {
             ),
             // Info text
             React.createElement('p', {
-              style: { fontSize: '13px', color: '#6b7280', textAlign: 'center', lineHeight: '1.6' }
+              style: { fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'center', lineHeight: '1.6' }
             }, 'You can configure login credentials, add local music folders, and customize your experience in the Plug-Ins settings.')
           ),
           // Footer
           React.createElement('div', {
             style: {
               padding: '16px 32px 24px',
-              borderTop: '1px solid rgba(0,0,0,0.06)',
+              borderTop: '1px solid var(--border-subtle)',
               display: 'flex',
               justifyContent: 'center',
               gap: '12px'
@@ -53964,15 +54131,15 @@ useEffect(() => {
                 padding: '10px 20px',
                 fontSize: '14px',
                 fontWeight: '500',
-                color: '#6b7280',
+                color: 'var(--text-secondary)',
                 backgroundColor: 'transparent',
-                border: '1px solid rgba(0,0,0,0.1)',
+                border: '1px solid var(--border-subtle)',
                 borderRadius: '10px',
                 cursor: 'pointer',
-                transition: 'all 150ms ease'
+                transition: 'color 150ms ease, border-color 150ms ease'
               },
-              onMouseEnter: (e) => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.2)'; e.currentTarget.style.color = '#1f2937'; },
-              onMouseLeave: (e) => { e.currentTarget.style.borderColor = 'rgba(0,0,0,0.1)'; e.currentTarget.style.color = '#6b7280'; }
+              onMouseEnter: (e) => { e.currentTarget.style.borderColor = 'var(--border-subtle)'; e.currentTarget.style.color = 'var(--text-primary)'; },
+              onMouseLeave: (e) => { e.currentTarget.style.borderColor = 'var(--border-subtle)'; e.currentTarget.style.color = 'var(--text-secondary)'; }
             }, 'Back'),
             React.createElement('button', {
               onClick: async () => {
@@ -53992,14 +54159,14 @@ useEffect(() => {
                 fontSize: '14px',
                 fontWeight: '500',
                 color: '#ffffff',
-                backgroundColor: '#7c3aed',
+                backgroundColor: 'var(--accent-primary)',
                 border: 'none',
                 borderRadius: '10px',
                 cursor: 'pointer',
                 transition: 'background-color 150ms ease'
               },
-              onMouseEnter: (e) => e.currentTarget.style.backgroundColor = '#6d28d9',
-              onMouseLeave: (e) => e.currentTarget.style.backgroundColor = '#7c3aed'
+              onMouseEnter: (e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary-hover)',
+              onMouseLeave: (e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'
             }, 'Go to Settings')
           )
         )
@@ -54009,17 +54176,19 @@ useEffect(() => {
     // Queue Drawer - slides up above the playbar with matching dark theme
     // Gradient transparency: more opaque near playbar, more transparent at top
     React.createElement('div', {
-      className: 'fixed left-0 right-0 backdrop-blur-md border-t border-gray-700/50 shadow-2xl transition-all duration-300 ease-in-out z-40',
+      className: 'fixed left-0 right-0 backdrop-blur-md shadow-2xl transition-all duration-300 ease-in-out z-40',
       style: {
         bottom: queueDrawerOpen ? '85px' : -queueDrawerHeight, // Position above the playbar (85px height)
         height: queueDrawerHeight + 'px',
-        background: 'linear-gradient(to top, rgba(17, 24, 39, 0.9), rgba(17, 24, 39, 0.5))'
+        background: 'linear-gradient(to top, var(--surface-dark-gradient-from), var(--surface-dark-gradient-to))',
+        borderTop: '1px solid var(--surface-dark-border)'
       }
     },
       // Drawer header with drag handle - dark translucent theme
       // Clicking anywhere on header (except drag handle and Clear) closes drawer
       React.createElement('div', {
-        className: 'flex items-center justify-between px-4 py-2 bg-gray-900/60 border-b border-gray-700/50 cursor-pointer hover:bg-gray-800/60 transition-colors',
+        className: 'flex items-center justify-between px-4 py-2 cursor-pointer transition-colors',
+        style: { backgroundColor: 'var(--surface-dark-header)', borderBottom: '1px solid var(--surface-dark-border)' },
         onClick: () => setQueueDrawerOpen(false)
       },
         React.createElement('div', {
@@ -54061,7 +54230,7 @@ useEffect(() => {
           React.createElement('span', {
             style: {
               fontSize: '11px',
-              color: '#9ca3af',
+              color: 'var(--text-tertiary)',
               marginLeft: '8px'
             }
           }, `${currentQueue.length} track${currentQueue.length !== 1 ? 's' : ''}`),
@@ -54069,7 +54238,7 @@ useEffect(() => {
           shuffleMode && React.createElement('span', {
             style: {
               fontSize: '10px',
-              color: '#a78bfa',
+              color: 'var(--accent-soft)',
               marginLeft: '8px',
               display: 'flex',
               alignItems: 'center',
