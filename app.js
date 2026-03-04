@@ -5445,8 +5445,11 @@ const Parachord = () => {
   const [concertsSearch, setConcertsSearch] = useState('');
   const [concertsSourceFilter, setConcertsSourceFilter] = useState('all'); // 'all' | 'bandsintown' | 'songkick' | 'seatgeek' | 'ticketmaster' | 'ai'
   const [concertsSourceFilterDropdownOpen, setConcertsSourceFilterDropdownOpen] = useState(false);
-  const [concertsLocation, setConcertsLocation] = useState(''); // User's location for filtering (e.g. "New York", "London, UK")
+  const [concertsLocation, setConcertsLocation] = useState(''); // User's location display text (e.g. "New York", "London, UK")
+  const [concertsLocationCoords, setConcertsLocationCoords] = useState(null); // { lat, lng } resolved coordinates
+  const [concertsLocationRadius, setConcertsLocationRadius] = useState(50); // radius in miles
   const [concertsLocationOpen, setConcertsLocationOpen] = useState(false);
+  const [concertsGeocodingLoading, setConcertsGeocodingLoading] = useState(false);
   const concertsCache = useRef({ events: null, timestamp: 0 });
 
   // Recommendations page state
@@ -5642,6 +5645,15 @@ const Parachord = () => {
       return () => document.removeEventListener('click', handleClickOutside);
     }
   }, [newReleasesFilterDropdownOpen]);
+
+  // Close concerts location dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setConcertsLocationOpen(false);
+    if (concertsLocationOpen) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [concertsLocationOpen]);
 
   // Close concerts source filter dropdown when clicking outside
   useEffect(() => {
@@ -12381,12 +12393,14 @@ ${trackListXml}
     }
   }, [playlistsViewMode, cacheLoaded]);
 
-  // Persist concerts location preference
+  // Persist concerts location preference (text, coords, radius)
   useEffect(() => {
     if (cacheLoaded && window.electron?.store) {
       window.electron.store.set('concerts_location', concertsLocation);
+      window.electron.store.set('concerts_location_coords', concertsLocationCoords);
+      window.electron.store.set('concerts_location_radius', concertsLocationRadius);
     }
-  }, [concertsLocation, cacheLoaded]);
+  }, [concertsLocation, concertsLocationCoords, concertsLocationRadius, cacheLoaded]);
 
   // Persist selected chat provider (only after cache is loaded to avoid overwriting)
   useEffect(() => {
@@ -18417,11 +18431,15 @@ ${trackListXml}
         console.log('📦 Loaded last used chat provider:', savedChatProvider);
       }
 
-      // Load concerts location preference
+      // Load concerts location preference (text, coords, radius)
       const savedConcertsLocation = await window.electron.store.get('concerts_location');
+      const savedConcertsCoords = await window.electron.store.get('concerts_location_coords');
+      const savedConcertsRadius = await window.electron.store.get('concerts_location_radius');
       if (savedConcertsLocation) {
         setConcertsLocation(savedConcertsLocation);
-        console.log('📦 Loaded concerts location:', savedConcertsLocation);
+        if (savedConcertsCoords) setConcertsLocationCoords(savedConcertsCoords);
+        if (savedConcertsRadius) setConcertsLocationRadius(savedConcertsRadius);
+        console.log('📦 Loaded concerts location:', savedConcertsLocation, savedConcertsCoords ? `(${savedConcertsCoords.lat.toFixed(2)}, ${savedConcertsCoords.lng.toFixed(2)})` : '(no coords)', `${savedConcertsRadius || 50}mi`);
       }
 
       // Load discovery feature seen hashes (for unread badges)
@@ -24095,6 +24113,61 @@ ${tracks}
 
     console.log(`🎤 Found ${collectionArtists.length + libraryArtists.length + historyArtists.length} unique artists for concerts (${collectionArtists.length} collection, ${libraryArtists.length} library, ${historyArtists.length} history), checking ${artistList.length}`);
     return artistList;
+  };
+
+  // Haversine distance between two lat/lng points in miles
+  const haversineDistance = (lat1, lng1, lat2, lng2) => {
+    const R = 3958.8; // Earth radius in miles
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  };
+
+  // Geocode a location string to coordinates using Nominatim (OpenStreetMap)
+  const geocodeLocation = async (query) => {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1`;
+    const resp = await fetch(url, {
+      headers: { 'User-Agent': 'Parachord/1.0', 'Accept': 'application/json' }
+    });
+    if (!resp.ok) return null;
+    const results = await resp.json();
+    if (!results || results.length === 0) return null;
+    const r = results[0];
+    return {
+      lat: parseFloat(r.lat),
+      lng: parseFloat(r.lon),
+      displayName: r.display_name?.split(',').slice(0, 2).join(',').trim() || query
+    };
+  };
+
+  // Use browser geolocation to get user's current coordinates
+  const getBrowserGeolocation = () => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject(new Error('Geolocation not supported'));
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        (err) => reject(err),
+        { enableHighAccuracy: false, timeout: 10000 }
+      );
+    });
+  };
+
+  // Reverse geocode coordinates to a display name
+  const reverseGeocode = async (lat, lng) => {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&zoom=10`;
+    const resp = await fetch(url, {
+      headers: { 'User-Agent': 'Parachord/1.0', 'Accept': 'application/json' }
+    });
+    if (!resp.ok) return `${lat.toFixed(2)}, ${lng.toFixed(2)}`;
+    const data = await resp.json();
+    const addr = data.address || {};
+    return addr.city || addr.town || addr.village || addr.county || data.display_name?.split(',').slice(0, 2).join(',').trim() || `${lat.toFixed(2)}, ${lng.toFixed(2)}`;
   };
 
   // Get dedicated concert service plugins (Bandsintown, Songkick, SeatGeek) that are enabled
@@ -42510,42 +42583,132 @@ useEffect(() => {
             ),
             // Location filter
             React.createElement('div', { className: 'relative ml-2' },
-              concertsLocationOpen ?
-                React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-1.5' },
-                  React.createElement('svg', { className: 'w-3.5 h-3.5 text-gray-400 mr-1.5 flex-shrink-0', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
-                    React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' }),
-                    React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M15 11a3 3 0 11-6 0 3 3 0 016 0z' })
-                  ),
+              // Location pin button (always visible)
+              React.createElement('button', {
+                onClick: () => setConcertsLocationOpen(!concertsLocationOpen),
+                className: `p-1.5 transition-colors ${concertsLocationCoords ? 'text-violet-500' : concertsLocation ? 'text-violet-400' : 'text-gray-400 hover:text-gray-600'}`,
+                title: concertsLocationCoords
+                  ? `${concertsLocation} (${concertsLocationRadius} mi)`
+                  : concertsLocation ? `Filtered: ${concertsLocation}` : 'Filter by location'
+              },
+                React.createElement('svg', { className: 'w-4 h-4', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
+                  React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' }),
+                  React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M15 11a3 3 0 11-6 0 3 3 0 016 0z' })
+                )
+              ),
+              // Location dropdown panel
+              concertsLocationOpen && React.createElement('div', {
+                className: 'absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg z-30 border border-gray-200',
+                style: { width: '260px', padding: '12px' },
+                onClick: (e) => e.stopPropagation()
+              },
+                // Text input row
+                React.createElement('div', { className: 'flex items-center gap-2 mb-3' },
                   React.createElement('input', {
                     type: 'text',
                     value: concertsLocation,
-                    onChange: (e) => setConcertsLocation(e.target.value),
-                    onBlur: () => { if (!concertsLocation.trim()) setConcertsLocationOpen(false); },
+                    onChange: (e) => {
+                      setConcertsLocation(e.target.value);
+                      if (!e.target.value.trim()) setConcertsLocationCoords(null);
+                    },
+                    onKeyDown: async (e) => {
+                      if (e.key === 'Enter' && concertsLocation.trim()) {
+                        setConcertsGeocodingLoading(true);
+                        const result = await geocodeLocation(concertsLocation.trim());
+                        setConcertsGeocodingLoading(false);
+                        if (result) {
+                          setConcertsLocationCoords({ lat: result.lat, lng: result.lng });
+                          setConcertsLocation(result.displayName);
+                        }
+                      }
+                    },
                     autoFocus: true,
                     placeholder: 'City or region...',
-                    className: 'bg-transparent text-gray-700 text-sm placeholder-gray-400 outline-none',
-                    style: { width: '130px' }
+                    className: 'flex-1 bg-transparent text-gray-700 text-sm placeholder-gray-400 outline-none border border-gray-200 rounded-md px-2.5 py-1.5'
                   }),
-                  concertsLocation && React.createElement('button', {
-                    onClick: () => { setConcertsLocation(''); setConcertsLocationOpen(false); },
-                    className: 'ml-1.5 text-gray-400 hover:text-gray-600'
+                  // "Use my location" button
+                  React.createElement('button', {
+                    onClick: async () => {
+                      setConcertsGeocodingLoading(true);
+                      try {
+                        const pos = await getBrowserGeolocation();
+                        setConcertsLocationCoords({ lat: pos.lat, lng: pos.lng });
+                        const name = await reverseGeocode(pos.lat, pos.lng);
+                        setConcertsLocation(name);
+                      } catch (err) {
+                        console.log('📍 Geolocation error:', err.message);
+                      }
+                      setConcertsGeocodingLoading(false);
+                    },
+                    disabled: concertsGeocodingLoading,
+                    className: 'p-1.5 text-gray-400 hover:text-violet-500 transition-colors flex-shrink-0',
+                    title: 'Use my location'
                   },
-                    React.createElement('svg', { className: 'w-3.5 h-3.5', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
-                      React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M6 18L18 6M6 6l12 12' })
-                    )
+                    concertsGeocodingLoading
+                      ? React.createElement('svg', { className: 'w-4 h-4 animate-spin', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
+                          React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15' })
+                        )
+                      : React.createElement('svg', { className: 'w-4 h-4', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
+                          React.createElement('circle', { cx: 12, cy: 12, r: 3, strokeWidth: 2 }),
+                          React.createElement('path', { strokeLinecap: 'round', strokeWidth: 2, d: 'M12 2v4m0 12v4m10-10h-4M6 12H2' })
+                        )
                   )
-                )
-              :
-                React.createElement('button', {
-                  onClick: () => setConcertsLocationOpen(true),
-                  className: `p-1.5 transition-colors ${concertsLocation ? 'text-violet-500' : 'text-gray-400 hover:text-gray-600'}`,
-                  title: concertsLocation ? `Filtered: ${concertsLocation}` : 'Filter by location'
+                ),
+                // Status line
+                concertsLocationCoords && React.createElement('div', {
+                  className: 'flex items-center gap-1 text-xs text-green-600 mb-3'
                 },
-                  React.createElement('svg', { className: 'w-4 h-4', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
-                    React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' }),
-                    React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M15 11a3 3 0 11-6 0 3 3 0 016 0z' })
-                  )
+                  React.createElement('span', null, '✓'),
+                  React.createElement('span', null, `${concertsLocation}`)
+                ),
+                // Radius slider
+                React.createElement('div', { style: { marginBottom: '8px' } },
+                  React.createElement('div', { className: 'flex items-center justify-between mb-1' },
+                    React.createElement('span', { className: 'text-xs text-gray-500' }, 'Radius'),
+                    React.createElement('span', { className: 'text-xs font-medium text-gray-700' }, `${concertsLocationRadius} mi`)
+                  ),
+                  React.createElement('input', {
+                    type: 'range',
+                    min: 10,
+                    max: 500,
+                    step: 10,
+                    value: concertsLocationRadius,
+                    onChange: (e) => setConcertsLocationRadius(parseInt(e.target.value)),
+                    className: 'w-full',
+                    style: { accentColor: '#8b5cf6', height: '4px' }
+                  })
+                ),
+                // Action buttons row
+                React.createElement('div', { className: 'flex items-center justify-between mt-2 pt-2', style: { borderTop: '1px solid #e5e7eb' } },
+                  // Clear button
+                  React.createElement('button', {
+                    onClick: () => {
+                      setConcertsLocation('');
+                      setConcertsLocationCoords(null);
+                      setConcertsLocationRadius(50);
+                      setConcertsLocationOpen(false);
+                    },
+                    className: 'text-xs text-gray-400 hover:text-gray-600 transition-colors'
+                  }, 'Clear'),
+                  // Apply button (geocode if needed)
+                  React.createElement('button', {
+                    onClick: async () => {
+                      if (concertsLocation.trim() && !concertsLocationCoords) {
+                        setConcertsGeocodingLoading(true);
+                        const result = await geocodeLocation(concertsLocation.trim());
+                        setConcertsGeocodingLoading(false);
+                        if (result) {
+                          setConcertsLocationCoords({ lat: result.lat, lng: result.lng });
+                          setConcertsLocation(result.displayName);
+                        }
+                      }
+                      setConcertsLocationOpen(false);
+                    },
+                    disabled: concertsGeocodingLoading,
+                    className: 'text-xs font-medium text-violet-600 hover:text-violet-700 transition-colors'
+                  }, concertsGeocodingLoading ? 'Looking up...' : 'Done')
                 )
+              )
             ),
             React.createElement('div', { className: 'flex-1' }),
             // Search
@@ -42686,8 +42849,22 @@ useEffect(() => {
                     return false;
                   }
                 }
-                // Location filter
-                if (locationLower) {
+                // Location filter — coordinate-based distance when available, text fallback
+                if (concertsLocationCoords) {
+                  const vLat = event.venue?.latitude;
+                  const vLng = event.venue?.longitude;
+                  if (vLat != null && vLng != null) {
+                    const dist = haversineDistance(concertsLocationCoords.lat, concertsLocationCoords.lng, vLat, vLng);
+                    if (dist > concertsLocationRadius) return false;
+                  } else if (locationLower) {
+                    // No venue coordinates — fall back to text matching
+                    const matchesCity = event.venue?.city?.toLowerCase().includes(locationLower);
+                    const matchesRegion = event.venue?.region?.toLowerCase().includes(locationLower);
+                    const matchesCountry = event.venue?.country?.toLowerCase().includes(locationLower);
+                    if (!matchesCity && !matchesRegion && !matchesCountry) return false;
+                  }
+                } else if (locationLower) {
+                  // No geocoded coords yet — use text matching
                   const matchesCity = event.venue?.city?.toLowerCase().includes(locationLower);
                   const matchesRegion = event.venue?.region?.toLowerCase().includes(locationLower);
                   const matchesCountry = event.venue?.country?.toLowerCase().includes(locationLower);
