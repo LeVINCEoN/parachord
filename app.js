@@ -5452,6 +5452,7 @@ const Parachord = () => {
   const [concertsGeocodingLoading, setConcertsGeocodingLoading] = useState(false);
   const concertsCache = useRef({ events: null, timestamp: 0 });
   const [concertsTicketFlyout, setConcertsTicketFlyout] = useState(null); // event ID of open flyout
+  const [concertsArtistImages, setConcertsArtistImages] = useState({}); // { normalizedArtistName: { url, facePosition } }
 
   // Recommendations page state
   const [recommendationsHeaderCollapsed, setRecommendationsHeaderCollapsed] = useState(false);
@@ -24252,6 +24253,12 @@ ${tracks}
     try {
       const artistList = await gatherConcertsArtists();
 
+      // Build a lookup from artist name to their source (collection/library/history)
+      const artistSourceMap = {};
+      for (const a of artistList) {
+        artistSourceMap[a.name.trim().toLowerCase()] = a.source;
+      }
+
       if (artistList.length === 0) {
         console.log('🎤 No artists found in collection or history for concerts');
         setConcerts([]);
@@ -24314,7 +24321,7 @@ ${tracks}
       });
 
       // Helper to add an event with dedup — merges ticket sources on match
-      const addEventDeduped = (event, artistName) => {
+      const addEventDeduped = (event, artistName, artistSource) => {
         const key = makeEventKey(event, artistName);
         const gk = geoKey(event, artistName);
 
@@ -24339,8 +24346,9 @@ ${tracks}
           return false;
         }
 
-        // New event — initialize ticketSources array
+        // New event — initialize ticketSources array and artist source
         event.ticketSources = [makeTicketSource(event)];
+        if (artistSource) event.artistSource = artistSource;
         seenEventKeys.add(key);
         if (gk) {
           seenGeoKeys.add(gk);
@@ -24477,11 +24485,11 @@ Return ONLY the JSON array, no other text.`;
 
       // Add dedicated service results
       for (const { event, artist } of dedicatedResults) {
-        addEventDeduped(event, artist);
+        addEventDeduped(event, artist, artistSourceMap[artist.trim().toLowerCase()]);
       }
       // Add AI results
       for (const aiEvent of aiResults) {
-        addEventDeduped(aiEvent, aiEvent.artist);
+        addEventDeduped(aiEvent, aiEvent.artist, artistSourceMap[(aiEvent.artist || '').trim().toLowerCase()]);
       }
 
       // Merge fresh results with prior cached events (so we don't lose results
@@ -25428,6 +25436,39 @@ Variety guidance: ${theme} Be creative and surprising — avoid defaulting to th
       loadConcerts();
     }
   }, [activeView, cacheLoaded]);
+
+  // Load artist images for concerts when concert data changes
+  useEffect(() => {
+    if (concerts.length === 0) return;
+    const uniqueArtists = [...new Set(concerts.map(e => e.artist).filter(Boolean))];
+    // Only fetch images for artists we don't already have
+    const toFetch = uniqueArtists.filter(name => {
+      const key = name.trim().toLowerCase();
+      return !concertsArtistImages[key];
+    });
+    if (toFetch.length === 0) return;
+
+    let cancelled = false;
+    (async () => {
+      // Batch fetch in groups of 5 to avoid overloading
+      for (let i = 0; i < toFetch.length && !cancelled; i += 5) {
+        const batch = toFetch.slice(i, i + 5);
+        const results = await Promise.allSettled(batch.map(name => getArtistImage(name)));
+        if (cancelled) return;
+        const updates = {};
+        batch.forEach((name, idx) => {
+          const result = results[idx];
+          if (result.status === 'fulfilled' && result.value?.url) {
+            updates[name.trim().toLowerCase()] = result.value;
+          }
+        });
+        if (Object.keys(updates).length > 0) {
+          setConcertsArtistImages(prev => ({ ...prev, ...updates }));
+        }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [concerts]);
 
   // Load recommendations when navigating to the page or when config changes
   useEffect(() => {
@@ -43042,10 +43083,21 @@ useEffect(() => {
                         const dayNum = eventDate ? eventDate.getDate() : '?';
                         const monthShort = eventDate ? eventDate.toLocaleDateString('en-US', { month: 'short' }) : '';
                         const location = [event.venue?.city, event.venue?.region, event.venue?.country].filter(Boolean).join(', ');
+                        const isDark = effectiveTheme === 'dark';
+                        const artistImg = event.artist ? concertsArtistImages[event.artist.trim().toLowerCase()] : null;
+                        // Build reason string based on why this artist was recommended
+                        const reasonText = (() => {
+                          const src = event.artistSource;
+                          if (src === 'collection') return 'In your collection';
+                          if (src === 'library') return 'In your library';
+                          if (src === 'history') return 'From your listening history';
+                          if (event.description && event.description !== 'AI-suggested event') return event.description;
+                          return null;
+                        })();
 
                         return React.createElement('div', {
                           key: event.id || `${monthKey}-${eventIdx}`,
-                          className: 'flex items-center gap-4 p-4 bg-white rounded-xl border border-gray-100 hover:border-violet-200 hover:shadow-sm transition-all cursor-default group',
+                          className: `flex items-center gap-4 p-4 rounded-xl border transition-all cursor-default group ${isDark ? 'bg-gray-800/50 border-gray-700/50 hover:border-violet-500/30 hover:bg-gray-800' : 'bg-white border-gray-100 hover:border-violet-200 hover:shadow-sm'}`,
                           style: {
                             animation: 'fadeIn 300ms ease-out both',
                             animationDelay: `${eventIdx * 30}ms`
@@ -43060,18 +43112,41 @@ useEffect(() => {
                               className: 'text-xs font-medium text-violet-500 uppercase'
                             }, monthShort),
                             React.createElement('span', {
-                              className: 'text-2xl font-bold text-gray-900 leading-tight'
+                              className: `text-2xl font-bold leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`
                             }, dayNum),
                             React.createElement('span', {
                               className: 'text-xs text-gray-400 uppercase'
                             }, dayOfWeek)
                           ),
 
+                          // Artist image
+                          React.createElement('div', {
+                            className: `flex-shrink-0 rounded-full overflow-hidden ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`,
+                            style: { width: '44px', height: '44px' },
+                            onClick: () => { if (event.artist) fetchArtistData(event.artist); }
+                          },
+                            artistImg?.url
+                              ? React.createElement('img', {
+                                  src: artistImg.url,
+                                  alt: event.artist,
+                                  className: 'w-full h-full object-cover cursor-pointer',
+                                  style: artistImg.facePosition ? { objectPosition: `${artistImg.facePosition.x}% ${artistImg.facePosition.y}%` } : undefined,
+                                  loading: 'lazy'
+                                })
+                              : React.createElement('div', {
+                                  className: `w-full h-full flex items-center justify-center cursor-pointer ${isDark ? 'text-gray-500' : 'text-gray-300'}`
+                                },
+                                  React.createElement('svg', { className: 'w-5 h-5', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
+                                    React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 1.5, d: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z' })
+                                  )
+                                )
+                          ),
+
                           // Event details
                           React.createElement('div', { className: 'flex-1 min-w-0' },
                             React.createElement('div', { className: 'flex items-center gap-2 mb-0.5' },
                               React.createElement('span', {
-                                className: 'font-semibold text-gray-900 truncate cursor-pointer hover:text-violet-600 transition-colors',
+                                className: `font-semibold truncate cursor-pointer hover:text-violet-600 transition-colors ${isDark ? 'text-white' : 'text-gray-900'}`,
                                 onClick: () => {
                                   // Navigate to artist page
                                   if (event.artist) {
@@ -43081,7 +43156,6 @@ useEffect(() => {
                               }, event.artist),
                               // Source badges (one per provider that found this event)
                               ...(() => {
-                                const isDark = effectiveTheme === 'dark';
                                 const bgAlpha = isDark ? 0.2 : 0.1;
                                 const srcColors = {
                                   bandsintown: { bg: `rgba(0, 180, 179, ${bgAlpha})`, text: isDark ? '#2dd4bf' : '#00B4B3' },
@@ -43111,15 +43185,19 @@ useEffect(() => {
                               })()
                             ),
                             React.createElement('div', {
-                              className: 'text-sm text-gray-600 truncate'
+                              className: `text-sm truncate ${isDark ? 'text-gray-300' : 'text-gray-600'}`
                             }, event.venue?.name || 'Venue TBA'),
                             location && React.createElement('div', {
-                              className: 'text-xs text-gray-400 truncate mt-0.5'
+                              className: `text-xs truncate mt-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`
                             }, location),
                             // Lineup (if more than just the main artist)
                             event.lineup && event.lineup.length > 1 && React.createElement('div', {
-                              className: 'text-xs text-gray-400 mt-1'
-                            }, 'with ' + event.lineup.filter(a => a.toLowerCase() !== event.artist.toLowerCase()).join(', '))
+                              className: `text-xs mt-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`
+                            }, 'with ' + event.lineup.filter(a => a.toLowerCase() !== event.artist.toLowerCase()).join(', ')),
+                            // Reason — why this concert was recommended
+                            reasonText && React.createElement('div', {
+                              className: `text-xs mt-1 italic ${isDark ? 'text-violet-400/70' : 'text-violet-400'}`
+                            }, reasonText)
                           ),
 
                           // Ticket button with provider flyout
