@@ -43113,18 +43113,20 @@ useEffect(() => {
               // Location chip (shown when a location is active)
               concertsLocationCoords && React.createElement('button', {
                 onClick: (e) => { e.stopPropagation(); setConcertsLocationOpen(!concertsLocationOpen); },
-                className: `flex items-center gap-1.5 pl-2 pr-1.5 py-1 rounded-full text-xs font-medium transition-colors ${isDark ? 'bg-violet-500/20 text-violet-300 hover:bg-violet-500/30' : 'bg-violet-50 text-violet-600 hover:bg-violet-100'}`,
+                className: 'flex items-center gap-1.5 pl-2 pr-1.5 py-1 rounded-full text-xs font-medium transition-colors',
+                style: { backgroundColor: 'var(--accent-primary-alpha-15)', color: 'var(--accent-primary)' },
                 title: `${concertsLocation} (${concertsLocationRadius} mi radius)`
               },
                 React.createElement('svg', { className: 'w-3 h-3 flex-shrink-0', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
                   React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2.5, d: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z' })
                 ),
                 React.createElement('span', { className: 'max-w-[120px] truncate' }, concertsLocation),
-                React.createElement('span', { className: isDark ? 'text-violet-400/60' : 'text-violet-400' }, `${concertsLocationRadius}mi`),
+                React.createElement('span', { style: { opacity: 0.7 } }, `${concertsLocationRadius}mi`),
                 // X to clear
                 React.createElement('span', {
                   onClick: (e) => { e.stopPropagation(); setConcertsLocation(''); setConcertsLocationCoords(null); setConcertsLocationRadius(50); },
-                  className: `ml-0.5 rounded-full p-0.5 transition-colors cursor-pointer ${isDark ? 'hover:bg-violet-500/30 text-violet-400' : 'hover:bg-violet-200 text-violet-400'}`
+                  className: 'ml-0.5 rounded-full p-0.5 transition-colors cursor-pointer',
+                  style: { color: 'var(--accent-primary)' }
                 },
                   React.createElement('svg', { className: 'w-3 h-3', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
                     React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2.5, d: 'M6 18L18 6M6 6l12 12' })
@@ -43134,7 +43136,8 @@ useEffect(() => {
               // Location pin button (shown when no location is active)
               !concertsLocationCoords && React.createElement('button', {
                 onClick: (e) => { e.stopPropagation(); setConcertsLocationOpen(!concertsLocationOpen); },
-                className: `p-1.5 transition-colors ${concertsLocation ? 'text-violet-400' : (isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600')}`,
+                className: 'p-1.5 transition-colors',
+                style: { color: concertsLocation ? 'var(--accent-primary)' : 'var(--text-tertiary)' },
                 title: concertsLocation ? `Filtered: ${concertsLocation}` : 'Filter by location'
               },
                 React.createElement('svg', { className: 'w-4 h-4', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
