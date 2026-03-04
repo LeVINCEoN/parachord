@@ -48018,7 +48018,7 @@ useEffect(() => {
               // Line 1: Track title
               React.createElement('div', { className: 'text-sm font-medium text-white truncate' }, currentTrack.title),
               // Line 2: Artist name with bio tooltip + on tour badge
-              React.createElement('div', { className: 'flex items-center gap-1.5 text-xs text-gray-400 min-w-0' },
+              React.createElement('div', { className: 'flex items-center text-xs text-gray-400 min-w-0' },
                 (() => {
                   const bioPreview = playbarArtistBio && playbarArtistBio.bio
                     ? playbarArtistBio.bio.split('\n').slice(0, 2).join(' ').substring(0, 200).trim() + (playbarArtistBio.bio.length > 200 ? '...' : '')
@@ -48060,7 +48060,8 @@ useEffect(() => {
                       setArtistPageTab('on-tour');
                       fetchArtistData(currentTrack.artist);
                     },
-                    className: 'flex-shrink-0 px-1.5 py-0.5 rounded-full text-xs font-medium bg-violet-500/20 text-violet-300 hover:bg-violet-500/30 transition-colors cursor-pointer no-drag',
+                    className: 'flex-shrink-0 ml-2 px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer no-drag',
+                    style: { backgroundColor: '#7c3aed', color: '#fff', fontSize: '9px', letterSpacing: '0.05em' },
                     title: 'View upcoming shows'
                   }, 'On Tour');
                 })()
