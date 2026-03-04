@@ -43409,18 +43409,16 @@ useEffect(() => {
                     const dist = haversineDistance(concertsLocationCoords.lat, concertsLocationCoords.lng, vLat, vLng);
                     if (dist > concertsLocationRadius) return false;
                   } else if (locationLower) {
-                    // No venue coordinates — fall back to text matching
+                    // No venue coordinates — fall back to city/state text matching
                     const matchesCity = event.venue?.city?.toLowerCase().includes(locationLower);
                     const matchesRegion = event.venue?.region?.toLowerCase().includes(locationLower);
-                    const matchesCountry = event.venue?.country?.toLowerCase().includes(locationLower);
-                    if (!matchesCity && !matchesRegion && !matchesCountry) return false;
+                    if (!matchesCity && !matchesRegion) return false;
                   }
                 } else if (locationLower) {
-                  // No geocoded coords yet — use text matching
+                  // No geocoded coords yet — use city/state text matching
                   const matchesCity = event.venue?.city?.toLowerCase().includes(locationLower);
                   const matchesRegion = event.venue?.region?.toLowerCase().includes(locationLower);
-                  const matchesCountry = event.venue?.country?.toLowerCase().includes(locationLower);
-                  if (!matchesCity && !matchesRegion && !matchesCountry) return false;
+                  if (!matchesCity && !matchesRegion) return false;
                 }
                 // Search filter
                 if (searchLower) {
