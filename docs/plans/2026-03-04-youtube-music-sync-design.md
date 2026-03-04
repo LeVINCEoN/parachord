@@ -481,3 +481,110 @@ describe('YouTube Music Sync Provider', () => {
 | Credentials setup doc update | `docs/setup/API_CREDENTIALS_SETUP.md` | Small |
 
 Total: ~7 files new, ~3 files modified.
+
+---
+
+## Appendix A: Spotify Bulk Data Export Research
+
+### Does Spotify Have a Bulk Export API?
+
+**No.** Spotify has no programmatic bulk export endpoint. The only bulk export is the manual "Download your data" feature at Account > Privacy Settings, which:
+
+1. Is triggered manually via web UI (no API)
+2. Requires email confirmation
+3. Takes hours to 30 days to prepare
+4. Delivers a ZIP of JSON files
+
+**There is no equivalent to Google's Data Portability API for Spotify.**
+
+### What's in the Spotify Data Dump?
+
+All JSON files in a ZIP:
+
+| File | Contents |
+|------|----------|
+| `YourLibrary.json` | Liked songs, saved podcasts, followed artists, hidden items |
+| `Playlist1.json` (etc.) | User playlists with track listings |
+| `StreamingHistory0.json` (etc.) | Last ~year of play history |
+| `SearchQueries.json` | Search history |
+| `Userdata.json` | Account info |
+
+### Data Quality Compared to Web API
+
+The GDPR export is **significantly less useful** than the Web API Parachord already uses:
+
+| Field | GDPR Export | Web API (current) |
+|-------|-------------|-------------------|
+| Track IDs | Inconsistent/missing | Full Spotify IDs |
+| Album art | Not included | Multiple sizes |
+| `added_at` timestamps | Not included | Included |
+| Duration | Not included | Included |
+| Artist/Album IDs | Not included | Included |
+| Playlist track IDs | Names only | Full track objects |
+| Write-back | No | Yes |
+| Continuous sync | No | Yes (polling) |
+| Change detection | No | `snapshot_id` + count probes |
+
+### Verdict for Parachord
+
+**No action needed.** The paginated REST API approach in `sync-providers/spotify.js` is definitively the correct approach. The GDPR dump is:
+- Not triggerable programmatically
+- Less data-rich (missing IDs, art, timestamps, durations)
+- Not suitable for continuous or two-way sync
+
+The only hypothetical use would be a one-time import fallback for users who already have a downloaded dump but don't want to connect their account — but the data quality is too low to justify the implementation effort (you'd need to resolve track names back to Spotify IDs via search).
+
+### Note: Feb 2026 API Restrictions
+
+Spotify's Web API now requires Premium for Dev Mode apps, and Extended Quota Mode (for >25 users) requires 250K MAU and business registration. This is a business/compliance concern for Parachord's BYOK model, not a technical data export concern.
+
+---
+
+## Appendix B: Apple Music Bulk Data Export Research
+
+### Does Apple Have a Bulk Export API?
+
+**No.** Apple has two related mechanisms, neither of which is a programmatic music export:
+
+1. **privacy.apple.com** — Manual web portal for GDPR data download. Covers Apple Music but is not programmatic.
+2. **Account Data Transfer API** (EU DMA) — Only covers App Store data (transactions/downloads), **not** Apple Music.
+
+### What's in the Apple Music Data Dump?
+
+Mixed CSV and JSON in a ZIP, prepared in up to 7 days:
+
+| File | Format | Contents |
+|------|--------|----------|
+| `Apple Music Library Tracks.json` | JSON | Full library with title, artist, album, genre, year, duration, play count, date added, skip count |
+| `Apple Music Play Activity.csv` | CSV | Lifetime play history (~45 columns, but no dedicated artist column — must parse from "Item Description") |
+| `Apple Music - Play History Daily Tracks.csv` | CSV | Simplified daily play aggregation |
+| `Apple Music Likes and Dislikes.csv` | CSV | Ratings with timestamps |
+| `Apple Music - Container Details.csv` | CSV | Playlist/container metadata (but not full playlist track listings) |
+
+### Data Quality Issues
+
+- **No dedicated Artist Name column** in Play Activity CSV — artist must be parsed from combined "Item Description" field
+- **Playlist contents are incomplete** — the export has container metadata but not full track listings per playlist
+- **Data quality widely described as "awful"** by developers who've worked with it
+- Library Tracks JSON is the best file — has proper structured metadata
+
+### Comparison to MusicKit API (current Parachord approach)
+
+| Aspect | Privacy Export | MusicKit API (current) |
+|--------|---------------|----------------------|
+| Access | Manual, up to 7 days | Real-time REST API |
+| Library | Yes (JSON, good quality) | Yes (`/v1/me/library/songs`) |
+| Playlists | Metadata only, no track lists | Full contents (`/v1/me/library/playlists`) |
+| Play history | Full lifetime | Recent only (limited, deduplicated) |
+| Write access | None | Create/modify playlists, ratings |
+| Programmatic | No | Yes |
+
+### Verdict for Parachord
+
+**No action needed for library sync.** The MusicKit API approach in `sync-providers/applemusic.js` provides better data for library/playlist import.
+
+**One potential future use:** The privacy export contains **full lifetime play history**, which the MusicKit API does not expose. If Parachord ever wants to import listening history (for scrobbling backfill, recommendation seeding, or stats), a manual Apple Music data dump import could be valuable. But this is a separate feature from library sync.
+
+### DMA Status
+
+Apple Music is **not designated as a gatekeeper core platform service** under the EU DMA. Apple's DMA obligations cover iOS, App Store, and Safari — not Apple Music specifically. No music-specific data portability API is mandated.
