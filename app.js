@@ -43488,7 +43488,7 @@ useEffect(() => {
 
                         return React.createElement('div', {
                           key: event.id || `${monthKey}-${eventIdx}`,
-                          className: `flex items-stretch rounded-xl border cursor-default overflow-hidden ${isDark ? 'bg-gray-800/50 border-gray-700/50' : 'bg-white border-gray-100'}`,
+                          className: `flex items-center rounded-xl border cursor-default overflow-hidden ${isDark ? 'bg-gray-800/50 border-gray-700/50' : 'bg-white border-gray-100'}`,
                           style: {
                             animation: 'fadeIn 300ms ease-out both',
                             animationDelay: `${eventIdx * 30}ms`
@@ -43496,7 +43496,7 @@ useEffect(() => {
                         },
                           // Date column
                           React.createElement('div', {
-                            className: 'flex flex-col items-center justify-center text-center flex-shrink-0 self-center px-4',
+                            className: 'flex flex-col items-center justify-center text-center flex-shrink-0 px-4',
                             style: { minWidth: '100px' }
                           },
                             React.createElement('span', {
@@ -43513,7 +43513,7 @@ useEffect(() => {
                           // Artist image — full-bleed rectangle
                           React.createElement('div', {
                             className: `flex-shrink-0 overflow-hidden cursor-pointer ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`,
-                            style: { width: '100px', alignSelf: 'stretch' },
+                            style: { width: '100px', height: '100px', alignSelf: 'stretch' },
                             onClick: () => { if (event.artist) fetchArtistData(event.artist); }
                           },
                             artistImg?.url
@@ -43534,7 +43534,7 @@ useEffect(() => {
                           ),
 
                           // Event details column
-                          React.createElement('div', { className: 'flex-1 min-w-0 flex items-center self-center px-4 py-3' },
+                          React.createElement('div', { className: 'flex-1 min-w-0 flex items-center px-4 py-3' },
                             React.createElement('div', { className: 'flex-1 min-w-0' },
                               React.createElement('div', { className: 'flex items-center gap-2 mb-0.5' },
                                 React.createElement('span', {
@@ -43588,8 +43588,8 @@ useEffect(() => {
 
                           // Reason column — fixed width so text aligns vertically across rows
                           React.createElement('div', {
-                            className: 'flex-shrink-0 text-xs italic self-center px-3',
-                            style: { width: '140px', textAlign: 'left', color: 'var(--text-tertiary)' }
+                            className: 'flex-shrink-0 text-xs italic px-3 truncate',
+                            style: { width: '280px', textAlign: 'left', color: 'var(--text-tertiary)' }
                           }, reasonText || ''),
 
                           // Ticket button with provider flyout
@@ -43603,7 +43603,7 @@ useEffect(() => {
                                 href: sources[0].ticketUrl,
                                 target: '_blank',
                                 rel: 'noopener noreferrer',
-                                className: 'flex-shrink-0 self-center mr-4 px-4 py-2 text-sm font-medium rounded-lg transition-colors no-drag',
+                                className: 'flex-shrink-0 mr-4 px-4 py-2 text-sm font-medium rounded-lg transition-colors no-drag',
                                 style: { backgroundColor: '#7c3aed', color: '#fff' },
                                 onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = '#6d28d9'; },
                                 onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = '#7c3aed'; },
@@ -43612,7 +43612,7 @@ useEffect(() => {
                             }
                             // Multiple sources — flyout
                             const isOpen = concertsTicketFlyout === eventId;
-                            return React.createElement('div', { className: 'relative flex-shrink-0 self-center mr-4' },
+                            return React.createElement('div', { className: 'relative flex-shrink-0 mr-4' },
                               React.createElement('button', {
                                 onClick: (e) => {
                                   e.stopPropagation();
