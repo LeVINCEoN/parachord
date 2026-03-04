@@ -32471,7 +32471,8 @@ useEffect(() => {
           },
             // Sticky filter bar for Artists (sort dropdown + search on right like other pages)
             searchDetailCategory === 'artists' && React.createElement('div', {
-              className: 'sticky top-0 z-10 flex items-center px-6 py-3 bg-white border-b border-gray-200'
+              className: 'sticky top-0 z-10 flex items-center px-6 py-3',
+              style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
             },
               // Sort dropdown
               React.createElement('div', { className: 'relative' },
@@ -32556,7 +32557,8 @@ useEffect(() => {
 
             // Sticky filter bar for Albums (sort dropdown + search like Critical Darlings)
             searchDetailCategory === 'albums' && React.createElement('div', {
-              className: 'sticky top-0 z-10 flex items-center px-6 py-3 bg-white border-b border-gray-200'
+              className: 'sticky top-0 z-10 flex items-center px-6 py-3',
+              style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
             },
               // Sort dropdown
               React.createElement('div', { className: 'relative' },
@@ -32647,7 +32649,8 @@ useEffect(() => {
 
             // Sticky filter bar for Songs (sort dropdown + search)
             searchDetailCategory === 'tracks' && React.createElement('div', {
-              className: 'sticky top-0 z-10 flex items-center px-6 py-3 bg-white border-b border-gray-200'
+              className: 'sticky top-0 z-10 flex items-center px-6 py-3',
+              style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
             },
               // Sort dropdown
               React.createElement('div', { className: 'relative' },
@@ -35801,7 +35804,8 @@ useEffect(() => {
             return React.createElement(React.Fragment, null,
               // Sticky filter bar - show when both services are configured
               hasBothServicesConfigured && React.createElement('div', {
-                className: 'sticky top-0 z-10 flex items-center px-6 py-3 bg-white border-b border-gray-200'
+                className: 'sticky top-0 z-10 flex items-center px-6 py-3',
+              style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
               },
                 React.createElement('div', { className: 'flex gap-2' },
                   [
@@ -36057,7 +36061,7 @@ useEffect(() => {
 
                       return React.createElement('div', {
                         key: event.id || `${monthKey}-${eventIdx}`,
-                        className: `flex items-center gap-4 p-4 rounded-xl border transition-all cursor-default group ${isDark ? 'bg-gray-800/50 border-gray-700/50 hover:border-violet-500/30 hover:bg-gray-800' : 'bg-white border-gray-100 hover:border-violet-200 hover:shadow-sm'}`,
+                        className: `flex items-center gap-4 p-4 rounded-xl border cursor-default group ${isDark ? 'bg-gray-800/50 border-gray-700/50' : 'bg-white border-gray-100'}`,
                         style: {
                           animation: 'fadeIn 300ms ease-out both',
                           animationDelay: `${eventIdx * 30}ms`
@@ -36261,7 +36265,8 @@ useEffect(() => {
         },
           // PLAYLIST DETAILS sticky bar with breadcrumb (same as loaded state)
           React.createElement('div', {
-            className: 'sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200'
+            className: 'sticky top-0 z-10 flex items-center justify-between px-6 py-4',
+            style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
           },
             // Breadcrumb navigation: Playlists > Playlist Name
             React.createElement('div', {
@@ -36436,7 +36441,8 @@ useEffect(() => {
         },
           // PLAYLIST DETAILS section header with breadcrumb and Edit buttons (sticky)
           React.createElement('div', {
-            className: 'sticky top-0 z-10 flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200'
+            className: 'sticky top-0 z-10 flex items-center justify-between px-6 py-4',
+            style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
           },
             // Breadcrumb navigation: Playlists > Playlist Name (or HOME for ephemeral)
             React.createElement('div', {
@@ -37482,8 +37488,8 @@ useEffect(() => {
         ),
         // Filter bar (outside scrollable area)
         React.createElement('div', {
-          className: 'flex items-center px-6 py-3 bg-white border-b border-gray-200',
-          style: { flexShrink: 0 }
+          className: 'flex items-center px-6 py-3',
+          style: { flexShrink: 0, backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
         },
           // Sort dropdown
           React.createElement('div', { className: 'relative' },
@@ -38243,8 +38249,8 @@ useEffect(() => {
 
           // Sticky header bar with Collection Radio button
           React.createElement('div', {
-            className: 'flex items-center justify-end px-6 py-3 bg-white border-b border-gray-200',
-            style: { flexShrink: 0, minHeight: '52px' }
+            className: 'flex items-center justify-end px-6 py-3',
+            style: { flexShrink: 0, minHeight: '52px', backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
           },
             // Start Collection Radio button
             (collectionData.tracks.length > 0 || library.length > 0) && React.createElement('button', {
@@ -40155,7 +40161,8 @@ useEffect(() => {
           },
             // Sticky filter bar
             React.createElement('div', {
-              className: 'sticky top-0 z-10 flex items-center px-6 py-3 bg-white border-b border-gray-200'
+              className: 'sticky top-0 z-10 flex items-center px-6 py-3',
+              style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
             },
               // Sort dropdown (moved to left)
               React.createElement('div', { className: 'relative' },
@@ -41257,7 +41264,8 @@ useEffect(() => {
           ),
           // Filter bar (outside scrollable area)
           React.createElement('div', {
-            className: 'flex items-center px-6 py-3 bg-white border-b border-gray-200',
+            className: 'flex items-center px-6 py-3',
+            style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' },
             style: { flexShrink: 0 }
           },
               // Source dropdown (for Songs tab)
@@ -42031,7 +42039,8 @@ useEffect(() => {
           ),
           // Filter bar (outside scrollable area)
           React.createElement('div', {
-            className: 'flex items-center px-6 py-3 bg-white border-b border-gray-200',
+            className: 'flex items-center px-6 py-3',
+            style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' },
             style: { flexShrink: 0 }
           },
             // Type filter dropdown
@@ -42531,7 +42540,8 @@ useEffect(() => {
           ),
           // Filter bar (outside scrollable area)
           React.createElement('div', {
-            className: 'flex items-center px-6 py-3 bg-white border-b border-gray-200',
+            className: 'flex items-center px-6 py-3',
+            style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' },
             style: { flexShrink: 0 }
           },
             // Sort dropdown
@@ -43011,8 +43021,8 @@ useEffect(() => {
           (() => {
             const isDark = effectiveTheme === 'dark';
             return React.createElement('div', {
-            className: `flex items-center px-6 py-3 border-b ${isDark ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'}`,
-            style: { flexShrink: 0 }
+            className: 'flex items-center px-6 py-3',
+            style: { flexShrink: 0, backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
           },
             // Source filter dropdown
             React.createElement('div', { className: 'relative' },
@@ -43167,6 +43177,7 @@ useEffect(() => {
                         setConcertsLocationCoords({ lat: pos.lat, lng: pos.lng });
                         const name = await reverseGeocode(pos.lat, pos.lng);
                         setConcertsLocation(name);
+                        setConcertsLocationOpen(false);
                       } catch (err) {
                         console.log('📍 Geolocation error:', err.message);
                       }
@@ -43473,7 +43484,7 @@ useEffect(() => {
 
                         return React.createElement('div', {
                           key: event.id || `${monthKey}-${eventIdx}`,
-                          className: `flex items-center gap-4 p-4 rounded-xl border transition-all cursor-default group ${isDark ? 'bg-gray-800/50 border-gray-700/50 hover:border-violet-500/30 hover:bg-gray-800' : 'bg-white border-gray-100 hover:border-violet-200 hover:shadow-sm'}`,
+                          className: `flex items-center gap-4 p-4 rounded-xl border cursor-default group ${isDark ? 'bg-gray-800/50 border-gray-700/50' : 'bg-white border-gray-100'}`,
                           style: {
                             animation: 'fadeIn 300ms ease-out both',
                             animationDelay: `${eventIdx * 30}ms`
@@ -43832,7 +43843,8 @@ useEffect(() => {
             },
               // Sticky filter bar - show when both services are configured (even during loading)
               hasBothServicesConfigured && React.createElement('div', {
-                className: 'sticky top-0 z-10 flex items-center px-6 py-3 bg-white border-b border-gray-200'
+                className: 'sticky top-0 z-10 flex items-center px-6 py-3',
+              style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
               },
                 // Source filter pills
                 React.createElement('div', { className: 'flex gap-2' },
@@ -44397,7 +44409,8 @@ useEffect(() => {
           ),
           // Filter bar (outside scrollable area)
           React.createElement('div', {
-            className: 'flex items-center px-6 py-3 bg-white border-b border-gray-200',
+            className: 'flex items-center px-6 py-3',
+            style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' },
             style: { flexShrink: 0 }
           },
             // Period dropdown for top charts OR sort dropdown for recent
@@ -45438,7 +45451,8 @@ useEffect(() => {
             ),
             // Filter bar (outside scrollable area - matching History exactly)
             React.createElement('div', {
-              className: 'flex items-center px-6 py-3 bg-white border-b border-gray-200',
+              className: 'flex items-center px-6 py-3',
+            style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' },
               style: { flexShrink: 0 }
             },
               // Sort dropdown for recent, period dropdown for top charts
