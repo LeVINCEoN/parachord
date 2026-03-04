@@ -5028,6 +5028,12 @@ const Parachord = () => {
   const [loadingBio, setLoadingBio] = useState(false);
   const [loadingRelated, setLoadingRelated] = useState(false);
   const [loadingArtist, setLoadingArtist] = useState(false);
+  // On Tour tab state (artist-specific concerts)
+  const [artistConcerts, setArtistConcerts] = useState([]);
+  const [artistConcertsLoading, setArtistConcertsLoading] = useState(false);
+  const [artistConcertsLoaded, setArtistConcertsLoaded] = useState(false);
+  const artistConcertsCache = useRef({}); // { normalizedArtistName: { events: [], timestamp } }
+  const [artistConcertsTicketFlyout, setArtistConcertsTicketFlyout] = useState(null);
   const [currentRelease, setCurrentRelease] = useState(null); // Release/Album page data
   const [loadingRelease, setLoadingRelease] = useState(false);
   const [prefetchedReleases, setPrefetchedReleases] = useState({}); // Cache for on-hover prefetched release tracks: { releaseId: { tracks: [...], title, albumArt } }
@@ -5665,6 +5671,15 @@ const Parachord = () => {
       return () => document.removeEventListener('click', handleClickOutside);
     }
   }, [concertsTicketFlyout]);
+
+  // Close artist concerts ticket flyout when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setArtistConcertsTicketFlyout(null);
+    if (artistConcertsTicketFlyout) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [artistConcertsTicketFlyout]);
 
   // Close concerts source filter dropdown when clicking outside
   useEffect(() => {
@@ -6606,6 +6621,13 @@ const Parachord = () => {
       setArtistBio(null);
       setArtistExtendedInfo(null);
       setRelatedArtists([]);
+    }
+    // Reset and proactively load artist concerts for the On Tour tab
+    setArtistConcerts([]);
+    setArtistConcertsLoaded(false);
+    setArtistConcertsTicketFlyout(null);
+    if (currentArtist?.name) {
+      loadArtistConcerts(currentArtist.name);
     }
   }, [currentArtist]);
 
@@ -9252,7 +9274,7 @@ const Parachord = () => {
           case 'artist': {
             const [artistName, tab] = segments;
             if (artistName) {
-              if (tab && ['music', 'biography', 'related'].includes(tab)) {
+              if (tab && ['music', 'biography', 'related', 'on-tour'].includes(tab)) {
                 pendingProtocolTabRef.current = tab;
               }
               setActiveView('artist');
@@ -24548,6 +24570,136 @@ Return ONLY the JSON array, no other text.`;
     }
   };
 
+  // Load concerts for a specific artist (On Tour tab)
+  const loadArtistConcerts = async (artistName, forceRefresh = false) => {
+    if (!artistName || artistConcertsLoading) return;
+
+    const normalizedName = artistName.trim().toLowerCase();
+    const now = Date.now();
+
+    // Check ref cache
+    if (!forceRefresh && artistConcertsCache.current[normalizedName]) {
+      const cached = artistConcertsCache.current[normalizedName];
+      if ((now - cached.timestamp) < CACHE_TTL.concerts) {
+        console.log(`🎸 Using cached artist concerts for ${artistName} (${cached.events.length} events)`);
+        setArtistConcerts(cached.events);
+        setArtistConcertsLoaded(true);
+        return;
+      }
+    }
+
+    const concertServices = getConcertServices();
+    if (concertServices.length === 0) {
+      setArtistConcerts([]);
+      setArtistConcertsLoaded(true);
+      return;
+    }
+
+    setArtistConcertsLoading(true);
+    console.log(`🎸 Loading concerts for ${artistName} from ${concertServices.length} service(s)...`);
+
+    try {
+      const allEvents = [];
+      const eventKeyToIndex = new Map();
+      const geoKeyToEventKey = new Map();
+
+      const normalizeForDedup = (str) =>
+        (str || '').toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+
+      const makeEventKey = (event) => {
+        const date = event.date || '';
+        const artist = normalizeForDedup(artistName);
+        const venuePrefix = normalizeForDedup(event.venue?.name).slice(0, 20);
+        return `${date}-${artist}-${venuePrefix}`;
+      };
+
+      const geoKey = (event) => {
+        if (!event.venue?.latitude || !event.venue?.longitude) return null;
+        const lat = Math.round(event.venue.latitude * 50) / 50;
+        const lng = Math.round(event.venue.longitude * 50) / 50;
+        return `${event.date || ''}-${normalizeForDedup(artistName)}-${lat},${lng}`;
+      };
+
+      const makeTicketSource = (event) => ({
+        source: event.source,
+        ticketUrl: event.ticketUrl || event.url || null,
+        label: event.source === 'bandsintown' ? 'Bandsintown'
+          : event.source === 'songkick' ? 'Songkick'
+          : event.source === 'seatgeek' ? 'SeatGeek'
+          : event.source === 'ticketmaster' ? 'Ticketmaster'
+          : event.source || 'Unknown'
+      });
+
+      const addEventDeduped = (event) => {
+        const key = makeEventKey(event);
+        const gk = geoKey(event);
+
+        let existingKey = eventKeyToIndex.has(key) ? key : null;
+        if (!existingKey && gk && geoKeyToEventKey.has(gk)) {
+          existingKey = geoKeyToEventKey.get(gk);
+        }
+
+        if (existingKey) {
+          const idx = eventKeyToIndex.get(existingKey);
+          const existing = allEvents[idx];
+          const newSource = makeTicketSource(event);
+          if (newSource.ticketUrl && !existing.ticketSources.some(s => s.source === newSource.source)) {
+            existing.ticketSources.push(newSource);
+          }
+          if (event.lineup && event.lineup.length > (existing.lineup || []).length) {
+            existing.lineup = event.lineup;
+          }
+          return;
+        }
+
+        event.ticketSources = [makeTicketSource(event)];
+        if (gk) geoKeyToEventKey.set(gk, key);
+        eventKeyToIndex.set(key, allEvents.length);
+        allEvents.push(event);
+      };
+
+      // Query all concert services in parallel for this single artist
+      const results = await Promise.allSettled(
+        concertServices.map(async (service) => {
+          const rawConfig = metaServiceConfigs[service.id] || {};
+          const authField = Object.keys(service.configurable || service.settings?.configurable || {}).find(k => k !== 'model');
+          const config = (authField && authField !== 'apiKey' && !rawConfig[authField] && rawConfig.apiKey)
+            ? { ...rawConfig, [authField]: rawConfig.apiKey }
+            : rawConfig;
+          return service.searchArtistEvents(artistName, config);
+        })
+      );
+
+      for (const result of results) {
+        if (result.status === 'fulfilled' && Array.isArray(result.value)) {
+          for (const event of result.value) {
+            addEventDeduped(event);
+          }
+        }
+      }
+
+      // Filter to future dates only and sort
+      const today = new Date().toISOString().split('T')[0];
+      const futureEvents = allEvents
+        .filter(e => !e.date || e.date >= today)
+        .sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+
+      console.log(`🎸 Found ${futureEvents.length} upcoming concerts for ${artistName}`);
+
+      setArtistConcerts(futureEvents);
+      setArtistConcertsLoaded(true);
+
+      // Cache results
+      artistConcertsCache.current[normalizedName] = { events: futureEvents, timestamp: Date.now() };
+    } catch (error) {
+      console.error(`Failed to load concerts for ${artistName}:`, error);
+      setArtistConcerts([]);
+      setArtistConcertsLoaded(true);
+    } finally {
+      setArtistConcertsLoading(false);
+    }
+  };
+
   // Handle scroll for Concerts header collapse
   const handleConcertsScroll = (e) => {
     const scrollTop = e.target.scrollTop;
@@ -34313,7 +34465,7 @@ useEffect(() => {
               className: 'flex items-center gap-1 mt-6',
               style: { textShadow: '0 1px 10px rgba(0,0,0,0.5)' }
             },
-              ['music', 'biography', 'related'].map((tab, index) => [
+              ['music', 'biography', 'related', ...(artistConcertsLoaded && artistConcerts.length > 0 ? ['on-tour'] : [])].map((tab, index) => [
                 index > 0 && React.createElement('span', {
                   key: `sep-${tab}`,
                   className: 'text-gray-400 mx-2'
@@ -34338,7 +34490,7 @@ useEffect(() => {
                       ? 'text-white'
                       : 'text-gray-400 hover:text-white'
                   }`
-                }, tab === 'related' ? 'Related Artists' : tab.charAt(0).toUpperCase() + tab.slice(1))
+                }, tab === 'related' ? 'Related Artists' : tab === 'on-tour' ? 'On Tour' : tab.charAt(0).toUpperCase() + tab.slice(1))
               ]).flat().filter(Boolean)
             ),
             // Play Top Tracks button - responsive sizing
@@ -34433,7 +34585,7 @@ useEffect(() => {
               className: 'flex items-center gap-1',
               style: { textShadow: '0 1px 10px rgba(0,0,0,0.5)' }
             },
-              ['music', 'biography', 'related'].map((tab, index) => [
+              ['music', 'biography', 'related', ...(artistConcertsLoaded && artistConcerts.length > 0 ? ['on-tour'] : [])].map((tab, index) => [
                 index > 0 && React.createElement('span', {
                   key: `sep-collapsed-${tab}`,
                   className: 'text-gray-400 mx-2'
@@ -34457,7 +34609,7 @@ useEffect(() => {
                       ? 'text-white'
                       : 'text-gray-400 hover:text-white'
                   }`
-                }, tab === 'related' ? 'Related Artists' : tab.charAt(0).toUpperCase() + tab.slice(1))
+                }, tab === 'related' ? 'Related Artists' : tab === 'on-tour' ? 'On Tour' : tab.charAt(0).toUpperCase() + tab.slice(1))
               ]).flat().filter(Boolean)
             ),
             // Right side: Play Top Tracks button - responsive sizing
@@ -34543,7 +34695,7 @@ useEffect(() => {
               className: 'flex items-center gap-1',
               style: { textShadow: '0 1px 10px rgba(0,0,0,0.5)' }
             },
-              ['music', 'biography', 'related'].map((tab, index) => [
+              ['music', 'biography', 'related', ...(artistConcertsLoaded && artistConcerts.length > 0 ? ['on-tour'] : [])].map((tab, index) => [
                 index > 0 && React.createElement('span', {
                   key: `sep-release-${tab}`,
                   className: 'text-gray-400 mx-2'
@@ -34582,7 +34734,7 @@ useEffect(() => {
                       ? 'text-white'
                       : 'text-gray-400 hover:text-white'
                   }`
-                }, tab === 'related' ? 'Related Artists' : tab.charAt(0).toUpperCase() + tab.slice(1))
+                }, tab === 'related' ? 'Related Artists' : tab === 'on-tour' ? 'On Tour' : tab.charAt(0).toUpperCase() + tab.slice(1))
               ]).flat().filter(Boolean)
             )
           )
@@ -35815,10 +35967,234 @@ useEffect(() => {
                 )
               )
             );
+          })(),
+
+          // On Tour tab — upcoming concerts for this artist
+          artistPageTab === 'on-tour' && (() => {
+            const isDark = effectiveTheme === 'dark';
+            const events = artistConcerts;
+
+            // Group events by month
+            const grouped = {};
+            for (const event of events) {
+              const date = event.date ? new Date(event.date + 'T00:00:00') : null;
+              const monthKey = date ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}` : 'unknown';
+              const monthLabel = date ? date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Date TBA';
+              if (!grouped[monthKey]) {
+                grouped[monthKey] = { label: monthLabel, events: [] };
+              }
+              grouped[monthKey].events.push(event);
+            }
+            const sortedMonths = Object.keys(grouped).sort();
+
+            return React.createElement('div', { className: 'p-6' },
+              // Header row with count and refresh
+              React.createElement('div', {
+                className: `flex items-center justify-between mb-6`
+              },
+                React.createElement('div', { className: 'flex items-center gap-3' },
+                  React.createElement('h2', {
+                    className: `text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`
+                  }, `${events.length} Upcoming Concert${events.length !== 1 ? 's' : ''}`),
+                  artistConcertsLoading && React.createElement('svg', {
+                    className: 'w-4 h-4 animate-spin text-violet-500',
+                    fill: 'none', viewBox: '0 0 24 24'
+                  },
+                    React.createElement('circle', { className: 'opacity-25', cx: 12, cy: 12, r: 10, stroke: 'currentColor', strokeWidth: 4 }),
+                    React.createElement('path', { className: 'opacity-75', fill: 'currentColor', d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z' })
+                  )
+                ),
+                React.createElement('button', {
+                  onClick: () => currentArtist && loadArtistConcerts(currentArtist.name, true),
+                  disabled: artistConcertsLoading,
+                  className: `p-1.5 transition-colors ${artistConcertsLoading ? 'text-violet-500' : (isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600')}`,
+                  title: artistConcertsLoading ? 'Loading...' : 'Refresh'
+                },
+                  React.createElement('svg', {
+                    className: `w-4 h-4 ${artistConcertsLoading ? 'animate-spin' : ''}`,
+                    fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor'
+                  },
+                    React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15' })
+                  )
+                )
+              ),
+
+              // Empty state
+              events.length === 0 && !artistConcertsLoading && React.createElement('div', {
+                className: 'flex flex-col items-center justify-center py-12'
+              },
+                React.createElement('p', { className: `text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}` }, 'No upcoming concerts found.')
+              ),
+
+              // Loading state
+              events.length === 0 && artistConcertsLoading && React.createElement('div', {
+                className: 'flex flex-col items-center justify-center py-12'
+              },
+                React.createElement('svg', {
+                  className: 'w-8 h-8 animate-spin text-violet-500 mb-3',
+                  fill: 'none', viewBox: '0 0 24 24'
+                },
+                  React.createElement('circle', { className: 'opacity-25', cx: 12, cy: 12, r: 10, stroke: 'currentColor', strokeWidth: 4 }),
+                  React.createElement('path', { className: 'opacity-75', fill: 'currentColor', d: 'M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z' })
+                ),
+                React.createElement('p', { className: `text-sm ${isDark ? 'text-gray-500' : 'text-gray-400'}` }, 'Loading concerts...')
+              ),
+
+              // Month-grouped event list
+              sortedMonths.map(monthKey =>
+                React.createElement('div', { key: monthKey, className: 'mb-8' },
+                  React.createElement('h3', {
+                    className: `text-sm font-semibold uppercase tracking-wider mb-3 px-1 ${isDark ? 'text-gray-400' : 'text-gray-400'}`
+                  }, grouped[monthKey].label),
+
+                  React.createElement('div', { className: 'space-y-3' },
+                    grouped[monthKey].events.map((event, eventIdx) => {
+                      const eventDate = event.date ? new Date(event.date + 'T00:00:00') : null;
+                      const dayOfWeek = eventDate ? eventDate.toLocaleDateString('en-US', { weekday: 'short' }) : '';
+                      const dayNum = eventDate ? eventDate.getDate() : '?';
+                      const monthShort = eventDate ? eventDate.toLocaleDateString('en-US', { month: 'short' }) : '';
+                      const location = [event.venue?.city, event.venue?.region, event.venue?.country].filter(Boolean).join(', ');
+
+                      return React.createElement('div', {
+                        key: event.id || `${monthKey}-${eventIdx}`,
+                        className: `flex items-center gap-4 p-4 rounded-xl border transition-all cursor-default group ${isDark ? 'bg-gray-800/50 border-gray-700/50 hover:border-violet-500/30 hover:bg-gray-800' : 'bg-white border-gray-100 hover:border-violet-200 hover:shadow-sm'}`,
+                        style: {
+                          animation: 'fadeIn 300ms ease-out both',
+                          animationDelay: `${eventIdx * 30}ms`
+                        }
+                      },
+                        // Date column
+                        React.createElement('div', {
+                          className: 'flex flex-col items-center text-center',
+                          style: { minWidth: '56px' }
+                        },
+                          React.createElement('span', {
+                            className: 'text-xs font-medium text-violet-500 uppercase'
+                          }, monthShort),
+                          React.createElement('span', {
+                            className: `text-2xl font-bold leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`
+                          }, dayNum),
+                          React.createElement('span', {
+                            className: 'text-xs text-gray-400 uppercase'
+                          }, dayOfWeek)
+                        ),
+
+                        // Event details
+                        React.createElement('div', { className: 'flex-1 min-w-0' },
+                          React.createElement('div', { className: 'flex items-center gap-2 mb-0.5' },
+                            React.createElement('span', {
+                              className: `font-semibold truncate ${isDark ? 'text-white' : 'text-gray-900'}`
+                            }, event.title || `${currentArtist?.name || event.artist} live`),
+                            // Source badges
+                            ...(() => {
+                              const bgAlpha = isDark ? 0.2 : 0.1;
+                              const srcColors = {
+                                bandsintown: { bg: `rgba(0, 180, 179, ${bgAlpha})`, text: isDark ? '#2dd4bf' : '#00B4B3' },
+                                songkick: { bg: `rgba(248, 0, 70, ${bgAlpha})`, text: isDark ? '#fb7185' : '#F80046' },
+                                seatgeek: { bg: `rgba(252, 76, 2, ${bgAlpha})`, text: isDark ? '#fb923c' : '#FC4C02' },
+                                ticketmaster: { bg: `rgba(2, 108, 223, ${bgAlpha})`, text: isDark ? '#60a5fa' : '#026CDF' }
+                              };
+                              const badgeLabel = (src) => src.source === 'bandsintown' ? 'BIT' : src.source === 'songkick' ? 'SK' : src.source === 'seatgeek' ? 'SG' : src.source === 'ticketmaster' ? 'TM' : (src.label || 'Unknown');
+                              const sources = event.ticketSources || [{ source: event.source }];
+                              return sources.map((src, si) => {
+                                const c = srcColors[src.source] || { bg: `rgba(139, 92, 246, ${bgAlpha})`, text: isDark ? '#a78bfa' : '#8b5cf6' };
+                                return React.createElement('span', {
+                                  key: `badge-${si}`,
+                                  className: 'flex-shrink-0 px-1.5 py-0.5 text-xs rounded-full',
+                                  style: { backgroundColor: c.bg, color: c.text }
+                                }, badgeLabel(src));
+                              });
+                            })()
+                          ),
+                          React.createElement('div', {
+                            className: `text-sm truncate ${isDark ? 'text-gray-300' : 'text-gray-600'}`
+                          }, event.venue?.name || 'Venue TBA'),
+                          location && React.createElement('div', {
+                            className: `text-xs truncate mt-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`
+                          }, location),
+                          event.lineup && event.lineup.length > 1 && React.createElement('div', {
+                            className: `text-xs mt-0.5 ${isDark ? 'text-gray-500' : 'text-gray-400'}`
+                          }, 'with ' + event.lineup.filter(a => a.toLowerCase() !== (currentArtist?.name || '').toLowerCase()).join(', '))
+                        ),
+
+                        // Ticket button with provider flyout
+                        (() => {
+                          const sources = (event.ticketSources || []).filter(s => s.ticketUrl);
+                          const eventId = event.id || `${monthKey}-${eventIdx}`;
+                          if (sources.length === 0) return null;
+                          if (sources.length === 1) {
+                            return React.createElement('a', {
+                              href: sources[0].ticketUrl,
+                              target: '_blank',
+                              rel: 'noopener noreferrer',
+                              className: 'flex-shrink-0 px-4 py-2 bg-violet-500 text-white text-sm font-medium rounded-lg hover:bg-violet-600 transition-colors opacity-70 group-hover:opacity-100',
+                              onClick: (e) => e.stopPropagation()
+                            }, 'Tickets');
+                          }
+                          const isOpen = artistConcertsTicketFlyout === eventId;
+                          return React.createElement('div', { className: 'relative flex-shrink-0' },
+                            React.createElement('button', {
+                              onClick: (e) => {
+                                e.stopPropagation();
+                                setArtistConcertsTicketFlyout(isOpen ? null : eventId);
+                              },
+                              className: 'px-4 py-2 bg-violet-500 text-white text-sm font-medium rounded-lg hover:bg-violet-600 transition-colors opacity-70 group-hover:opacity-100 flex items-center gap-1.5'
+                            },
+                              'Tickets',
+                              React.createElement('svg', {
+                                className: `w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`,
+                                fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor'
+                              },
+                                React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2.5, d: 'M19 9l-7 7-7-7' })
+                              )
+                            ),
+                            isOpen && React.createElement('div', {
+                              className: `absolute right-0 top-full mt-1 rounded-lg shadow-lg border py-1 z-30 ${isDark ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'}`,
+                              style: { minWidth: '180px' },
+                              onClick: (e) => e.stopPropagation()
+                            },
+                              sources.map((src, si) => {
+                                const srcColors = {
+                                  bandsintown: isDark ? '#2dd4bf' : '#00B4B3',
+                                  songkick: isDark ? '#fb7185' : '#F80046',
+                                  seatgeek: isDark ? '#fb923c' : '#FC4C02',
+                                  ticketmaster: isDark ? '#60a5fa' : '#026CDF'
+                                };
+                                const color = srcColors[src.source] || (isDark ? '#a78bfa' : '#8b5cf6');
+                                return React.createElement('a', {
+                                  key: si,
+                                  href: src.ticketUrl,
+                                  target: '_blank',
+                                  rel: 'noopener noreferrer',
+                                  className: `flex items-center gap-2 px-4 py-2 text-sm transition-colors ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`,
+                                  onClick: () => setArtistConcertsTicketFlyout(null)
+                                },
+                                  React.createElement('span', {
+                                    className: 'w-2 h-2 rounded-full flex-shrink-0',
+                                    style: { backgroundColor: color }
+                                  }),
+                                  React.createElement('span', { className: isDark ? 'text-gray-200' : 'text-gray-700' }, src.label),
+                                  React.createElement('svg', {
+                                    className: 'w-3 h-3 text-gray-400 ml-auto',
+                                    fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor'
+                                  },
+                                    React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14' })
+                                  )
+                                );
+                              })
+                            )
+                          );
+                        })()
+                      );
+                    })
+                  )
+                )
+              )
+            );
           })()
         )
       )
-      
+
       // Main content area - Playlist Page loading state (waiting for playlist to be resolved)
       : activeView === 'playlist-view' && !selectedPlaylist ? React.createElement('div', {
         className: 'flex-1 flex flex-col',
