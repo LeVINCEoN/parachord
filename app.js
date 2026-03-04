@@ -43488,16 +43488,32 @@ useEffect(() => {
 
                         return React.createElement('div', {
                           key: event.id || `${monthKey}-${eventIdx}`,
-                          className: `flex items-center rounded-xl border cursor-default overflow-hidden ${isDark ? 'bg-gray-800/50 border-gray-700/50' : 'bg-white border-gray-100'}`,
+                          className: `flex items-stretch rounded-xl border cursor-default overflow-hidden ${isDark ? 'bg-gray-800/50 border-gray-700/50' : 'bg-white border-gray-100'}`,
                           style: {
                             animation: 'fadeIn 300ms ease-out both',
                             animationDelay: `${eventIdx * 30}ms`
                           }
                         },
+                          // Date column
+                          React.createElement('div', {
+                            className: 'flex flex-col items-center justify-center text-center flex-shrink-0 px-4',
+                            style: { minWidth: '64px' }
+                          },
+                            React.createElement('span', {
+                              className: 'text-xs font-medium text-violet-500 uppercase'
+                            }, monthShort),
+                            React.createElement('span', {
+                              className: `text-2xl font-bold leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`
+                            }, dayNum),
+                            React.createElement('span', {
+                              className: 'text-xs text-gray-400 uppercase'
+                            }, dayOfWeek)
+                          ),
+
                           // Artist image — full-bleed rectangle
                           React.createElement('div', {
                             className: `flex-shrink-0 overflow-hidden cursor-pointer ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`,
-                            style: { width: '100px', height: '100px' },
+                            style: { width: '100px', alignSelf: 'stretch' },
                             onClick: () => { if (event.artist) fetchArtistData(event.artist); }
                           },
                             artistImg?.url
@@ -43517,25 +43533,8 @@ useEffect(() => {
                                 )
                           ),
 
-                          // Date + event details column
-                          React.createElement('div', { className: 'flex-1 min-w-0 flex items-center gap-4 px-4 py-3' },
-                            // Date column
-                            React.createElement('div', {
-                              className: 'flex flex-col items-center text-center flex-shrink-0',
-                              style: { minWidth: '48px' }
-                            },
-                              React.createElement('span', {
-                                className: 'text-xs font-medium text-violet-500 uppercase'
-                              }, monthShort),
-                              React.createElement('span', {
-                                className: `text-2xl font-bold leading-tight ${isDark ? 'text-white' : 'text-gray-900'}`
-                              }, dayNum),
-                              React.createElement('span', {
-                                className: 'text-xs text-gray-400 uppercase'
-                              }, dayOfWeek)
-                            ),
-
-                            // Event info
+                          // Event details column
+                          React.createElement('div', { className: 'flex-1 min-w-0 flex items-center px-4 py-3' },
                             React.createElement('div', { className: 'flex-1 min-w-0' },
                               React.createElement('div', { className: 'flex items-center gap-2 mb-0.5' },
                                 React.createElement('span', {
@@ -43589,8 +43588,8 @@ useEffect(() => {
 
                           // Reason column
                           reasonText && React.createElement('div', {
-                            className: `flex-shrink-0 text-xs italic px-3 ${isDark ? 'text-violet-400/70' : 'text-violet-400'}`,
-                            style: { maxWidth: '160px' }
+                            className: `flex-shrink-0 text-xs italic self-center px-3 ${isDark ? 'text-violet-400/70' : 'text-violet-400'}`,
+                            style: { maxWidth: '160px', textAlign: 'left' }
                           }, reasonText),
 
                           // Ticket button with provider flyout
@@ -43604,7 +43603,7 @@ useEffect(() => {
                                 href: sources[0].ticketUrl,
                                 target: '_blank',
                                 rel: 'noopener noreferrer',
-                                className: 'flex-shrink-0 px-4 py-2 text-sm font-medium rounded-lg transition-colors no-drag',
+                                className: 'flex-shrink-0 self-center mr-4 px-4 py-2 text-sm font-medium rounded-lg transition-colors no-drag',
                                 style: { backgroundColor: '#7c3aed', color: '#fff' },
                                 onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = '#6d28d9'; },
                                 onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = '#7c3aed'; },
@@ -43613,7 +43612,7 @@ useEffect(() => {
                             }
                             // Multiple sources — flyout
                             const isOpen = concertsTicketFlyout === eventId;
-                            return React.createElement('div', { className: 'relative flex-shrink-0' },
+                            return React.createElement('div', { className: 'relative flex-shrink-0 self-center mr-4' },
                               React.createElement('button', {
                                 onClick: (e) => {
                                   e.stopPropagation();
