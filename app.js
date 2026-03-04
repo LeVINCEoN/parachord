@@ -43116,9 +43116,6 @@ useEffect(() => {
                                 className: 'px-4 py-2 bg-violet-500 text-white text-sm font-medium rounded-lg hover:bg-violet-600 transition-colors opacity-70 group-hover:opacity-100 flex items-center gap-1.5'
                               },
                                 'Tickets',
-                                React.createElement('span', {
-                                  className: 'bg-white/25 text-white text-xs rounded-full px-1.5 py-0.5 leading-none'
-                                }, sources.length),
                                 React.createElement('svg', {
                                   className: `w-3 h-3 transition-transform ${isOpen ? 'rotate-180' : ''}`,
                                   fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor'
