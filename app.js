@@ -42669,7 +42669,7 @@ useEffect(() => {
             React.createElement('div', { className: 'relative ml-2' },
               // Location pin button (always visible)
               React.createElement('button', {
-                onClick: () => setConcertsLocationOpen(!concertsLocationOpen),
+                onClick: (e) => { e.stopPropagation(); setConcertsLocationOpen(!concertsLocationOpen); },
                 className: `p-1.5 transition-colors ${concertsLocationCoords ? 'text-violet-500' : concertsLocation ? 'text-violet-400' : 'text-gray-400 hover:text-gray-600'}`,
                 title: concertsLocationCoords
                   ? `${concertsLocation} (${concertsLocationRadius} mi)`
@@ -42979,18 +42979,7 @@ useEffect(() => {
 
               const sortedMonths = Object.keys(grouped).sort();
 
-              const hasAiResults = filtered.some(e => e.source === 'ai');
-
               return React.createElement('div', { className: 'p-6' },
-                // AI disclaimer banner
-                hasAiResults && React.createElement('div', {
-                  className: 'flex items-start gap-2 px-3 py-2 mb-4 rounded-lg bg-violet-50 border border-violet-100 text-xs text-violet-600'
-                },
-                  React.createElement('svg', { className: 'w-3.5 h-3.5 mt-0.5 flex-shrink-0', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
-                    React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' })
-                  ),
-                  React.createElement('span', null, 'Some results are AI-generated and may not be accurate. Verify event details before purchasing tickets.')
-                ),
 
                 filtered.length === 0 && searchLower && React.createElement('div', {
                   className: 'flex flex-col items-center justify-center py-12'
@@ -43068,7 +43057,8 @@ useEffect(() => {
                                 };
                                 const badgeLabel = (src) => src.source === 'bandsintown' ? 'BIT' : src.source === 'songkick' ? 'SK' : src.source === 'seatgeek' ? 'SG' : src.source === 'ticketmaster' ? 'TM' : (src.aiProviderName || 'AI');
                                 const sources = event.ticketSources || [{ source: event.source, aiProviderName: event.aiProviderName }];
-                                return sources.map((src, si) => {
+                                const hasAiSource = sources.some(s => s.source === 'ai');
+                                const badges = sources.map((src, si) => {
                                   const c = srcColors[src.source] || { bg: `rgba(139, 92, 246, ${bgAlpha})`, text: isDark ? '#a78bfa' : '#8b5cf6' };
                                   return React.createElement('span', {
                                     key: `badge-${si}`,
@@ -43076,6 +43066,14 @@ useEffect(() => {
                                     style: { backgroundColor: c.bg, color: c.text }
                                   }, badgeLabel(src));
                                 });
+                                if (hasAiSource) {
+                                  badges.push(React.createElement('span', {
+                                    key: 'ai-disclaimer',
+                                    className: 'text-xs text-violet-400 italic flex-shrink-0',
+                                    title: 'AI-generated results may not be accurate. Verify event details before purchasing tickets.'
+                                  }, 'AI-generated'));
+                                }
+                                return badges;
                               })()
                             ),
                             React.createElement('div', {
