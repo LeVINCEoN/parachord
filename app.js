@@ -31260,7 +31260,7 @@ useEffect(() => {
               className: 'w-full flex items-center gap-3 px-3 py-1.5 rounded text-sm transition-colors',
               style: {
                 backgroundColor: activeView === 'concerts' ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
-                color: activeView === 'concerts' ? '#8b5cf6' : '#4b5563',
+                color: activeView === 'concerts' ? '#8b5cf6' : 'var(--nav-inactive)',
                 fontWeight: activeView === 'concerts' ? '500' : '400'
               }
             },
@@ -42793,16 +42793,18 @@ useEffect(() => {
                               // Source badge
                               React.createElement('span', {
                                 className: 'flex-shrink-0 px-1.5 py-0.5 text-xs rounded-full',
-                                style: {
-                                  backgroundColor: event.source === 'bandsintown' ? 'rgba(0, 180, 179, 0.1)' :
-                                    event.source === 'songkick' ? 'rgba(248, 0, 70, 0.1)' :
-                                    event.source === 'seatgeek' ? 'rgba(77, 184, 77, 0.1)' :
-                                    event.source === 'ticketmaster' ? 'rgba(2, 108, 223, 0.1)' : 'rgba(139, 92, 246, 0.1)',
-                                  color: event.source === 'bandsintown' ? '#00B4B3' :
-                                    event.source === 'songkick' ? '#F80046' :
-                                    event.source === 'seatgeek' ? '#4DB84D' :
-                                    event.source === 'ticketmaster' ? '#026CDF' : '#8b5cf6'
-                                }
+                                style: (() => {
+                                  const isDark = effectiveTheme === 'dark';
+                                  const bgAlpha = isDark ? 0.2 : 0.1;
+                                  const srcColors = {
+                                    bandsintown: { bg: `rgba(0, 180, 179, ${bgAlpha})`, text: isDark ? '#2dd4bf' : '#00B4B3' },
+                                    songkick: { bg: `rgba(248, 0, 70, ${bgAlpha})`, text: isDark ? '#fb7185' : '#F80046' },
+                                    seatgeek: { bg: `rgba(77, 184, 77, ${bgAlpha})`, text: isDark ? '#6ee7b7' : '#4DB84D' },
+                                    ticketmaster: { bg: `rgba(2, 108, 223, ${bgAlpha})`, text: isDark ? '#60a5fa' : '#026CDF' }
+                                  };
+                                  const c = srcColors[event.source] || { bg: `rgba(139, 92, 246, ${bgAlpha})`, text: isDark ? '#a78bfa' : '#8b5cf6' };
+                                  return { backgroundColor: c.bg, color: c.text };
+                                })()
                               }, event.source === 'bandsintown' ? 'BIT' : event.source === 'songkick' ? 'SK' : event.source === 'seatgeek' ? 'SG' : event.source === 'ticketmaster' ? 'TM' : (event.aiProviderName || 'AI'))
                             ),
                             React.createElement('div', {
