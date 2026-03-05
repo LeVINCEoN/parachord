@@ -48060,8 +48060,8 @@ useEffect(() => {
                       setArtistPageTab('on-tour');
                       fetchArtistData(currentTrack.artist);
                     },
-                    className: 'flex-shrink-0 ml-2 px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wide transition-colors cursor-pointer no-drag',
-                    style: { backgroundColor: '#7c3aed', color: '#fff', fontSize: '9px', letterSpacing: '0.05em' },
+                    className: 'flex-shrink-0 ml-1.5 px-1.5 py-px rounded font-semibold uppercase tracking-wide transition-colors cursor-pointer no-drag',
+                    style: { backgroundColor: '#7c3aed', color: '#fff', fontSize: '9px', lineHeight: '1.4', letterSpacing: '0.04em' },
                     title: 'View upcoming shows'
                   }, 'On Tour');
                 })()
