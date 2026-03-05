@@ -43436,10 +43436,11 @@ useEffect(() => {
                 // Search filter
                 if (searchLower) {
                   const matchesArtist = event.artist?.toLowerCase().includes(searchLower);
+                  const matchesLineup = event.lineup && event.lineup.some(a => a.toLowerCase().includes(searchLower));
                   const matchesVenue = event.venue?.name?.toLowerCase().includes(searchLower);
                   const matchesCity = event.venue?.city?.toLowerCase().includes(searchLower);
                   const matchesTitle = event.title?.toLowerCase().includes(searchLower);
-                  if (!matchesArtist && !matchesVenue && !matchesCity && !matchesTitle) return false;
+                  if (!matchesArtist && !matchesLineup && !matchesVenue && !matchesCity && !matchesTitle) return false;
                 }
                 return true;
               });
@@ -48057,7 +48058,9 @@ useEffect(() => {
                   if (!concertsLoaded || !currentTrack?.artist) return null;
                   const artistNorm = currentTrack.artist.trim().toLowerCase();
                   const hasNearbyShows = concerts.some(event => {
-                    if (event.artist?.trim().toLowerCase() !== artistNorm) return false;
+                    const isPrimary = event.artist?.trim().toLowerCase() === artistNorm;
+                    const isInLineup = event.lineup && event.lineup.some(a => a.trim().toLowerCase() === artistNorm);
+                    if (!isPrimary && !isInLineup) return false;
                     if (!concertsLocationCoords) return true; // no location filter — any show counts
                     const vLat = event.venue?.latitude;
                     const vLng = event.venue?.longitude;
@@ -48078,8 +48081,8 @@ useEffect(() => {
                         setArtistPageTab('on-tour');
                         fetchArtistData(currentTrack.artist);
                       },
-                      className: 'flex-shrink-0 ml-1.5 rounded-full transition-opacity hover:opacity-80 cursor-pointer no-drag',
-                      style: { width: '7px', height: '7px', backgroundColor: '#7c3aed' }
+                      className: 'flex-shrink-0 ml-2.5 rounded-full transition-opacity hover:opacity-80 cursor-pointer no-drag',
+                      style: { width: '7px', height: '7px', backgroundColor: '#a855f6' }
                     })
                   );
                 })()
