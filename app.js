@@ -36098,15 +36098,26 @@ useEffect(() => {
                                 ticketmaster: { bg: `rgba(2, 108, 223, ${bgAlpha})`, text: isDark ? '#60a5fa' : '#026CDF' }
                               };
                               const badgeLabel = (src) => src.source === 'bandsintown' ? 'BIT' : src.source === 'songkick' ? 'SK' : src.source === 'seatgeek' ? 'SG' : src.source === 'ticketmaster' ? 'TM' : (src.label || 'Unknown');
-                              const sources = event.ticketSources || [{ source: event.source }];
-                              return sources.map((src, si) => {
+                              const badgeFullName = (src) => src.source === 'bandsintown' ? 'Bandsintown' : src.source === 'songkick' ? 'Songkick' : src.source === 'seatgeek' ? 'SeatGeek' : src.source === 'ticketmaster' ? 'Ticketmaster' : (src.label || 'Unknown');
+                              const sources = event.ticketSources || [{ source: event.source, aiProviderName: event.aiProviderName }];
+                              const hasAiSource = sources.some(s => s.source === 'ai');
+                              const badges = sources.map((src, si) => {
                                 const c = srcColors[src.source] || { bg: `rgba(139, 92, 246, ${bgAlpha})`, text: isDark ? '#a78bfa' : '#8b5cf6' };
                                 return React.createElement('span', {
                                   key: `badge-${si}`,
                                   className: 'flex-shrink-0 px-1.5 py-0.5 text-xs rounded-full',
-                                  style: { backgroundColor: c.bg, color: c.text }
+                                  style: { backgroundColor: c.bg, color: c.text },
+                                  title: badgeFullName(src)
                                 }, badgeLabel(src));
                               });
+                              if (hasAiSource) {
+                                badges.push(React.createElement('span', {
+                                  key: 'ai-disclaimer',
+                                  className: 'text-xs text-violet-400 italic flex-shrink-0',
+                                  title: 'AI-generated results may not be accurate. Verify event details before purchasing tickets.'
+                                }, 'AI generated results may be hallucinations'));
+                              }
+                              return badges;
                             })()
                           ),
                           React.createElement('div', {
@@ -43557,6 +43568,7 @@ useEffect(() => {
                                     ticketmaster: { bg: `rgba(2, 108, 223, ${bgAlpha})`, text: isDark ? '#60a5fa' : '#026CDF' }
                                   };
                                   const badgeLabel = (src) => src.source === 'bandsintown' ? 'BIT' : src.source === 'songkick' ? 'SK' : src.source === 'seatgeek' ? 'SG' : src.source === 'ticketmaster' ? 'TM' : (src.aiProviderName || 'AI');
+                                  const badgeFullName = (src) => src.source === 'bandsintown' ? 'Bandsintown' : src.source === 'songkick' ? 'Songkick' : src.source === 'seatgeek' ? 'SeatGeek' : src.source === 'ticketmaster' ? 'Ticketmaster' : (src.aiProviderName || 'AI');
                                   const sources = event.ticketSources || [{ source: event.source, aiProviderName: event.aiProviderName }];
                                   const hasAiSource = sources.some(s => s.source === 'ai');
                                   const badges = sources.map((src, si) => {
@@ -43564,7 +43576,8 @@ useEffect(() => {
                                     return React.createElement('span', {
                                       key: `badge-${si}`,
                                       className: 'flex-shrink-0 px-1.5 py-0.5 text-xs rounded-full',
-                                      style: { backgroundColor: c.bg, color: c.text }
+                                      style: { backgroundColor: c.bg, color: c.text },
+                                      title: badgeFullName(src)
                                     }, badgeLabel(src));
                                   });
                                   if (hasAiSource) {
@@ -43572,7 +43585,7 @@ useEffect(() => {
                                       key: 'ai-disclaimer',
                                       className: 'text-xs text-violet-400 italic flex-shrink-0',
                                       title: 'AI-generated results may not be accurate. Verify event details before purchasing tickets.'
-                                    }, 'AI-generated'));
+                                    }, 'AI generated results may be hallucinations'));
                                   }
                                   return badges;
                                 })()
@@ -48054,16 +48067,21 @@ useEffect(() => {
                     return true; // no venue coords — include it
                   });
                   if (!hasNearbyShows) return null;
-                  return React.createElement('button', {
-                    onClick: (e) => {
-                      e.stopPropagation();
-                      setArtistPageTab('on-tour');
-                      fetchArtistData(currentTrack.artist);
-                    },
-                    className: 'flex-shrink-0 ml-1.5 px-1.5 py-px rounded font-semibold uppercase tracking-wide transition-colors cursor-pointer no-drag',
-                    style: { backgroundColor: '#7c3aed', color: '#fff', fontSize: '9px', lineHeight: '1.4', letterSpacing: '0.04em' },
-                    title: 'View upcoming shows'
-                  }, 'On Tour');
+                  return React.createElement(Tooltip, {
+                    content: 'On tour near you',
+                    position: 'top',
+                    variant: 'dark'
+                  },
+                    React.createElement('button', {
+                      onClick: (e) => {
+                        e.stopPropagation();
+                        setArtistPageTab('on-tour');
+                        fetchArtistData(currentTrack.artist);
+                      },
+                      className: 'flex-shrink-0 ml-1.5 rounded-full transition-opacity hover:opacity-80 cursor-pointer no-drag',
+                      style: { width: '7px', height: '7px', backgroundColor: '#7c3aed' }
+                    })
+                  );
                 })()
               ),
               // Line 3: Resolver dropdown + browser indicator
