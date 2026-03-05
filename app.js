@@ -24206,19 +24206,36 @@ ${tracks}
     }
   };
 
-  // Use browser geolocation to get user's current coordinates
-  const getBrowserGeolocation = () => {
-    return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        reject(new Error('Geolocation not supported'));
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(
-        (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-        (err) => reject(err),
-        { enableHighAccuracy: false, timeout: 30000 }
-      );
+  // Use browser geolocation to get user's current coordinates, with IP-based fallback
+  const getBrowserGeolocation = async () => {
+    // Try navigator.geolocation first
+    try {
+      const pos = await new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+          reject(new Error('Geolocation not supported'));
+          return;
+        }
+        navigator.geolocation.getCurrentPosition(
+          (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+          (err) => reject(err),
+          { enableHighAccuracy: false, timeout: 10000 }
+        );
+      });
+      return pos;
+    } catch (browserErr) {
+      console.log('📍 Browser geolocation failed, trying IP lookup:', browserErr.message);
+    }
+    // Fallback: IP-based geolocation
+    const resp = await fetch('https://ipapi.co/json/', {
+      headers: { 'Accept': 'application/json' }
     });
+    if (resp.ok) {
+      const data = await resp.json();
+      if (data.latitude && data.longitude) {
+        return { lat: data.latitude, lng: data.longitude };
+      }
+    }
+    throw new Error('Could not determine your location');
   };
 
   // Reverse geocode coordinates to a display name
@@ -43242,6 +43259,7 @@ useEffect(() => {
                         setConcertsLocation(name);
                       } catch (err) {
                         console.log('📍 Geolocation error:', err.message);
+                        showToast('Could not determine your location');
                       }
                       setConcertsGeocodingLoading(false);
                     },
