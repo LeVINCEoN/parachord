@@ -48147,8 +48147,8 @@ useEffect(() => {
                         pendingProtocolTabRef.current = 'on-tour';
                         fetchArtistData(currentTrack.artist);
                       },
-                      className: 'flex-shrink-0 ml-2.5 rounded-full transition-opacity hover:opacity-80 cursor-pointer no-drag',
-                      style: { width: '7px', height: '7px', backgroundColor: '#a855f6' }
+                      className: 'flex-shrink-0 ml-3 rounded-full transition-opacity hover:opacity-80 cursor-pointer no-drag',
+                      style: { width: '7px', height: '7px', backgroundColor: '#7c3aed' }
                     })
                   );
                 })()
