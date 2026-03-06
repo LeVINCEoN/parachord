@@ -43222,8 +43222,8 @@ useEffect(() => {
               // Location chip (shown when a location is active)
               concertsLocationCoords && React.createElement('button', {
                 onClick: (e) => { e.stopPropagation(); setConcertsLocationOpen(!concertsLocationOpen); },
-                className: 'flex items-center gap-2 rounded-full text-xs font-medium transition-colors',
-                style: { backgroundColor: 'var(--accent-primary-alpha-15)', color: 'var(--accent-primary)', padding: '6px 12px 6px 14px' },
+                className: 'flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium transition-colors',
+                style: { backgroundColor: 'var(--accent-surface)', color: 'var(--accent-primary)' },
                 title: `${concertsLocation} (${concertsLocationRadius} mi radius)`
               },
                 React.createElement('svg', { className: 'w-3 h-3 flex-shrink-0', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
