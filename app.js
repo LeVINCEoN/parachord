@@ -31542,7 +31542,9 @@ useEffect(() => {
               className: 'w-full flex items-center gap-3 px-3 py-1.5 rounded text-sm transition-colors',
               style: collectionDropHighlight ? {
                 backgroundColor: 'var(--accent-primary-alpha-10)',
-                border: '2px solid #a78bfa',
+                outline: '2px solid #a78bfa',
+                outlineOffset: '-2px',
+                borderRadius: '4px',
                 color: 'var(--accent-primary)'
               } : {
                 backgroundColor: activeView === 'library' ? 'rgba(147, 51, 234, 0.1)' : 'transparent',
@@ -35032,12 +35034,8 @@ useEffect(() => {
         },
           // Sticky filter bar (Music tab only) - refined styling
           artistPageTab === 'music' && React.createElement('div', {
-            className: 'sticky top-0 z-10 flex items-center px-6 py-4',
-            style: {
-              backgroundColor: 'var(--bg-secondary)',
-              backdropFilter: 'blur(8px)',
-              borderBottom: '1px solid var(--border-subtle)'
-            }
+            className: 'sticky top-0 z-10 flex items-center px-6 py-3',
+            style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
           },
             // Release type filter pills
             React.createElement('div', { className: 'flex gap-2 flex-wrap' },
@@ -35061,18 +35059,9 @@ useEffect(() => {
                 return React.createElement('button', {
                   key: value,
                   onClick: () => setReleaseTypeFilter(value),
-                  className: 'no-drag transition-all',
-                  style: {
-                    padding: '8px 16px',
-                    borderRadius: '16px',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    backgroundColor: isActive ? 'var(--accent-primary)' : 'var(--hover-bg-default)',
-                    color: isActive ? '#ffffff' : 'var(--nav-inactive)',
-                    border: 'none',
-                    cursor: 'pointer',
-                    boxShadow: isActive ? '0 2px 8px rgba(124, 58, 237, 0.3)' : 'none'
-                  }
+                  className: `px-3 py-1.5 rounded-full text-sm transition-all no-drag ${
+                    isActive ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`
                 }, loadingArtist ? label : `${label} (${count})`);
               })
             ),
@@ -35082,14 +35071,7 @@ useEffect(() => {
             React.createElement('div', { className: 'relative mr-3' },
               React.createElement('button', {
                 onClick: (e) => { e.stopPropagation(); setArtistSortDropdownOpen(!artistSortDropdownOpen); },
-                className: 'flex items-center gap-2 transition-colors',
-                style: {
-                  padding: '8px 12px',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  color: 'var(--text-secondary)',
-                  cursor: 'pointer'
-                }
+                className: 'flex items-center gap-1 px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors'
               },
                 React.createElement('span', null, artistSortOptions.find(o => o.value === artistSort)?.label || 'Sort'),
                 React.createElement('svg', { className: 'w-4 h-4', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
@@ -35128,15 +35110,7 @@ useEffect(() => {
             // Search toggle/field
             React.createElement('div', { className: 'flex items-center' },
               artistSearchOpen ?
-                React.createElement('div', {
-                  className: 'flex items-center',
-                  style: {
-                    padding: '6px 14px',
-                    borderRadius: '16px',
-                    backgroundColor: 'var(--hover-bg-default)',
-                    border: '1px solid var(--border-subtle)'
-                  }
-                },
+                React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-1.5' },
                   React.createElement('input', {
                     type: 'text',
                     value: artistSearch,
@@ -35148,12 +35122,8 @@ useEffect(() => {
                     },
                     autoFocus: true,
                     placeholder: 'Filter...',
-                    className: 'bg-transparent outline-none',
-                    style: {
-                      width: '150px',
-                      fontSize: '13px',
-                      color: 'var(--text-primary)'
-                    }
+                    className: 'bg-transparent text-gray-700 text-sm placeholder-gray-400 outline-none',
+                    style: { width: '150px' }
                   }),
                   artistSearch && React.createElement('button', {
                     onClick: () => {
@@ -35170,12 +35140,7 @@ useEffect(() => {
               :
                 React.createElement('button', {
                   onClick: () => setArtistSearchOpen(true),
-                  className: 'transition-colors',
-                  style: {
-                    padding: '8px',
-                    color: 'var(--text-tertiary)',
-                    cursor: 'pointer'
-                  }
+                  className: 'p-1.5 text-gray-400 hover:text-gray-600 transition-colors'
                 },
                   React.createElement('svg', { className: 'w-5 h-5', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
                     React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' })
@@ -36128,7 +36093,7 @@ useEffect(() => {
 
                       return React.createElement('div', {
                         key: event.id || `${monthKey}-${eventIdx}`,
-                        className: `flex items-center gap-4 p-4 rounded-xl border cursor-default group ${isDark ? 'bg-gray-800/50 border-gray-700/50' : 'bg-white border-gray-100'}`,
+                        className: 'flex items-center gap-4 p-4 rounded-xl border cursor-default group bg-white border-gray-100',
                         style: {
                           animation: 'fadeIn 300ms ease-out both',
                           animationDelay: `${eventIdx * 30}ms`
@@ -41349,8 +41314,7 @@ useEffect(() => {
           // Filter bar (outside scrollable area)
           React.createElement('div', {
             className: 'flex items-center px-6 py-3',
-            style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' },
-            style: { flexShrink: 0 }
+            style: { flexShrink: 0, backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
           },
               // Source dropdown (for Songs tab)
               chartsTab === 'songs' && React.createElement('div', { className: 'relative' },
@@ -42124,8 +42088,7 @@ useEffect(() => {
           // Filter bar (outside scrollable area)
           React.createElement('div', {
             className: 'flex items-center px-6 py-3',
-            style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' },
-            style: { flexShrink: 0 }
+            style: { flexShrink: 0, backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
           },
             // Type filter dropdown
             React.createElement('div', { className: 'relative' },
@@ -42625,8 +42588,7 @@ useEffect(() => {
           // Filter bar (outside scrollable area)
           React.createElement('div', {
             className: 'flex items-center px-6 py-3',
-            style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' },
-            style: { flexShrink: 0 }
+            style: { flexShrink: 0, backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
           },
             // Sort dropdown
               React.createElement('div', { className: 'relative' },
@@ -43165,7 +43127,7 @@ useEffect(() => {
                   React.createElement('button', {
                     key: 'source-btn',
                     onClick: (e) => { e.stopPropagation(); setConcertsSourceFilterDropdownOpen(!concertsSourceFilterDropdownOpen); },
-                    className: `flex items-center gap-1 px-3 py-1.5 text-sm transition-colors ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'}`
+                    className: 'flex items-center gap-1 px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors'
                   },
                     React.createElement('span', null, selectedLabel),
                     React.createElement('svg', { className: 'w-4 h-4', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
@@ -43174,7 +43136,7 @@ useEffect(() => {
                   ),
                   concertsSourceFilterDropdownOpen && React.createElement('div', {
                     key: 'source-dropdown',
-                    className: `absolute left-0 top-full mt-1 rounded-lg shadow-lg py-1 min-w-[160px] z-30 border ${isDark ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'}`
+                    className: 'absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg py-1 min-w-[160px] z-30 border border-gray-200'
                   },
                     sourceOptions.map(option =>
                       React.createElement('button', {
@@ -43184,8 +43146,8 @@ useEffect(() => {
                           setConcertsSourceFilter(option.value);
                           setConcertsSourceFilterDropdownOpen(false);
                         },
-                        className: `w-full px-4 py-2 text-left text-sm flex items-center justify-between ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} ${
-                          concertsSourceFilter === option.value ? (isDark ? 'text-white font-medium' : 'text-gray-900 font-medium') : (isDark ? 'text-gray-300' : 'text-gray-600')
+                        className: `w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center justify-between ${
+                          concertsSourceFilter === option.value ? 'text-gray-900 font-medium' : 'text-gray-600'
                         }`
                       },
                         option.label,
@@ -43207,7 +43169,7 @@ useEffect(() => {
             React.createElement('button', {
               onClick: () => loadConcerts(true),
               disabled: concertsLoading,
-              className: `ml-2 p-1.5 transition-colors ${concertsLoading ? 'text-violet-500' : (isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600')}`,
+              className: `ml-2 p-1.5 transition-colors ${concertsLoading ? 'text-violet-500' : 'text-gray-400 hover:text-gray-600'}`,
               title: concertsLoading ? 'Loading...' : 'Refresh'
             },
               React.createElement('svg', {
@@ -43414,7 +43376,7 @@ useEffect(() => {
             // Search
             React.createElement('div', { className: 'flex items-center' },
               concertsSearchOpen ?
-                React.createElement('div', { className: `flex items-center border rounded-full px-3 py-1.5 ${isDark ? 'border-gray-600' : 'border-gray-300'}` },
+                React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-1.5' },
                   React.createElement('input', {
                     type: 'text',
                     value: concertsSearch,
@@ -43422,12 +43384,12 @@ useEffect(() => {
                     onBlur: () => { if (!concertsSearch.trim()) setConcertsSearchOpen(false); },
                     autoFocus: true,
                     placeholder: 'Filter...',
-                    className: `bg-transparent text-sm outline-none ${isDark ? 'text-gray-200 placeholder-gray-500' : 'text-gray-700 placeholder-gray-400'}`,
+                    className: 'bg-transparent text-gray-700 text-sm placeholder-gray-400 outline-none',
                     style: { width: '150px' }
                   }),
                   concertsSearch && React.createElement('button', {
                     onClick: () => { setConcertsSearch(''); setConcertsSearchOpen(false); },
-                    className: `ml-2 ${isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}`
+                    className: 'ml-2 text-gray-400 hover:text-gray-600'
                   },
                     React.createElement('svg', { className: 'w-4 h-4', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
                       React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M6 18L18 6M6 6l12 12' })
@@ -43437,7 +43399,7 @@ useEffect(() => {
               :
                 React.createElement('button', {
                   onClick: () => setConcertsSearchOpen(true),
-                  className: `p-1.5 transition-colors ${isDark ? 'text-gray-500 hover:text-gray-300' : 'text-gray-400 hover:text-gray-600'}`
+                  className: 'p-1.5 text-gray-400 hover:text-gray-600 transition-colors'
                 },
                   React.createElement('svg', { className: 'w-5 h-5', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
                     React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z' })
@@ -43644,7 +43606,7 @@ useEffect(() => {
 
                         return React.createElement('div', {
                           key: event.id || `${monthKey}-${eventIdx}`,
-                          className: `flex items-center rounded-xl border cursor-default ${isDark ? 'bg-gray-800/50 border-gray-700/50' : 'bg-white border-gray-100'}`,
+                          className: 'flex items-center rounded-xl border cursor-default bg-white border-gray-100',
                           style: {
                             animation: 'fadeIn 300ms ease-out both',
                             animationDelay: `${eventIdx * 30}ms`,
@@ -44035,7 +43997,7 @@ useEffect(() => {
                       onClick: () => setRecommendationsSourceFilter(value),
                       className: `px-3 py-1.5 rounded-full text-sm transition-all no-drag ${
                         recommendationsSourceFilter === value
-                          ? value === 'listenbrainz' ? 'bg-indigo-600 text-white'
+                          ? value === 'listenbrainz' ? 'bg-orange-500 text-white'
                             : value === 'lastfm' ? 'bg-red-600 text-white'
                             : 'bg-purple-600 text-white'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -44587,8 +44549,7 @@ useEffect(() => {
           // Filter bar (outside scrollable area)
           React.createElement('div', {
             className: 'flex items-center px-6 py-3',
-            style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' },
-            style: { flexShrink: 0 }
+            style: { flexShrink: 0, backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
           },
             // Period dropdown for top charts OR sort dropdown for recent
             historyTab === 'recent' ?
@@ -45629,8 +45590,7 @@ useEffect(() => {
             // Filter bar (outside scrollable area - matching History exactly)
             React.createElement('div', {
               className: 'flex items-center px-6 py-3',
-            style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' },
-              style: { flexShrink: 0 }
+            style: { flexShrink: 0, backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
             },
               // Sort dropdown for recent, period dropdown for top charts
               friendHistoryTab === 'recent' ?
@@ -55174,22 +55134,22 @@ useEffect(() => {
                     },
                       // Checkbox placeholder
                       React.createElement('div', {
-                        className: 'rounded shimmer-light animate-shimmer',
+                        className: 'rounded shimmer-strong animate-shimmer',
                         style: { width: '16px', height: '16px', flexShrink: 0, backgroundSize: '200% 100%' }
                       }),
                       // Image placeholder
                       React.createElement('div', {
-                        className: 'rounded-md shimmer-light animate-shimmer',
+                        className: 'rounded-md shimmer-strong animate-shimmer',
                         style: { width: '40px', height: '40px', flexShrink: 0, backgroundSize: '200% 100%' }
                       }),
                       // Text lines
                       React.createElement('div', { style: { flex: 1, display: 'flex', flexDirection: 'column', gap: '6px' } },
                         React.createElement('div', {
-                          className: 'rounded shimmer-light animate-shimmer',
+                          className: 'rounded shimmer-strong animate-shimmer',
                           style: { height: '14px', width: `${55 + (i * 17) % 35}%`, backgroundSize: '200% 100%' }
                         }),
                         React.createElement('div', {
-                          className: 'rounded shimmer-light animate-shimmer',
+                          className: 'rounded shimmer-strong animate-shimmer',
                           style: { height: '12px', width: '80px', backgroundSize: '200% 100%' }
                         })
                       )
@@ -55222,19 +55182,19 @@ useEffect(() => {
                           fontSize: '13px',
                           fontWeight: '500',
                           color: syncSetupModal.playlistFilter === filter.key ? 'var(--text-primary)' : 'var(--text-secondary)',
-                          backgroundColor: syncSetupModal.playlistFilter === filter.key ? '#ffffff' : 'transparent',
+                          backgroundColor: syncSetupModal.playlistFilter === filter.key ? (effectiveTheme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : '#ffffff') : 'transparent',
                           border: 'none',
                           borderRadius: '8px',
                           cursor: 'pointer',
                           transition: 'background-color 150ms ease, color 150ms ease, box-shadow 150ms ease',
-                          boxShadow: syncSetupModal.playlistFilter === filter.key ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                          boxShadow: syncSetupModal.playlistFilter === filter.key ? (effectiveTheme === 'dark' ? '0 1px 3px rgba(0,0,0,0.3)' : '0 1px 3px rgba(0,0,0,0.1)') : 'none'
                         }
                       }, filter.label)
                     )
                   ),
                   // Select all / deselect all for current filter
                   React.createElement('div', {
-                    style: { display: 'flex', justifyContent: 'flex-end', gap: '12px', marginBottom: '4px' }
+                    style: { display: 'flex', justifyContent: 'flex-end', gap: '12px', marginBottom: '4px', padding: '0 12px' }
                   },
                     React.createElement('button', {
                       onClick: () => {
