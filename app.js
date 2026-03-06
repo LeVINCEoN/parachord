@@ -24229,14 +24229,31 @@ ${tracks}
     } catch (browserErr) {
       console.log('📍 Browser geolocation failed, trying IP lookup:', browserErr.message);
     }
-    // Fallback: IP-based geolocation
-    const resp = await fetch('https://ipapi.co/json/', {
-      headers: { 'Accept': 'application/json' }
-    });
-    if (resp.ok) {
-      const data = await resp.json();
-      if (data.latitude && data.longitude) {
-        return { lat: data.latitude, lng: data.longitude };
+    // Fallback: IP-based geolocation — try multiple services
+    const ipServices = [
+      {
+        url: 'https://ipapi.co/json/',
+        parse: (d) => d.latitude && d.longitude ? { lat: d.latitude, lng: d.longitude } : null
+      },
+      {
+        url: 'http://ip-api.com/json/?fields=lat,lon,status',
+        parse: (d) => d.status === 'success' && d.lat && d.lon ? { lat: d.lat, lng: d.lon } : null
+      },
+      {
+        url: 'https://ipwho.is/',
+        parse: (d) => d.success !== false && d.latitude && d.longitude ? { lat: d.latitude, lng: d.longitude } : null
+      }
+    ];
+    for (const svc of ipServices) {
+      try {
+        const resp = await fetch(svc.url, { headers: { 'Accept': 'application/json' } });
+        if (resp.ok) {
+          const data = await resp.json();
+          const pos = svc.parse(data);
+          if (pos) return pos;
+        }
+      } catch (e) {
+        console.log(`📍 IP geolocation failed (${svc.url}):`, e.message);
       }
     }
     throw new Error('Could not determine your location');
