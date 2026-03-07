@@ -18031,7 +18031,12 @@ ${trackListXml}
         // Populate state immediately so Fresh Drops preview shows on Home
         if (hydratedReleases.length > 0) {
           setNewReleases(hydratedReleases);
-          setNewReleasesLoaded(true);
+          // Only mark as fully loaded if the cache is fresh. For stale caches,
+          // leave newReleasesLoaded=false so the background useEffect triggers
+          // an automatic refresh while the user sees the stale data instantly.
+          if (now - newReleasesData.timestamp < CACHE_TTL.newReleases) {
+            setNewReleasesLoaded(true);
+          }
           // Update the cache ref too so it has the hydrated art
           newReleasesCache.current.releases = hydratedReleases;
         }
