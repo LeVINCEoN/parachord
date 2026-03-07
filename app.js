@@ -3373,7 +3373,7 @@ const ReleasePage = ({
   const albumArtSize = isCompact ? 160 : 192; // 160px or 192px (w-40 or w-48)
   const columnWidth = isCompact ? 180 : 240;
 
-  return React.createElement('div', { ref: containerRef, className: 'flex gap-0 p-6' },
+  return React.createElement('div', { ref: containerRef, className: 'flex gap-0 px-6 pb-6', style: { flex: 1, minHeight: 0 } },
     // LEFT COLUMN: Album card - matching ReleaseCard styling
     (() => {
       const year = release.date ? release.date.split('-')[0] : '';
@@ -3389,10 +3389,12 @@ const ReleasePage = ({
       const badge = badgeStyles[releaseType] || badgeStyles.album;
 
       return React.createElement('div', {
-        className: 'flex-shrink-0 pr-4 md:pr-8',
+        className: 'flex-shrink-0 pr-4 md:pr-8 pt-6 scrollable-content',
         style: {
           width: `${columnWidth}px`,
-          transition: 'width 300ms ease'
+          transition: 'width 300ms ease',
+          overflowY: 'auto',
+          overflowX: 'hidden'
         }
       },
         // Card wrapper - matching ReleaseCard styling
@@ -3643,7 +3645,7 @@ const ReleasePage = ({
     })(),
 
     // RIGHT COLUMN: Tracklist
-    React.createElement('div', { className: 'flex-1 min-w-0' },
+    React.createElement('div', { className: 'flex-1 min-w-0 pt-6 scrollable-content', style: { overflowY: 'auto' } },
       // Show skeleton while tracks are loading
       !release.tracks ? React.createElement('div', { className: 'space-y-0' },
         [75, 60, 85, 55, 70, 80, 50, 65, 90, 58].map((width, i) =>
@@ -34905,19 +34907,22 @@ useEffect(() => {
           )
         ),
 
-        // Release page content (scrollable) - new layout with album details header
+        // Release page content - new layout with album details header
         // Show immediately with partial data (tracks may still be loading)
         currentRelease && React.createElement('div', {
-          className: 'scrollable-content bg-white',
+          className: 'bg-white',
           style: {
             flex: 1,
-            overflowY: 'scroll',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
             pointerEvents: 'auto'
           }
         },
           // ALBUM DETAILS section header with breadcrumb
           React.createElement('div', {
-            className: 'flex items-center justify-between px-6 py-4 border-b border-gray-200'
+            className: 'flex items-center justify-between px-6 py-4 flex-shrink-0',
+            style: { backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
           },
             // Breadcrumb navigation: Artist Name > Album Name
             React.createElement('div', {
@@ -34933,10 +34938,13 @@ useEffect(() => {
                     fetchArtistData(artistName);
                   }
                 },
-                className: 'text-gray-400 hover:text-gray-600 transition-colors uppercase'
+                style: { color: 'var(--text-tertiary)', transition: 'color 0.15s' },
+                className: 'hover:text-gray-600 transition-colors uppercase',
+                onMouseEnter: (e) => e.currentTarget.style.color = 'var(--text-secondary)',
+                onMouseLeave: (e) => e.currentTarget.style.color = 'var(--text-tertiary)'
               }, currentArtist?.name || currentRelease?.artist?.name || 'Artist'),
-              React.createElement('span', { className: 'text-gray-300' }, '/'),
-              React.createElement('span', { className: 'text-gray-600 uppercase' },
+              React.createElement('span', { style: { color: 'var(--border-default)' } }, '/'),
+              React.createElement('span', { style: { color: 'var(--text-secondary)' }, className: 'uppercase' },
                 currentRelease?.title || 'Album Details'
               )
             ),
@@ -36617,7 +36625,7 @@ useEffect(() => {
           )
         ),
 
-        // Playlist content (scrollable) - white background with new layout
+        // Playlist content - white background with new layout
         React.createElement('div', {
           ref: (el) => {
             playlistScrollContainerRef.current = el;
@@ -36625,10 +36633,12 @@ useEffect(() => {
               setPlaylistScrollContainerReady(true);
             }
           },
-          className: 'scrollable-content bg-white',
+          className: 'bg-white',
           style: {
             flex: 1,
-            overflowY: 'scroll',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
             pointerEvents: 'auto'
           }
         },
@@ -36963,11 +36973,11 @@ useEffect(() => {
           })(),
 
           // Two-column layout: playlist cover + metadata on left, tracklist on right
-          React.createElement('div', { className: 'flex gap-0 p-6' },
-            // LEFT COLUMN: 2x2 album art grid and metadata
+          React.createElement('div', { className: 'flex gap-0 px-6 pb-6', style: { flex: 1, minHeight: 0 } },
+            // LEFT COLUMN: 2x2 album art grid and metadata (fixed, scrolls independently)
             React.createElement('div', {
-              className: 'flex-shrink-0 pr-8',
-              style: { width: '240px', overflow: 'hidden' }
+              className: 'flex-shrink-0 pr-8 pt-8 scrollable-content',
+              style: { width: '240px', overflowY: 'auto', overflowX: 'hidden' }
             },
               // Playlist card - matches playlist card style from grid view
               (() => {
@@ -37299,8 +37309,8 @@ useEffect(() => {
               )
             ),
 
-            // RIGHT COLUMN: Tracklist
-            React.createElement('div', { className: 'flex-1 min-w-0' },
+            // RIGHT COLUMN: Tracklist (scrolls independently)
+            React.createElement('div', { className: 'flex-1 min-w-0 pt-8 scrollable-content', style: { overflowY: 'auto' } },
               // Use edited tracks when in edit mode, otherwise use playlistTracks
               (() => {
                 const displayTracks = playlistEditMode && editedPlaylistData ? editedPlaylistData.tracks : playlistTracks;
@@ -50023,7 +50033,7 @@ useEffect(() => {
                   width: '36px',
                   height: '36px',
                   borderRadius: '10px',
-                  backgroundColor: 'var(--accent-primary)',
+                  backgroundColor: '#7c3aed',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -50089,7 +50099,7 @@ useEffect(() => {
                   outline: 'none',
                   transition: 'border-color 150ms ease, box-shadow 150ms ease'
                 },
-                onFocus: (e) => { e.target.style.borderColor = 'var(--accent-primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(124, 58, 237, 0.15)'; },
+                onFocus: (e) => { e.target.style.borderColor = '#7c3aed'; e.target.style.boxShadow = '0 0 0 3px rgba(124, 58, 237, 0.25)'; },
                 onBlur: (e) => { e.target.style.borderColor = 'var(--border-default)'; e.target.style.boxShadow = 'none'; },
                 disabled: urlImportLoading,
                 autoFocus: true
@@ -50124,14 +50134,14 @@ useEffect(() => {
                   fontSize: '14px',
                   fontWeight: '500',
                   color: '#ffffff',
-                  backgroundColor: 'var(--accent-primary)',
+                  backgroundColor: '#7c3aed',
                   borderRadius: '8px',
                   cursor: urlImportLoading || !urlImportValue.trim() ? 'not-allowed' : 'pointer',
                   opacity: urlImportLoading || !urlImportValue.trim() ? '0.6' : '1',
                   minWidth: '80px'
                 },
-                onMouseEnter: (e) => { if (!urlImportLoading && urlImportValue.trim()) e.currentTarget.style.backgroundColor = 'var(--accent-primary-hover)'; },
-                onMouseLeave: (e) => { if (!urlImportLoading && urlImportValue.trim()) e.currentTarget.style.backgroundColor = 'var(--accent-primary)'; }
+                onMouseEnter: (e) => { if (!urlImportLoading && urlImportValue.trim()) e.currentTarget.style.backgroundColor = '#6d28d9'; },
+                onMouseLeave: (e) => { if (!urlImportLoading && urlImportValue.trim()) e.currentTarget.style.backgroundColor = '#7c3aed'; }
               },
                 urlImportLoading ? React.createElement('svg', {
                   className: 'w-4 h-4 animate-spin',
@@ -50285,7 +50295,7 @@ useEffect(() => {
               outline: 'none',
               transition: 'border-color 150ms ease, box-shadow 150ms ease'
             },
-            onFocus: (e) => { e.target.style.borderColor = 'var(--accent-primary)'; e.target.style.boxShadow = '0 0 0 3px rgba(124, 58, 237, 0.1)'; },
+            onFocus: (e) => { e.target.style.borderColor = '#7c3aed'; e.target.style.boxShadow = '0 0 0 3px rgba(124, 58, 237, 0.25)'; },
             onBlur: (e) => { e.target.style.borderColor = 'var(--border-default)'; e.target.style.boxShadow = 'none'; },
             autoFocus: true
           }),
@@ -50327,13 +50337,13 @@ useEffect(() => {
               fontSize: '14px',
               fontWeight: '500',
               color: '#ffffff',
-              backgroundColor: 'var(--accent-primary)',
+              backgroundColor: '#7c3aed',
               borderRadius: '10px',
               cursor: addFriendLoading || !addFriendInput.trim() ? 'not-allowed' : 'pointer',
               opacity: addFriendLoading || !addFriendInput.trim() ? '0.35' : '1'
             },
-            onMouseEnter: (e) => { if (!addFriendLoading && addFriendInput.trim()) e.currentTarget.style.backgroundColor = 'var(--accent-primary-hover)'; },
-            onMouseLeave: (e) => { if (!addFriendLoading && addFriendInput.trim()) e.currentTarget.style.backgroundColor = 'var(--accent-primary)'; }
+            onMouseEnter: (e) => { if (!addFriendLoading && addFriendInput.trim()) e.currentTarget.style.backgroundColor = '#6d28d9'; },
+            onMouseLeave: (e) => { if (!addFriendLoading && addFriendInput.trim()) e.currentTarget.style.backgroundColor = '#7c3aed'; }
           },
             addFriendLoading && React.createElement('svg', {
               className: 'w-4 h-4 animate-spin',
@@ -54976,7 +54986,7 @@ useEffect(() => {
               borderRadius: '50%',
               backgroundColor: confirmDialog.type === 'success' ? 'rgba(34, 197, 94, 0.1)' :
                 confirmDialog.type === 'error' ? 'rgba(220, 38, 38, 0.1)' :
-                'var(--accent-primary-alpha-10)',
+                'rgba(124, 58, 237, 0.12)',
               marginBottom: '16px'
             }
           },
@@ -54985,7 +54995,7 @@ useEffect(() => {
                 fontSize: '24px',
                 color: confirmDialog.type === 'success' ? '#22c55e' :
                   confirmDialog.type === 'error' ? '#dc2626' :
-                  'var(--accent-primary)'
+                  '#7c3aed'
               }
             }, confirmDialog.type === 'success' ? '✓' :
                confirmDialog.type === 'error' ? '✕' : 'ℹ')
@@ -55025,7 +55035,7 @@ useEffect(() => {
               color: '#ffffff',
               backgroundColor: confirmDialog.type === 'success' ? '#22c55e' :
                 confirmDialog.type === 'error' ? '#dc2626' :
-                'var(--accent-primary)',
+                '#7c3aed',
               border: 'none',
               borderRadius: '10px',
               cursor: 'pointer'
@@ -55093,7 +55103,7 @@ useEffect(() => {
               fontSize: '13px',
               fontWeight: '500',
               color: '#ffffff',
-              backgroundColor: 'var(--accent-primary)',
+              backgroundColor: '#7c3aed',
               border: 'none',
               borderRadius: '10px',
               cursor: 'pointer'
