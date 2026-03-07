@@ -34630,35 +34630,57 @@ useEffect(() => {
             // Navigation tabs (centered)
             React.createElement('div', {
               className: 'flex items-center gap-1 mt-6',
-              style: { textShadow: '0 1px 10px rgba(0,0,0,0.5)' }
+              style: { textShadow: '0 2px 12px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.4)' }
             },
-              ['music', 'biography', 'related', ...((artistConcertsLoaded && artistConcerts.length > 0) || artistPageTab === 'on-tour' ? ['on-tour'] : [])].map((tab, index) => [
-                index > 0 && React.createElement('span', {
-                  key: `sep-${tab}`,
-                  className: 'text-gray-400 mx-2'
-                }, '|'),
-                React.createElement('button', {
-                  key: tab,
-                  onClick: async () => {
-                    setArtistPageTab(tab);
-                    // Lazy load data when tab is first clicked
-                    if (tab === 'biography' && artistBio === null && !loadingBio && currentArtist) {
-                      setLoadingBio(true); // Set loading immediately before async call
-                      const bioData = await getArtistBio(currentArtist.name, currentArtist.mbid);
-                      setArtistBio(bioData === null ? false : bioData); // Use false to indicate "fetched but no bio"
-                    }
-                    if (tab === 'related' && relatedArtists.length === 0 && currentArtist) {
-                      const related = await getRelatedArtists(currentArtist.name, currentArtist.mbid);
-                      if (related.length > 0) { setRelatedArtists(related); resolveRelatedArtistImages(related); }
-                    }
-                  },
-                  className: `px-2 py-1 text-sm font-medium uppercase tracking-wider transition-colors no-drag ${
-                    artistPageTab === tab
-                      ? 'text-white'
-                      : 'text-gray-400 hover:text-white'
-                  }`
-                }, tab === 'related' ? 'Related Artists' : tab === 'on-tour' ? 'On Tour' : tab.charAt(0).toUpperCase() + tab.slice(1))
-              ]).flat().filter(Boolean)
+              (() => {
+                const showOnTour = (artistConcertsLoaded && artistConcerts.length > 0) || artistPageTab === 'on-tour';
+                return ['music', 'biography', 'related', 'on-tour'].map((tab, index) => {
+                  const isOnTour = tab === 'on-tour';
+                  const hidden = isOnTour && !showOnTour;
+                  return [
+                    index > 0 && React.createElement('span', {
+                      key: `sep-${tab}`,
+                      className: 'text-white/30 mx-2',
+                      style: isOnTour ? {
+                        opacity: showOnTour ? 1 : 0,
+                        maxWidth: showOnTour ? '20px' : '0px',
+                        overflow: 'hidden',
+                        transition: 'opacity 0.4s ease, max-width 0.4s ease'
+                      } : undefined
+                    }, '|'),
+                    React.createElement('button', {
+                      key: tab,
+                      onClick: async () => {
+                        if (hidden) return;
+                        setArtistPageTab(tab);
+                        // Lazy load data when tab is first clicked
+                        if (tab === 'biography' && artistBio === null && !loadingBio && currentArtist) {
+                          setLoadingBio(true);
+                          const bioData = await getArtistBio(currentArtist.name, currentArtist.mbid);
+                          setArtistBio(bioData === null ? false : bioData);
+                        }
+                        if (tab === 'related' && relatedArtists.length === 0 && currentArtist) {
+                          const related = await getRelatedArtists(currentArtist.name, currentArtist.mbid);
+                          if (related.length > 0) { setRelatedArtists(related); resolveRelatedArtistImages(related); }
+                        }
+                      },
+                      className: `py-1 text-sm font-medium uppercase tracking-wider transition-colors no-drag ${
+                        artistPageTab === tab
+                          ? 'text-white'
+                          : 'text-white/60 hover:text-white'
+                      }`,
+                      style: isOnTour ? {
+                        opacity: showOnTour ? 1 : 0,
+                        maxWidth: showOnTour ? '200px' : '0px',
+                        overflow: 'hidden',
+                        padding: showOnTour ? '0.25rem 0.5rem' : '0.25rem 0',
+                        transition: 'opacity 0.4s ease, max-width 0.4s ease, padding 0.4s ease',
+                        whiteSpace: 'nowrap'
+                      } : { padding: '0.25rem 0.5rem' }
+                    }, tab === 'related' ? 'Related Artists' : tab === 'on-tour' ? 'On Tour' : tab.charAt(0).toUpperCase() + tab.slice(1))
+                  ];
+                }).flat().filter(Boolean);
+              })()
             ),
             // Play Top Tracks button - responsive sizing
             React.createElement('button', {
@@ -34750,34 +34772,56 @@ useEffect(() => {
             // Center: Navigation tabs
             React.createElement('div', {
               className: 'flex items-center gap-1',
-              style: { textShadow: '0 1px 10px rgba(0,0,0,0.5)' }
+              style: { textShadow: '0 2px 12px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.4)' }
             },
-              ['music', 'biography', 'related', ...((artistConcertsLoaded && artistConcerts.length > 0) || artistPageTab === 'on-tour' ? ['on-tour'] : [])].map((tab, index) => [
-                index > 0 && React.createElement('span', {
-                  key: `sep-collapsed-${tab}`,
-                  className: 'text-gray-400 mx-2'
-                }, '|'),
-                React.createElement('button', {
-                  key: `collapsed-${tab}`,
-                  onClick: async () => {
-                    setArtistPageTab(tab);
-                    if (tab === 'biography' && artistBio === null && !loadingBio && currentArtist) {
-                      setLoadingBio(true); // Set loading immediately before async call
-                      const bioData = await getArtistBio(currentArtist.name, currentArtist.mbid);
-                      setArtistBio(bioData === null ? false : bioData); // Use false to indicate "fetched but no bio"
-                    }
-                    if (tab === 'related' && relatedArtists.length === 0 && currentArtist) {
-                      const related = await getRelatedArtists(currentArtist.name, currentArtist.mbid);
-                      if (related.length > 0) { setRelatedArtists(related); resolveRelatedArtistImages(related); }
-                    }
-                  },
-                  className: `px-2 py-1 text-sm font-medium uppercase tracking-wider transition-colors no-drag ${
-                    artistPageTab === tab
-                      ? 'text-white'
-                      : 'text-gray-400 hover:text-white'
-                  }`
-                }, tab === 'related' ? 'Related Artists' : tab === 'on-tour' ? 'On Tour' : tab.charAt(0).toUpperCase() + tab.slice(1))
-              ]).flat().filter(Boolean)
+              (() => {
+                const showOnTour = (artistConcertsLoaded && artistConcerts.length > 0) || artistPageTab === 'on-tour';
+                return ['music', 'biography', 'related', 'on-tour'].map((tab, index) => {
+                  const isOnTour = tab === 'on-tour';
+                  const hidden = isOnTour && !showOnTour;
+                  return [
+                    index > 0 && React.createElement('span', {
+                      key: `sep-collapsed-${tab}`,
+                      className: 'text-white/30 mx-2',
+                      style: isOnTour ? {
+                        opacity: showOnTour ? 1 : 0,
+                        maxWidth: showOnTour ? '20px' : '0px',
+                        overflow: 'hidden',
+                        transition: 'opacity 0.4s ease, max-width 0.4s ease'
+                      } : undefined
+                    }, '|'),
+                    React.createElement('button', {
+                      key: `collapsed-${tab}`,
+                      onClick: async () => {
+                        if (hidden) return;
+                        setArtistPageTab(tab);
+                        if (tab === 'biography' && artistBio === null && !loadingBio && currentArtist) {
+                          setLoadingBio(true);
+                          const bioData = await getArtistBio(currentArtist.name, currentArtist.mbid);
+                          setArtistBio(bioData === null ? false : bioData);
+                        }
+                        if (tab === 'related' && relatedArtists.length === 0 && currentArtist) {
+                          const related = await getRelatedArtists(currentArtist.name, currentArtist.mbid);
+                          if (related.length > 0) { setRelatedArtists(related); resolveRelatedArtistImages(related); }
+                        }
+                      },
+                      className: `py-1 text-sm font-medium uppercase tracking-wider transition-colors no-drag ${
+                        artistPageTab === tab
+                          ? 'text-white'
+                          : 'text-white/60 hover:text-white'
+                      }`,
+                      style: isOnTour ? {
+                        opacity: showOnTour ? 1 : 0,
+                        maxWidth: showOnTour ? '200px' : '0px',
+                        overflow: 'hidden',
+                        padding: showOnTour ? '0.25rem 0.5rem' : '0.25rem 0',
+                        transition: 'opacity 0.4s ease, max-width 0.4s ease, padding 0.4s ease',
+                        whiteSpace: 'nowrap'
+                      } : { padding: '0.25rem 0.5rem' }
+                    }, tab === 'related' ? 'Related Artists' : tab === 'on-tour' ? 'On Tour' : tab.charAt(0).toUpperCase() + tab.slice(1))
+                  ];
+                }).flat().filter(Boolean);
+              })()
             ),
             // Right side: Play Top Tracks button - responsive sizing
             React.createElement('button', {
