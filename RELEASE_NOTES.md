@@ -22,7 +22,7 @@ Full dark mode support with a comprehensive design token system. Every surface, 
 A brand-new Concerts page aggregates upcoming shows from multiple ticketing services, filtered by your location and listening history.
 
 - **Four concert data sources** — new Bandsintown, Songkick, SeatGeek, and Ticketmaster plugins (`.axe` files) provide concert listings
-- **AI-powered concert discovery** — AI plugins (Claude, ChatGPT, Ollama, Gemini) can suggest concerts too; a disclaimer badge flags AI-sourced events (removed from latest builds to prevent hallucinated events)
+- **AI concert disclaimer** — when AI-sourced concert results are present, a disclaimer badge flags them as potentially hallucinated
 - **Location-aware filtering** — IP-based geolocation with multiple fallback services, plus a location autocomplete search dialog with configurable radius (miles)
 - **On Tour indicator** — a purple dot next to the now-playing artist links directly to the On Tour tab when nearby concerts exist; hovering shows a tooltip
 - **Artist page On Tour tab** — artist detail pages show an "On Tour" tab with that artist's upcoming concerts, with ticket links and loading skeletons
@@ -61,7 +61,6 @@ A brand-new Concerts page aggregates upcoming shows from multiple ticketing serv
 ## Plugin Marketplace
 
 - **New concert plugins** — Bandsintown, Songkick, SeatGeek, and Ticketmaster added to the marketplace manifest with icons, descriptions, and download URLs
-- **Concert capability** — AI plugins (Claude, ChatGPT, Ollama, Gemini) now declare `"concerts": true` in their capabilities
 - **New `concerts` category** — added to the marketplace category list
 
 ## Documentation
