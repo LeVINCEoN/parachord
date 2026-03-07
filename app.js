@@ -19937,10 +19937,10 @@ ${trackListXml}
       artistName = track.artist || track.artistName || 'Unknown Artist';
     }
 
-    // Early abort check
+    // Early abort check - throw AbortError so scheduler knows resolution didn't complete
     if (signal?.aborted) {
       console.log(`⏹️ Resolution aborted for "${track.title}" before start`);
-      return;
+      throw new DOMException('Resolution aborted', 'AbortError');
     }
 
     // Use track.id as the key for trackSources state - this matches what views use to look up resolved sources
@@ -20244,10 +20244,10 @@ ${trackListXml}
 
       await Promise.all(resolverPromises);
 
-      // Final abort check before state update
+      // Final abort check before state update - throw AbortError so scheduler knows resolution didn't complete
       if (signal?.aborted) {
         console.log(`⏹️ Resolution aborted for "${track.title}" before state update`);
-        return;
+        throw new DOMException('Resolution aborted', 'AbortError');
       }
 
       // Update state with combined sources (filter noMatch sentinels for UI)
@@ -20443,10 +20443,10 @@ ${trackListXml}
     // Wait for all resolvers to complete
     await Promise.all(resolverPromises);
 
-    // Final abort check before state update
+    // Final abort check before state update - throw AbortError so scheduler knows resolution didn't complete
     if (signal?.aborted) {
       console.log(`⏹️ Resolution aborted for "${track.title}" before state update`);
-      return;
+      throw new DOMException('Resolution aborted', 'AbortError');
     }
 
     // Final state update with all sources
@@ -21559,6 +21559,10 @@ ${trackListXml}
     // Wait for scroll container to be available
     const scrollContainer = playlistScrollContainerRef.current;
     if (!scrollContainer) return;
+
+    // Clear visibility tracking when recreating observer (e.g., navigating back)
+    // so the observer re-fires for all visible tracks and the scheduler re-enqueues them
+    visiblePlaylistTrackIds.current.clear();
 
     playlistObserverRef.current = new IntersectionObserver(
       (entries) => {
@@ -25007,10 +25011,36 @@ Return ONLY the JSON array, no other text.`;
   };
 
   // Load recommendations from ListenBrainz
+  // ListenBrainz fetch helper with retry on 429 rate limits
+  const fetchListenBrainz = async (url, maxRetries = 3) => {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const response = await fetch(url);
+        if (response.ok) return response;
+        if (response.status === 429 || response.status === 503) {
+          const delay = Math.pow(2, attempt) * 1500; // 1.5s, 3s, 6s
+          console.log(`[ListenBrainz] Rate limited (${response.status}), retrying in ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue;
+        }
+        return response; // Non-retryable error
+      } catch (networkError) {
+        if (attempt < maxRetries - 1) {
+          const delay = Math.pow(2, attempt) * 1500;
+          console.log(`[ListenBrainz] Network error, retrying in ${delay}ms:`, networkError.message);
+          await new Promise(resolve => setTimeout(resolve, delay));
+        } else {
+          throw networkError;
+        }
+      }
+    }
+    return fetch(url); // Final attempt
+  };
+
   const loadListenbrainzRecommendations = async (username) => {
     // ListenBrainz has a recommendations endpoint that returns personalized playlists
     // First try to get recommendation playlists
-    const playlistsResponse = await fetch(`https://api.listenbrainz.org/1/user/${encodeURIComponent(username)}/playlists/recommendations`);
+    const playlistsResponse = await fetchListenBrainz(`https://api.listenbrainz.org/1/user/${encodeURIComponent(username)}/playlists/recommendations`);
 
     if (playlistsResponse.ok) {
       const playlistsData = await playlistsResponse.json();
@@ -25023,7 +25053,7 @@ Return ONLY the JSON array, no other text.`;
 
         if (playlistId) {
           // Fetch the full playlist with tracks
-          const playlistResponse = await fetch(`https://api.listenbrainz.org/1/playlist/${playlistId}`);
+          const playlistResponse = await fetchListenBrainz(`https://api.listenbrainz.org/1/playlist/${playlistId}`);
           if (playlistResponse.ok) {
             const playlistData = await playlistResponse.json();
             const tracks = playlistData.playlist?.track || [];
@@ -25043,7 +25073,7 @@ Return ONLY the JSON array, no other text.`;
 
     // Fallback: use top recordings as pseudo-recommendations
     console.log('⭐ No ListenBrainz recommendation playlists found, falling back to top recordings');
-    const statsResponse = await fetch(`https://api.listenbrainz.org/1/stats/user/${encodeURIComponent(username)}/recordings?range=month&count=50`);
+    const statsResponse = await fetchListenBrainz(`https://api.listenbrainz.org/1/stats/user/${encodeURIComponent(username)}/recordings?range=month&count=50`);
 
     if (statsResponse.ok) {
       const statsData = await statsResponse.json();
@@ -25071,7 +25101,7 @@ Return ONLY the JSON array, no other text.`;
     try {
       // Fetch playlists created for the user (includes Weekly Jams, Weekly Exploration, etc.)
       // Request enough results to capture several weeks of both jams and exploration playlists
-      const response = await fetch(
+      const response = await fetchListenBrainz(
         `https://api.listenbrainz.org/1/user/${encodeURIComponent(listenbrainzConfig.username)}/playlists/createdfor?count=100`
       );
 
@@ -25126,7 +25156,7 @@ Return ONLY the JSON array, no other text.`;
   // Load tracks for a specific Weekly Jam playlist
   const loadWeeklyJamTracks = async (playlistId) => {
     try {
-      const playlistResponse = await fetch(`https://api.listenbrainz.org/1/playlist/${playlistId}`);
+      const playlistResponse = await fetchListenBrainz(`https://api.listenbrainz.org/1/playlist/${playlistId}`);
       if (!playlistResponse.ok) return [];
 
       const playlistData = await playlistResponse.json();
@@ -35234,6 +35264,57 @@ useEffect(() => {
                 }
               }
             },
+              // Skeleton loading cards while fetching artist data
+              loadingArtist && artistReleases.length === 0 && Array.from({ length: 15 }, (_, i) =>
+                React.createElement('div', {
+                  key: `skeleton-${i}`,
+                  className: 'card-fade-up',
+                  style: {
+                    width: '100%',
+                    backgroundColor: 'var(--card-bg)',
+                    borderRadius: '10px',
+                    padding: '10px',
+                    boxShadow: 'var(--card-shadow)',
+                    animationDelay: `${Math.min(i * 30, 300)}ms`
+                  }
+                },
+                  // Skeleton album art
+                  React.createElement('div', {
+                    className: 'animate-shimmer',
+                    style: {
+                      width: '100%',
+                      aspectRatio: '1',
+                      borderRadius: '6px',
+                      background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))',
+                      backgroundSize: '200% 100%',
+                      marginBottom: '10px'
+                    }
+                  }),
+                  // Skeleton title
+                  React.createElement('div', {
+                    className: 'animate-shimmer',
+                    style: {
+                      height: '14px',
+                      width: `${60 + (i * 13 % 30)}%`,
+                      borderRadius: '4px',
+                      background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))',
+                      backgroundSize: '200% 100%',
+                      marginBottom: '6px'
+                    }
+                  }),
+                  // Skeleton year
+                  React.createElement('div', {
+                    className: 'animate-shimmer',
+                    style: {
+                      height: '12px',
+                      width: '35%',
+                      borderRadius: '4px',
+                      background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))',
+                      backgroundSize: '200% 100%'
+                    }
+                  })
+                )
+              ),
               sortArtistReleases(filterArtistReleases(artistReleases)).map((release, index) =>
                 React.createElement(ReleaseCard, {
                   key: release.id,
