@@ -1834,11 +1834,11 @@ const VirtualizedQueueList = React.memo(({
         : isLoading ?
           React.createElement('div', { className: 'flex items-center gap-1' },
             React.createElement('div', {
-              className: 'rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+              className: 'rounded shimmer-light animate-shimmer',
               style: { width: '20px', height: '20px' }
             }),
             React.createElement('div', {
-              className: 'rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+              className: 'rounded shimmer-light animate-shimmer',
               style: { width: '20px', height: '20px', animationDelay: '0.1s' }
             })
           )
@@ -1877,12 +1877,12 @@ const VirtualizedQueueList = React.memo(({
         :
           React.createElement('div', { className: 'flex items-center gap-1' },
             React.createElement('div', {
-              className: 'rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+              className: 'rounded shimmer-light animate-shimmer',
               style: { width: '20px', height: '20px' },
               title: 'Resolving track...'
             }),
             React.createElement('div', {
-              className: 'rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+              className: 'rounded shimmer-light animate-shimmer',
               style: { width: '20px', height: '20px', animationDelay: '0.1s' }
             })
           )
@@ -3824,12 +3824,20 @@ const ReleasePage = ({
                       className: 'flex items-center gap-1'
                     },
                       React.createElement('div', {
-                        className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                        className: 'w-5 h-5 rounded animate-shimmer',
+                        style: {
+                          background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))',
+                          backgroundSize: '200% 100%'
+                        },
                         title: 'Resolving track...'
                       }),
                       React.createElement('div', {
-                        className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
-                        style: { animationDelay: '0.1s' }
+                        className: 'w-5 h-5 rounded animate-shimmer',
+                        style: {
+                          background: 'linear-gradient(to right, var(--shimmer-from), var(--shimmer-via), var(--shimmer-to))',
+                          backgroundSize: '200% 100%',
+                          animationDelay: '0.1s'
+                        }
                       })
                     );
                   }
@@ -33413,11 +33421,11 @@ useEffect(() => {
                           className: 'flex items-center gap-1'
                         },
                           React.createElement('div', {
-                            className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                            className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                             title: 'Resolving track...'
                           }),
                           React.createElement('div', {
-                            className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                            className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                             style: { animationDelay: '0.1s' }
                           })
                         )
@@ -37106,7 +37114,7 @@ useEffect(() => {
                   // Track count - matching grid typography (11px)
                   playlistTracks.length === 0 && selectedPlaylist?.isEphemeral ?
                     React.createElement('div', {
-                      className: 'h-4 w-20 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                      className: 'h-4 w-20 rounded shimmer-light animate-shimmer',
                       style: { marginTop: '2px' }
                     }) :
                     React.createElement('div', {
@@ -37457,11 +37465,11 @@ useEffect(() => {
                             className: 'flex items-center gap-1'
                           },
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                               title: 'Resolving track...'
                             }),
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                               style: { animationDelay: '0.1s' }
                             })
                           )
@@ -37511,11 +37519,11 @@ useEffect(() => {
                             className: 'flex items-center gap-1'
                           },
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                               title: 'Resolving track...'
                             }),
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                               style: { animationDelay: '0.1s' }
                             })
                           )
@@ -37534,32 +37542,32 @@ useEffect(() => {
                     },
                       // Track number skeleton
                       React.createElement('div', {
-                        className: 'w-6 h-4 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                        className: 'w-6 h-4 rounded shimmer-light animate-shimmer',
                         style: { width: '32px', animationDelay: `${index * 50}ms` }
                       }),
                       // Track title skeleton - flexible
                       React.createElement('div', {
-                        className: 'h-4 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                        className: 'h-4 rounded shimmer-light animate-shimmer',
                         style: { flex: '1 1 0', minWidth: 0, animationDelay: `${index * 50 + 25}ms` }
                       }),
                       // Artist name skeleton - flexible
                       React.createElement('div', {
-                        className: 'h-4 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                        className: 'h-4 rounded shimmer-light animate-shimmer',
                         style: { flex: '0.7 1 0', minWidth: 0, animationDelay: `${index * 50 + 50}ms` }
                       }),
                       // Duration skeleton
                       React.createElement('div', {
-                        className: 'h-4 rounded shimmer-light bg-[length:200%_100%] animate-shimmer flex-shrink-0',
+                        className: 'h-4 rounded shimmer-light animate-shimmer flex-shrink-0',
                         style: { width: '40px', animationDelay: `${index * 50 + 75}ms` }
                       }),
                       // Resolver icons skeleton
                       React.createElement('div', { className: 'flex items-center gap-1', style: { width: '140px', flexShrink: 0 } },
                         React.createElement('div', {
-                          className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                          className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                           style: { animationDelay: `${index * 50 + 100}ms` }
                         }),
                         React.createElement('div', {
-                          className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                          className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                           style: { animationDelay: `${index * 50 + 125}ms` }
                         })
                       )
@@ -40990,11 +40998,11 @@ useEffect(() => {
                             }, React.createElement(ResolverIcon, { resolverId: 'localfiles', size: 12 })),
                             // Shimmer skeletons
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                               title: 'Resolving...'
                             }),
                             React.createElement('div', {
-                              className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                              className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                               style: { animationDelay: '0.1s' }
                             })
                           );
@@ -42062,11 +42070,11 @@ useEffect(() => {
                       isResolving ?
                         React.createElement('div', { className: 'flex items-center gap-1' },
                           React.createElement('div', {
-                            className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                            className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                             title: 'Resolving track...'
                           }),
                           React.createElement('div', {
-                            className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                            className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                             style: { animationDelay: '0.1s' }
                           })
                         )
@@ -44455,11 +44463,11 @@ useEffect(() => {
                               className: 'flex items-center gap-1'
                             },
                               React.createElement('div', {
-                                className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                                className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                                 title: 'Resolving track...'
                               }),
                               React.createElement('div', {
-                                className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                                className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                                 style: { animationDelay: '0.1s' }
                               })
                             )
@@ -44509,11 +44517,11 @@ useEffect(() => {
                               className: 'flex items-center gap-1'
                             },
                               React.createElement('div', {
-                                className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                                className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                                 title: 'Resolving track...'
                               }),
                               React.createElement('div', {
-                                className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer',
+                                className: 'w-5 h-5 rounded shimmer-light animate-shimmer',
                                 style: { animationDelay: '0.1s' }
                               })
                             )
@@ -44926,8 +44934,8 @@ useEffect(() => {
                         },
                           isResolving ?
                             React.createElement('div', { className: 'flex items-center gap-1' },
-                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light animate-shimmer', title: 'Resolving track...' }),
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light animate-shimmer', style: { animationDelay: '0.1s' } })
                             )
                           : hasResolved ?
                             Object.entries(resolvedSources).filter(([resolverId]) => activeResolvers.includes(resolverId)).sort(([aId], [bId]) => resolverOrder.indexOf(aId) - resolverOrder.indexOf(bId)).map(([resolverId, source]) => {
@@ -44945,8 +44953,8 @@ useEffect(() => {
                             })
                           :
                             React.createElement('div', { className: 'flex items-center gap-1' },
-                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light animate-shimmer', title: 'Resolving track...' }),
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light animate-shimmer', style: { animationDelay: '0.1s' } })
                             )
                         )
                       );
@@ -45049,8 +45057,8 @@ useEffect(() => {
                             })
                           :
                             React.createElement('div', { className: 'flex items-center gap-1' },
-                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer' }),
-                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light animate-shimmer' }),
+                              React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light animate-shimmer', style: { animationDelay: '0.1s' } })
                             )
                         )
                       );
@@ -45901,8 +45909,8 @@ useEffect(() => {
                           },
                             isResolving ?
                               React.createElement('div', { className: 'flex items-center gap-1' },
-                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light animate-shimmer', title: 'Resolving track...' }),
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light animate-shimmer', style: { animationDelay: '0.1s' } })
                               )
                             : hasResolved ?
                               Object.entries(resolvedSources).filter(([resolverId]) => activeResolvers.includes(resolverId)).sort(([aId], [bId]) => resolverOrder.indexOf(aId) - resolverOrder.indexOf(bId)).map(([resolverId, source]) => {
@@ -45920,8 +45928,8 @@ useEffect(() => {
                               })
                             :
                               React.createElement('div', { className: 'flex items-center gap-1' },
-                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light animate-shimmer', title: 'Resolving track...' }),
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light animate-shimmer', style: { animationDelay: '0.1s' } })
                               )
                           )
                       );
@@ -46002,8 +46010,8 @@ useEffect(() => {
                           },
                             isResolving ?
                               React.createElement('div', { className: 'flex items-center gap-1' },
-                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light animate-shimmer', title: 'Resolving track...' }),
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light animate-shimmer', style: { animationDelay: '0.1s' } })
                               )
                             : hasResolved ?
                               Object.entries(resolvedSources).filter(([resolverId]) => activeResolvers.includes(resolverId)).sort(([aId], [bId]) => resolverOrder.indexOf(aId) - resolverOrder.indexOf(bId)).map(([resolverId, source]) => {
@@ -46021,8 +46029,8 @@ useEffect(() => {
                               })
                             :
                               React.createElement('div', { className: 'flex items-center gap-1' },
-                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', title: 'Resolving track...' }),
-                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light bg-[length:200%_100%] animate-shimmer', style: { animationDelay: '0.1s' } })
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light animate-shimmer', title: 'Resolving track...' }),
+                                React.createElement('div', { className: 'w-5 h-5 rounded shimmer-light animate-shimmer', style: { animationDelay: '0.1s' } })
                               )
                           )
                         );
