@@ -312,9 +312,17 @@
     input:focus-visible,
     textarea:focus-visible,
     select:focus-visible {
-      outline: none;
-      box-shadow: 0 0 0 2px var(--accent-primary), 0 0 0 5px var(--accent-primary-alpha-15);
+      outline: 2px solid var(--accent-primary);
+      outline-offset: 2px;
       border-radius: 8px;
+    }
+
+    /* Filter pill: highlight outer border on focus instead of inner input */
+    .filter-pill:focus-within {
+      border-color: var(--accent-primary);
+    }
+    .filter-pill input:focus-visible {
+      outline: none !important;
     }
 
     /* Disable text selection in non-editable areas */

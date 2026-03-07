@@ -32661,7 +32661,7 @@ useEffect(() => {
               // Search/filter on right
               React.createElement('div', { className: 'flex items-center' },
                 searchResultsFilterOpen ?
-                  React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-1.5' },
+                  React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-[5px] filter-pill' },
                     React.createElement('input', {
                       type: 'text',
                       value: searchResultsFilter,
@@ -32753,7 +32753,7 @@ useEffect(() => {
               // Search/filter
               React.createElement('div', { className: 'flex items-center' },
                 searchResultsFilterOpen ?
-                  React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-1.5' },
+                  React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-[5px] filter-pill' },
                     React.createElement('input', {
                       type: 'text',
                       value: searchResultsFilter,
@@ -32845,7 +32845,7 @@ useEffect(() => {
               // Search/filter
               React.createElement('div', { className: 'flex items-center' },
                 searchResultsFilterOpen ?
-                  React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-1.5' },
+                  React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-[5px] filter-pill' },
                     React.createElement('input', {
                       type: 'text',
                       value: searchResultsFilter,
@@ -33675,7 +33675,7 @@ useEffect(() => {
                 cursor: 'pointer'
               }
             },
-              'Close',
+              'CLOSE',
               React.createElement('span', { style: { color: 'var(--text-tertiary)' } }, '×')
             )
           ),
@@ -35203,7 +35203,7 @@ useEffect(() => {
             // Search toggle/field
             React.createElement('div', { className: 'flex items-center' },
               artistSearchOpen ?
-                React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-1.5' },
+                React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-[5px] filter-pill' },
                   React.createElement('input', {
                     type: 'text',
                     value: artistSearch,
@@ -37751,7 +37751,7 @@ useEffect(() => {
           // Search
           React.createElement('div', { className: 'flex items-center' },
             playlistsSearchOpen ?
-              React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-1.5' },
+              React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-[5px] filter-pill' },
                 React.createElement('input', {
                   type: 'text',
                   value: playlistsSearch,
@@ -40398,7 +40398,7 @@ useEffect(() => {
               // Search toggle/field
               React.createElement('div', { className: 'flex items-center' },
                 collectionSearchOpen ?
-                  React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-1.5' },
+                  React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-[5px] filter-pill' },
                     React.createElement('input', {
                       type: 'text',
                       value: collectionSearch,
@@ -41589,7 +41589,7 @@ useEffect(() => {
               // Search
               React.createElement('div', { className: 'flex items-center' },
                 chartsSearchOpen ?
-                  React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-1.5' },
+                  React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-[5px] filter-pill' },
                     React.createElement('input', {
                       type: 'text',
                       value: chartsSearch,
@@ -42291,7 +42291,7 @@ useEffect(() => {
             // Search
             React.createElement('div', { className: 'flex items-center' },
               newReleasesSearchOpen ?
-                React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-1.5' },
+                React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-[5px] filter-pill' },
                   React.createElement('input', {
                     type: 'text',
                     value: newReleasesSearch,
@@ -42773,7 +42773,7 @@ useEffect(() => {
               // Search
               React.createElement('div', { className: 'flex items-center' },
                 criticsSearchOpen ?
-                  React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-1.5' },
+                  React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-[5px] filter-pill' },
                     React.createElement('input', {
                       type: 'text',
                       value: criticsSearch,
@@ -43516,7 +43516,7 @@ useEffect(() => {
             // Search
             React.createElement('div', { className: 'flex items-center' },
               concertsSearchOpen ?
-                React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-1.5' },
+                React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-[5px] filter-pill' },
                   React.createElement('input', {
                     type: 'text',
                     value: concertsSearch,
@@ -44773,7 +44773,7 @@ useEffect(() => {
             // Search (only for recent and top tracks)
             (historyTab === 'recent' || historyTab === 'topTracks') && React.createElement('div', { className: 'flex items-center' },
               historySearchOpen ?
-                React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-1.5' },
+                React.createElement('div', { className: 'flex items-center border border-gray-300 rounded-full px-3 py-[5px] filter-pill' },
                   React.createElement('input', {
                     type: 'text',
                     value: historySearch,
@@ -46356,7 +46356,7 @@ useEffect(() => {
                 cursor: 'pointer'
               }
             },
-              'Close',
+              'CLOSE',
               React.createElement('span', { style: { color: 'var(--text-tertiary)' } }, '×')
             )
           ),
@@ -54036,7 +54036,7 @@ useEffect(() => {
           // Search
           React.createElement('div', { className: 'flex items-center' },
             addToPlaylistSearchOpen ?
-              React.createElement('div', { className: 'flex items-center px-2 py-1', style: { border: '1px solid var(--border-subtle)', borderRadius: '8px' } },
+              React.createElement('div', { className: 'flex items-center px-2 py-1 filter-pill', style: { border: '1px solid var(--border-subtle)', borderRadius: '8px' } },
                 React.createElement('input', {
                   type: 'text',
                   value: addToPlaylistSearch,
