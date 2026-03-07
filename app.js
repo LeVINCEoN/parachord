@@ -2538,8 +2538,8 @@ const SearchArtistCard = ({ artist, getArtistImage, onClick, onContextMenu, onPl
 
   return React.createElement('div', {
     onClick: onClick,
-    className: 'bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group release-card card-fade-up flex-shrink-0',
-    style: { animationDelay: `${animationDelay}ms`, width: itemWidth || 160 },
+    className: 'rounded-lg overflow-hidden cursor-pointer group release-card card-fade-up flex-shrink-0',
+    style: { backgroundColor: 'var(--card-bg)', boxShadow: 'var(--card-shadow)', animationDelay: `${animationDelay}ms`, width: itemWidth || 160 },
     draggable: true,
     onDragStart: (e) => {
       e.dataTransfer.effectAllowed = 'copy';
@@ -2733,8 +2733,8 @@ const CollectionArtistCard = ({ artist, getArtistImage, onNavigate, onPlayTopTra
 
   return React.createElement('div', {
     onClick: onNavigate,
-    className: 'bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group release-card card-fade-up',
-    style: { animationDelay: `${animationDelay}ms` }
+    className: 'rounded-lg overflow-hidden cursor-pointer group release-card card-fade-up',
+    style: { backgroundColor: 'var(--card-bg)', boxShadow: 'var(--card-shadow)', animationDelay: `${animationDelay}ms` }
   },
     // Square image container - gray bg while loading, pattern only when no image found
     React.createElement('div', {
@@ -32902,8 +32902,8 @@ useEffect(() => {
                     const searchArtistPattern = generateArtistPattern(artist.name);
                     return React.createElement('div', {
                       key: artist.id,
-                      className: 'bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group release-card card-fade-up',
-                      style: { animationDelay: `${animationDelay}ms` },
+                      className: 'rounded-lg overflow-hidden cursor-pointer group release-card card-fade-up',
+                      style: { backgroundColor: 'var(--card-bg)', boxShadow: 'var(--card-shadow)', animationDelay: `${animationDelay}ms` },
                       draggable: true,
                       onDragStart: (e) => {
                         e.dataTransfer.effectAllowed = 'copy';
@@ -35994,8 +35994,8 @@ useEffect(() => {
                     const relatedPattern = generateArtistPattern(artist.name);
                     return React.createElement('div', {
                       key: artist.name,
-                      className: 'bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group release-card card-fade-up',
-                      style: { animationDelay: `${Math.min(index * 30, 300)}ms` },
+                      className: 'rounded-lg overflow-hidden cursor-pointer group release-card card-fade-up',
+                      style: { backgroundColor: 'var(--card-bg)', boxShadow: 'var(--card-shadow)', animationDelay: `${Math.min(index * 30, 300)}ms` },
                       draggable: true,
                       onDragStart: (e) => {
                         e.dataTransfer.effectAllowed = 'copy';
@@ -39868,8 +39868,10 @@ useEffect(() => {
                         aiRecs.artists.map((artist, index) =>
                           React.createElement('div', {
                             key: `ai-artist-${artist.name}`,
-                            className: 'bg-white rounded-lg hover:shadow-lg transition-shadow cursor-pointer group release-card card-fade-up',
+                            className: 'rounded-lg overflow-hidden cursor-pointer group release-card card-fade-up',
                             style: {
+                              backgroundColor: 'var(--card-bg)',
+                              boxShadow: 'var(--card-shadow)',
                               animationDelay: `${index * 50}ms`
                             },
                             onClick: () => {
@@ -44237,8 +44239,8 @@ useEffect(() => {
                     const recsArtistPattern = generateArtistPattern(artist.name);
                     return React.createElement('div', {
                       key: artist.id,
-                      className: 'bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group release-card card-fade-up',
-                      style: { animationDelay: `${Math.min(index * 30, 300)}ms` },
+                      className: 'rounded-lg overflow-hidden cursor-pointer group release-card card-fade-up',
+                      style: { backgroundColor: 'var(--card-bg)', boxShadow: 'var(--card-shadow)', animationDelay: `${Math.min(index * 30, 300)}ms` },
                       draggable: true,
                       onDragStart: (e) => {
                         e.dataTransfer.effectAllowed = 'copy';
@@ -45117,8 +45119,8 @@ useEffect(() => {
                     const topArtistPattern = generateArtistPattern(artist.name);
                     return React.createElement('div', {
                       key: artist.id,
-                      className: 'bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group release-card card-fade-up',
-                      style: { animationDelay: `${Math.min(index * 30, 300)}ms` },
+                      className: 'rounded-lg overflow-hidden cursor-pointer group release-card card-fade-up',
+                      style: { backgroundColor: 'var(--card-bg)', boxShadow: 'var(--card-shadow)', animationDelay: `${Math.min(index * 30, 300)}ms` },
                       draggable: true,
                       onDragStart: (e) => {
                         e.dataTransfer.effectAllowed = 'copy';
@@ -46046,7 +46048,8 @@ useEffect(() => {
                         const albumPattern = generateArtistPattern(`${album.artist} ${album.name}`);
                         return React.createElement('div', {
                           key: album.id || index,
-                          className: 'bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group',
+                          className: 'rounded-lg overflow-hidden cursor-pointer group release-card',
+                          style: { backgroundColor: 'var(--card-bg)', boxShadow: 'var(--card-shadow)' },
                           onClick: () => openTopAlbum(album),
                           onMouseEnter: () => prefetchTopAlbumTracks(album.artist, album.name, album.image),
                           onContextMenu: (e) => {
@@ -46206,7 +46209,8 @@ useEffect(() => {
                         const artistPattern = generateArtistPattern(artist.name);
                         return React.createElement('div', {
                           key: artist.id || index,
-                          className: 'bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer group',
+                          className: 'rounded-lg overflow-hidden cursor-pointer group release-card',
+                          style: { backgroundColor: 'var(--card-bg)', boxShadow: 'var(--card-shadow)' },
                           onClick: () => fetchArtistData(artist.name)
                         },
                           React.createElement('div', {
