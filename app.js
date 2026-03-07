@@ -29468,8 +29468,10 @@ Variety guidance: ${theme} Be creative and surprising — avoid defaulting to th
 
   const navigateBack = () => {
     // If we're viewing a release/album opened directly (not from artist browsing),
-    // close it and navigate back in one step
-    if (activeView === 'artist' && currentRelease && artistHistory.length === 0 && viewHistory.length > 1) {
+    // close it and navigate back in one step.
+    // Only do this when no discography is loaded — if artistReleases exist, the user
+    // was browsing the artist's discography and BACK should just close the release.
+    if (activeView === 'artist' && currentRelease && artistHistory.length === 0 && artistReleases.length === 0 && viewHistory.length > 1) {
       setCurrentRelease(null);
       // Also navigate back to previous view (e.g., HOME or Collection)
       const newHistory = [...viewHistory];
