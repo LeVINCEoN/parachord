@@ -39874,13 +39874,7 @@ useEffect(() => {
                               boxShadow: 'var(--card-shadow)',
                               animationDelay: `${index * 50}ms`
                             },
-                            onClick: () => {
-                              setCurrentArtist({ name: artist.name });
-                              setArtistReleases([]);
-                              setLoadingArtist(true);
-                              setArtistImage(null);
-                              navigateTo('artist');
-                            }
+                            onClick: () => fetchArtistData(artist.name)
                           },
                             React.createElement('div', {
                               className: 'aspect-square relative group/art overflow-hidden',
