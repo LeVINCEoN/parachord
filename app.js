@@ -31533,7 +31533,8 @@ useEffect(() => {
             className: 'w-full flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors rounded-lg',
             style: {
               backgroundColor: 'var(--hover-bg-default)',
-              color: activeView === 'search' ? 'var(--text-primary)' : 'var(--text-tertiary)'
+              color: activeView === 'search' ? 'var(--text-primary)' : 'var(--text-tertiary)',
+              ...(activeView === 'search' ? { boxShadow: 'inset 0 0 0 1.5px var(--accent-primary-alpha-30)' } : {})
             },
             onClick: () => navigateTo('search')
           },
@@ -31543,7 +31544,7 @@ useEffect(() => {
             React.createElement('span', {
               style: {
                 fontSize: '13px',
-                fontWeight: '400'
+                fontWeight: activeView === 'search' ? '500' : '400'
               }
             }, 'Search')
           )
