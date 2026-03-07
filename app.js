@@ -42240,48 +42240,27 @@ useEffect(() => {
             className: 'flex items-center px-6 py-3',
             style: { flexShrink: 0, backgroundColor: 'var(--bg-primary)', borderBottom: '1px solid var(--border-default)' }
           },
-            // Type filter dropdown
-            React.createElement('div', { className: 'relative' },
-              React.createElement('button', {
-                onClick: (e) => { e.stopPropagation(); setNewReleasesFilterDropdownOpen(!newReleasesFilterDropdownOpen); },
-                className: 'flex items-center gap-1 px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors'
-              },
-                React.createElement('span', null,
-                  newReleasesFilter === 'all' ? 'All Types' :
-                  newReleasesFilter === 'album' ? 'Albums' :
-                  newReleasesFilter === 'ep' ? 'EPs' : 'Singles'
-                ),
-                React.createElement('svg', { className: 'w-4 h-4', fill: 'none', viewBox: '0 0 24 24', stroke: 'currentColor' },
-                  React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M19 9l-7 7-7-7' })
-                )
-              ),
-              newReleasesFilterDropdownOpen && React.createElement('div', {
-                className: 'absolute left-0 top-full mt-1 bg-white rounded-lg shadow-lg py-1 min-w-[140px] z-30 border border-gray-200'
-              },
-                [{ value: 'all', label: 'All Types' }, { value: 'album', label: 'Albums' }, { value: 'ep', label: 'EPs' }, { value: 'single', label: 'Singles' }].map(option =>
-                  React.createElement('button', {
-                    key: option.value,
-                    onClick: (e) => {
-                      e.stopPropagation();
-                      setNewReleasesFilter(option.value);
-                      setNewReleasesFilterDropdownOpen(false);
-                    },
-                    className: `w-full px-4 py-2 text-left text-sm hover:bg-gray-100 flex items-center justify-between ${
-                      newReleasesFilter === option.value ? 'text-gray-900 font-medium' : 'text-gray-600'
-                    }`
-                  },
-                    option.label,
-                    newReleasesFilter === option.value && React.createElement('svg', {
-                      className: 'w-4 h-4',
-                      fill: 'none',
-                      viewBox: '0 0 24 24',
-                      stroke: 'currentColor'
-                    },
-                      React.createElement('path', { strokeLinecap: 'round', strokeLinejoin: 'round', strokeWidth: 2, d: 'M5 13l4 4L19 7' })
-                    )
-                  )
-                )
-              )
+            // Type filter pills
+            React.createElement('div', { className: 'flex gap-2 flex-wrap' },
+              [
+                { value: 'all', label: 'All' },
+                { value: 'album', label: 'Albums' },
+                { value: 'ep', label: 'EPs' },
+                { value: 'single', label: 'Singles' }
+              ].map(({ value, label }) => {
+                const count = value === 'all'
+                  ? newReleases.length
+                  : newReleases.filter(r => r.releaseType === value).length;
+                if (count === 0 && value !== 'all') return null;
+                const isActive = newReleasesFilter === value;
+                return React.createElement('button', {
+                  key: value,
+                  onClick: () => setNewReleasesFilter(value),
+                  className: `px-3 py-1.5 rounded-full text-sm transition-all no-drag ${
+                    isActive ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`
+                }, `${label} (${count})`);
+              })
             ),
             // Refresh button
             React.createElement('button', {
