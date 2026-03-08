@@ -18855,13 +18855,15 @@ ${trackListXml}
   // Helper to check if an artist name from a fallback source is a reasonable match
   const isFallbackNameMatch = (candidateName, searchName) => {
     const norm = s => s?.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase().replace(/[^a-z0-9]/g, '') || '';
+      .toLowerCase().replace(/[^a-z0-9\s]/g, '').trim() || '';
     const cn = norm(candidateName);
     const sn = norm(searchName);
     if (cn === sn) return true;
-    const shorter = Math.min(cn.length, sn.length);
-    const longer = Math.max(cn.length, sn.length);
-    return (cn.includes(sn) || sn.includes(cn)) && shorter >= longer * 0.5;
+    // Word-level matching: every word in the search name must appear in the candidate (or vice versa)
+    const cWords = cn.split(/\s+/).filter(Boolean);
+    const sWords = sn.split(/\s+/).filter(Boolean);
+    const [shorter, longer] = cWords.length <= sWords.length ? [cWords, sWords] : [sWords, cWords];
+    return shorter.length > 0 && shorter.every(w => longer.some(lw => lw === w));
   };
 
   // Fallback artist lookup via Spotify API (when MusicBrainz has no results)
