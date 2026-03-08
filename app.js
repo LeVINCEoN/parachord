@@ -18852,6 +18852,271 @@ ${trackListXml}
     }
   }, [friends, pendingFriendLoad]);
 
+  // Fallback artist lookup via Spotify API (when MusicBrainz has no results)
+  const fetchArtistFromSpotify = async (artistName) => {
+    const resolvers = loadedResolversRef.current || [];
+    const activeIds = activeResolversRef.current || [];
+    if (!activeIds.includes('spotify')) return null;
+
+    try {
+      const config = getResolverConfigRef.current ? await getResolverConfigRef.current('spotify') : {};
+      if (!config.token) return null;
+
+      console.log('🎵 Trying Spotify fallback for artist:', artistName);
+
+      // Search for artist
+      const searchUrl = `https://api.spotify.com/v1/search?q=artist:"${encodeURIComponent(artistName)}"&type=artist&limit=5`;
+      const searchResponse = await fetch(searchUrl, {
+        headers: { 'Authorization': `Bearer ${config.token}` }
+      });
+
+      if (!searchResponse.ok) return null;
+      const searchData = await searchResponse.json();
+      const artists = searchData.artists?.items || [];
+      const artist = artists.find(a => a.name.toLowerCase() === artistName.toLowerCase()) || artists[0];
+      if (!artist) return null;
+
+      // Fetch artist's albums
+      const albumsUrl = `https://api.spotify.com/v1/artists/${artist.id}/albums?include_groups=album,single&limit=50&market=US`;
+      const albumsResponse = await fetch(albumsUrl, {
+        headers: { 'Authorization': `Bearer ${config.token}` }
+      });
+
+      if (!albumsResponse.ok) return null;
+      const albumsData = await albumsResponse.json();
+      const albums = albumsData.items || [];
+
+      const releases = albums.map(album => {
+        const type = album.album_group || album.album_type || 'album';
+        return {
+          id: `spotify-${album.id}`,
+          title: album.name,
+          date: album.release_date || null,
+          releaseType: type === 'single' ? 'single' : (type === 'compilation' ? 'compilation' : 'album'),
+          secondaryTypes: [],
+          disambiguation: '',
+          albumArt: album.images?.[0]?.url || null
+        };
+      });
+
+      // Sort newest first
+      releases.sort((a, b) => (b.date || '0000').localeCompare(a.date || '0000'));
+
+      console.log(`🎵 Spotify fallback found ${releases.length} releases for ${artist.name}`);
+      return {
+        artist: {
+          name: artist.name,
+          mbid: null,
+          country: null,
+          disambiguation: null,
+          type: artist.type === 'artist' ? 'Person' : 'Group'
+        },
+        releases,
+        source: 'spotify'
+      };
+    } catch (error) {
+      console.error('🎵 Spotify artist fallback failed:', error);
+      return null;
+    }
+  };
+
+  // Fallback artist lookup via MusicKit / Apple Music catalog
+  const fetchArtistFromMusicKit = async (artistName) => {
+    const activeIds = activeResolversRef.current || [];
+    if (!activeIds.includes('applemusic')) return null;
+
+    const musicKitWeb = window.getMusicKitWeb ? window.getMusicKitWeb() : null;
+    if (!musicKitWeb?.isConfigured || !musicKitWeb?.musicKit) return null;
+
+    try {
+      console.log('🍎 Trying MusicKit fallback for artist:', artistName);
+
+      // Search for artist
+      const searchResults = await musicKitWeb.musicKit.api.music(`/v1/catalog/us/search`, {
+        term: artistName,
+        types: 'artists',
+        limit: 5
+      });
+
+      const artists = searchResults.data.results.artists?.data || [];
+      const artist = artists.find(a =>
+        a.attributes.name.toLowerCase() === artistName.toLowerCase()
+      ) || artists[0];
+      if (!artist) return null;
+
+      // Fetch artist's albums
+      const albumsResult = await musicKitWeb.musicKit.api.music(
+        `/v1/catalog/us/artists/${artist.id}/albums`,
+        { limit: 100 }
+      );
+
+      const albums = albumsResult.data.data || [];
+
+      const releases = albums.map(album => {
+        const attrs = album.attributes;
+        let releaseType = 'album';
+        if (attrs.isSingle) releaseType = 'single';
+        else if (attrs.isCompilation) releaseType = 'compilation';
+
+        return {
+          id: `applemusic-${album.id}`,
+          title: attrs.name,
+          date: attrs.releaseDate || null,
+          releaseType,
+          secondaryTypes: [],
+          disambiguation: '',
+          albumArt: attrs.artwork?.url
+            ?.replace('{w}', '500').replace('{h}', '500') || null
+        };
+      });
+
+      // Sort newest first
+      releases.sort((a, b) => (b.date || '0000').localeCompare(a.date || '0000'));
+
+      console.log(`🍎 MusicKit fallback found ${releases.length} releases for ${artist.attributes.name}`);
+      return {
+        artist: {
+          name: artist.attributes.name,
+          mbid: null,
+          country: null,
+          disambiguation: null,
+          type: null
+        },
+        releases,
+        source: 'applemusic'
+      };
+    } catch (error) {
+      console.error('🍎 MusicKit artist fallback failed:', error);
+      return null;
+    }
+  };
+
+  // Fallback artist lookup via Last.fm (artist.getTopAlbums)
+  const fetchArtistFromLastfm = async (artistName) => {
+    const apiKey = getLastfmApiKey();
+    if (!apiKey) return null;
+
+    try {
+      console.log('📻 Trying Last.fm fallback for artist:', artistName);
+
+      const url = `https://ws.audioscrobbler.com/2.0/?method=artist.gettopalbums&artist=${encodeURIComponent(artistName)}&api_key=${apiKey}&format=json&limit=100`;
+      const response = await lastfmFetch(url);
+
+      if (!response.ok) return null;
+      const data = await response.json();
+
+      if (data.error || !data.topalbums?.album?.length) return null;
+
+      const albums = data.topalbums.album;
+      // Last.fm returns artist name in the response
+      const lfmArtistName = albums[0]?.artist?.name || artistName;
+
+      const releases = albums
+        .filter(album => album.name && album.name !== '(null)')
+        .map(album => ({
+          id: `lastfm-${album.mbid || album.name.toLowerCase().replace(/\s+/g, '-')}`,
+          title: album.name,
+          date: null, // Last.fm topalbums doesn't include release dates
+          releaseType: 'album',
+          secondaryTypes: [],
+          disambiguation: '',
+          albumArt: album.image?.find(img => img.size === 'extralarge')?.['#text'] || null
+        }));
+
+      console.log(`📻 Last.fm fallback found ${releases.length} releases for ${lfmArtistName}`);
+      return {
+        artist: {
+          name: lfmArtistName,
+          mbid: albums[0]?.artist?.mbid || null,
+          country: null,
+          disambiguation: null,
+          type: null
+        },
+        releases,
+        source: 'lastfm'
+      };
+    } catch (error) {
+      console.error('📻 Last.fm artist fallback failed:', error);
+      return null;
+    }
+  };
+
+  // Fallback artist lookup via Discogs (artist search + releases)
+  const fetchArtistFromDiscogs = async (artistName) => {
+    try {
+      const discogsConfig = metaServiceConfigs?.discogs || {};
+      const token = discogsConfig.personalAccessToken;
+
+      console.log('📀 Trying Discogs fallback for artist:', artistName);
+
+      const headers = { 'User-Agent': 'Parachord/1.0 (https://parachord.app)' };
+      if (token) headers['Authorization'] = `Discogs token=${token}`;
+
+      // Search for artist
+      const searchUrl = `https://api.discogs.com/database/search?q=${encodeURIComponent(artistName)}&type=artist&per_page=5`;
+      const searchResponse = await fetch(searchUrl, { headers });
+      if (!searchResponse.ok) return null;
+
+      const searchData = await searchResponse.json();
+      if (!searchData.results?.length) return null;
+
+      const artistResult = searchData.results.find(r =>
+        r.title?.toLowerCase() === artistName.toLowerCase()
+      ) || searchData.results[0];
+
+      // Fetch artist releases
+      const releasesUrl = `https://api.discogs.com/artists/${artistResult.id}/releases?sort=year&sort_order=desc&per_page=100`;
+      const releasesResponse = await fetch(releasesUrl, { headers });
+      if (!releasesResponse.ok) return null;
+
+      const releasesData = await releasesResponse.json();
+      const discogsReleases = releasesData.releases || [];
+
+      // Deduplicate by title (Discogs has many regional editions)
+      const seen = new Set();
+      const releases = [];
+      for (const rel of discogsReleases) {
+        // Only include releases where this artist is the main artist
+        if (rel.role && rel.role !== 'Main') continue;
+        const key = rel.title?.toLowerCase();
+        if (!key || seen.has(key)) continue;
+        seen.add(key);
+
+        let releaseType = 'album';
+        const format = (rel.format || '').toLowerCase();
+        if (format.includes('single') || rel.type === 'Single') releaseType = 'single';
+        else if (format.includes('ep')) releaseType = 'ep';
+        else if (format.includes('compilation')) releaseType = 'compilation';
+
+        releases.push({
+          id: `discogs-${rel.id}`,
+          title: rel.title,
+          date: rel.year ? String(rel.year) : null,
+          releaseType,
+          secondaryTypes: [],
+          disambiguation: '',
+          albumArt: rel.thumb || null
+        });
+      }
+
+      console.log(`📀 Discogs fallback found ${releases.length} releases for ${artistResult.title}`);
+      return {
+        artist: {
+          name: artistResult.title,
+          mbid: null,
+          country: null,
+          disambiguation: null,
+          type: null
+        },
+        releases,
+        source: 'discogs'
+      };
+    } catch (error) {
+      console.error('📀 Discogs artist fallback failed:', error);
+      return null;
+    }
+  };
+
   // Fetch artist data and discography from MusicBrainz
   const fetchArtistData = async (artistName) => {
     console.log('Fetching artist data for:', artistName);
@@ -19007,13 +19272,102 @@ ${trackListXml}
       const searchData = await searchResponse.json();
       
       if (!searchData.artists || searchData.artists.length === 0) {
-        console.log('Artist not found');
-        showConfirmDialog({
-          type: 'info',
-          title: 'Artist Not Found',
-          message: `"${artistName}" was not found in MusicBrainz`
-        });
+        console.log('Artist not found on MusicBrainz, trying fallback sources...');
+
+        // Try fallback sources: enabled resolvers first, then meta-services
+        const fallbackSources = [
+          fetchArtistFromSpotify,
+          fetchArtistFromMusicKit,
+          fetchArtistFromLastfm,
+          fetchArtistFromDiscogs
+        ];
+
+        let fallbackResult = null;
+        for (const fetchFn of fallbackSources) {
+          if (thisFetchId !== artistFetchId.current) return; // Stale check
+          fallbackResult = await fetchFn(artistName);
+          if (fallbackResult) break;
+        }
+
+        if (!fallbackResult) {
+          showConfirmDialog({
+            type: 'info',
+            title: 'Artist Not Found',
+            message: `"${artistName}" was not found in MusicBrainz or any enabled fallback source`
+          });
+          setLoadingArtist(false);
+          return;
+        }
+
+        console.log(`✅ Found artist via ${fallbackResult.source} fallback:`, fallbackResult.artist.name);
+
+        if (thisFetchId !== artistFetchId.current) return; // Stale check
+
+        const fallbackArtist = fallbackResult.artist;
+        const fallbackReleases = fallbackResult.releases;
+
+        setCurrentArtist(fallbackArtist);
+
+        // Start fetching artist image (non-blocking)
+        (async () => {
+          const spotifyResult = await getArtistImage(artistName);
+          if (thisFetchId !== artistFetchId.current) return;
+          if (spotifyResult) {
+            setArtistImage(spotifyResult.url);
+            setArtistImagePosition(spotifyResult.facePosition || 'center 25%');
+            return;
+          }
+          if (fallbackArtist.mbid) {
+            const wikiImage = await getWikipediaArtistImage(fallbackArtist.mbid);
+            if (thisFetchId !== artistFetchId.current) return;
+            if (wikiImage) {
+              setArtistImage(wikiImage);
+              setArtistImagePosition('center 25%');
+              return;
+            }
+          }
+          const discogsImage = await getDiscogsArtistImage(null, artistName);
+          if (thisFetchId !== artistFetchId.current) return;
+          if (discogsImage) {
+            setArtistImage(discogsImage);
+            setArtistImagePosition('center 25%');
+          }
+        })();
+
+        // Cache the fallback data
+        artistDataCache.current[cacheKey] = {
+          artist: fallbackArtist,
+          releases: fallbackReleases,
+          timestamp: Date.now(),
+          cacheVersion: 2,
+          source: fallbackResult.source
+        };
+        console.log(`💾 Cached fallback artist data (${fallbackResult.source}) for:`, artistName);
+
+        if (thisFetchId !== artistFetchId.current) return;
+
+        // Some fallback sources provide album art inline
+        const releasesWithCache = fallbackReleases.map(release => ({
+          ...release,
+          albumArt: release.albumArt !== undefined ? release.albumArt
+            : (albumArtCache.current[release.id]?.url !== undefined
+              ? albumArtCache.current[release.id]?.url
+              : undefined)
+        }));
+
+        setArtistReleases(releasesWithCache);
+        setSmartReleaseTypeFilter(releasesWithCache);
         setLoadingArtist(false);
+
+        // Queue album art fetches for releases without art
+        const releasesNeedingArt = fallbackReleases.filter(r =>
+          !r.albumArt && !albumArtCache.current[r.id]
+        );
+        albumArtFetchId.current++;
+        isAlbumArtFetching.current = false;
+        albumArtQueue.current = releasesNeedingArt;
+        visibleAlbumIds.current.clear();
+        processAlbumArtQueue();
         return;
       }
       
