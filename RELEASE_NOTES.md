@@ -25,7 +25,7 @@ A brand-new Concerts page aggregates upcoming shows from multiple ticketing serv
 - **AI concert disclaimer** — when AI-sourced concert results are present, a disclaimer badge flags them as potentially hallucinated
 - **Location-aware filtering** — IP-based geolocation with multiple fallback services, plus a location autocomplete search dialog with configurable radius (miles)
 - **On Tour indicator** — a purple dot next to the now-playing artist links directly to the On Tour tab when nearby concerts exist; hovering shows a tooltip
-- **Artist page On Tour tab** — artist detail pages show an "On Tour" tab with that artist's upcoming concerts, with ticket links and loading skeletons
+- **Artist page On Tour tab** — artist detail pages show an "On Tour" tab with that artist's upcoming concerts, with ticket links and loading skeletons; the tab animates in smoothly via max-width/opacity transitions
 - **Concert row design** — large artist images, 3-column layout (date, image, venue/reason), ticket buttons with flyout menus linking to each service
 - **Lineup and opener matching** — concerts are matched against your library by headliner, opener, and lineup members; tribute/cover band false positives are filtered out
 - **Persistent cache** — concert results are cached for 24 hours and survive app restarts; `cache_concerts` added to the store key whitelist
@@ -36,6 +36,7 @@ A brand-new Concerts page aggregates upcoming shows from multiple ticketing serv
 - **Shuffled artist sources** — collection, library, and history artists are shuffled and interleaved in round-robin so every refresh discovers releases from different artists
 - **Full re-scan after 24 hours** — when the last full scan is over 24 hours old, a complete re-scan runs instead of an incremental check
 - **Fixed duplicate releases** — Fresh Drops no longer shows the same releases repeatedly
+- **Pill-style filter buttons** — replaced the filter dropdown with pill-style buttons; EP (purple), Single (pink), and Album (blue) colors are consistent between filter pills, text badges, and overlay badges
 
 ## Performance
 
@@ -45,8 +46,12 @@ A brand-new Concerts page aggregates upcoming shows from multiple ticketing serv
 ## UI & UX Polish
 
 - **Search tab** — font size and icon size now match other sidebar tabs; subtle active-state indicator added
-- **Filter pills** — consistent focus styling, rounded corners on focus-visible rings, standardized chip sizing across concerts and other filter bars
+- **Filter pills** — consistent focus styling, rounded corners on focus-visible rings, standardized chip sizing across concerts and other filter bars; focus-within highlight on pill containers
 - **Artist cards** — collection and search artist cards now match album card styling with visible borders at rest and theme-aware colors
+- **Sticky album/playlist columns** — left column (art, metadata) stays fixed while the track list scrolls independently
+- **Sidebar friends** — fixed layout shift when friends go on-air/off-air by using fixed-height entries
+- **Biography panel** — responsive width (25%) instead of fixed pixel widths
+- **Artist header tabs** — stronger text shadow for better contrast on bright album art backgrounds
 - **Sidebar tab colors** — brightened teal accent; highlight colors match page headers; fixed hover overflow and spin direction
 - **Tooltip contrast** — dark mode tooltips use a lighter background for better readability; player bar tooltips stay dark in both modes
 - **Playlist share button** — increased spacing above the Share button on playlist view
@@ -57,6 +62,10 @@ A brand-new Concerts page aggregates upcoming shows from multiple ticketing serv
 ## Spotify API Resilience
 
 - **Retry on 502/503/504** — both `spotifyRequest` and `spotifyFetch` now retry transient server errors with exponential backoff (up to 30 seconds between retries), instead of failing immediately
+
+## Artist Lookup Fallback
+
+- **Multi-source fallback** — when MusicBrainz returns no results for an artist, enabled resolvers (Spotify, Apple Music/MusicKit, Last.fm, Discogs) are tried in sequence as fallback sources for artist data and albums
 
 ## Plugin Marketplace
 
@@ -82,6 +91,9 @@ A brand-new Concerts page aggregates upcoming shows from multiple ticketing serv
 - Fixed dark mode styling inconsistencies across filter bars and modals
 - Fixed concert false positives from tribute and cover bands leaking through the location filter
 - Fixed concert refresh not clearing stale cache properly
+- Fixed friend activity music note invisible in dark mode (was using `--border-default`)
+- Fixed modal button/icon colors washed out in dark mode (switched to vivid purple)
+- Fixed album breadcrumb not respecting dark mode
 
 ---
 
