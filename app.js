@@ -44148,7 +44148,7 @@ useEffect(() => {
                       setConcertsGeocodingLoading(false);
                     },
                     disabled: concertsGeocodingLoading,
-                    className: `p-1.5 rounded-lg transition-colors flex-shrink-0 ${isDark ? 'text-gray-400 hover:text-teal-400 hover:bg-gray-700' : 'text-gray-400 hover:text-teal-500 hover:bg-gray-100'}`,
+                    className: `p-2 rounded-lg transition-colors flex-shrink-0 border ${isDark ? 'text-gray-300 bg-gray-700 border-gray-600 hover:text-teal-400 hover:border-teal-500' : 'text-gray-500 bg-gray-50 border-gray-200 hover:text-teal-500 hover:border-teal-400'}`,
                     title: 'Use my location'
                   },
                     concertsGeocodingLoading
