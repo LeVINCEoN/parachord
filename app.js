@@ -30014,8 +30014,8 @@ Variety guidance: ${theme} Be creative and surprising — avoid defaulting to th
       // required data (e.g. after an app relaunch where only the last page
       // was fully restored), fall back to a safe parent view.
       if (previousView === 'artist' && !currentArtist) {
-        previousView = 'library';
-        newHistory[newHistory.length - 1] = 'library';
+        previousView = 'home';
+        newHistory[newHistory.length - 1] = 'home';
       } else if (previousView === 'playlist-view' && !selectedPlaylist) {
         previousView = 'playlists';
         newHistory[newHistory.length - 1] = 'playlists';
