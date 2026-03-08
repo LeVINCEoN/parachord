@@ -54044,16 +54044,16 @@ useEffect(() => {
                   style: {
                     width: '32px',
                     height: '32px',
-                    borderRadius: '8px',
-                    background: 'linear-gradient(135deg, #4285f4 0%, #34a853 50%, #fbbc05 75%, #ea4335 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
                     flexShrink: 0
                   }
                 },
-                  React.createElement('svg', { width: '18', height: '18', viewBox: '0 0 24 24', fill: 'white' },
-                    React.createElement('path', { d: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z' })
+                  // Chrome logo - geometric 3-segment circle with blue center
+                  React.createElement('svg', { width: '32', height: '32', viewBox: '0 0 48 48' },
+                    React.createElement('path', { d: 'M24,24 L24,4 A20,20,0,0,1,41.32,34 Z', fill: '#EA4335' }),
+                    React.createElement('path', { d: 'M24,24 L41.32,34 A20,20,0,0,1,6.68,34 Z', fill: '#FBBC04' }),
+                    React.createElement('path', { d: 'M24,24 L6.68,34 A20,20,0,0,1,24,4 Z', fill: '#34A853' }),
+                    React.createElement('circle', { cx: '24', cy: '24', r: '11', fill: 'white' }),
+                    React.createElement('circle', { cx: '24', cy: '24', r: '8', fill: '#4285F4' })
                   )
                 ),
                 React.createElement('div', null,
@@ -54089,16 +54089,27 @@ useEffect(() => {
                   style: {
                     width: '32px',
                     height: '32px',
-                    borderRadius: '8px',
-                    background: 'linear-gradient(135deg, #FF9500 0%, #E66000 100%)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
                     flexShrink: 0
                   }
                 },
-                  React.createElement('svg', { width: '18', height: '18', viewBox: '0 0 24 24', fill: 'white' },
-                    React.createElement('path', { d: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z' })
+                  // Firefox logo - globe with flame
+                  React.createElement('svg', { width: '32', height: '32', viewBox: '0 0 48 48' },
+                    React.createElement('defs', null,
+                      React.createElement('linearGradient', { id: 'firefox-flame', x1: '0', y1: '0', x2: '1', y2: '1' },
+                        React.createElement('stop', { offset: '0', stopColor: '#FFBD4F' }),
+                        React.createElement('stop', { offset: '0.5', stopColor: '#FF980E' }),
+                        React.createElement('stop', { offset: '1', stopColor: '#FF3750' })
+                      ),
+                      React.createElement('radialGradient', { id: 'firefox-globe', cx: '0.3', cy: '0.3', r: '0.7' },
+                        React.createElement('stop', { offset: '0', stopColor: '#9059FF' }),
+                        React.createElement('stop', { offset: '1', stopColor: '#312A65' })
+                      )
+                    ),
+                    React.createElement('circle', { cx: '24', cy: '24', r: '20', fill: 'url(#firefox-globe)' }),
+                    React.createElement('path', {
+                      d: 'M42,16 C39,8 32,4 26,4 C29,8 30,12 28,16 C26,11 22,9 19,10 C22,13 23,18 20,23 C17,17 13,15 10,17 C13,20 14,26 17,32 C20,38 28,43 35,40 C42,37 45,30 44,24 C44,21 43,18 42,16Z',
+                      fill: 'url(#firefox-flame)'
+                    })
                   )
                 ),
                 React.createElement('div', null,
