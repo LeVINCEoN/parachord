@@ -461,6 +461,30 @@
         "events",
         "festivals"
       ]
+    },
+    {
+      "id": "ticketmaster",
+      "name": "Ticketmaster",
+      "type": "meta-service",
+      "version": "1.0.0",
+      "author": "Parachord Team",
+      "description": "Find concerts and live events via the Ticketmaster Discovery API.",
+      "icon": "🎟️",
+      "color": "#026CDF",
+      "homepage": "https://www.ticketmaster.com",
+      "capabilities": {
+        "concerts": true
+      },
+      "requiresAuth": true,
+      "downloadUrl": "https://raw.githubusercontent.com/Parachord/parachord-plugins/main/ticketmaster.axe",
+      "category": "concerts",
+      "tags": [
+        "concerts",
+        "tickets",
+        "live-music",
+        "events",
+        "tours"
+      ]
     }
   ],
   "categories": [
