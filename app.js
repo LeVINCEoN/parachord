@@ -44319,7 +44319,7 @@ useEffect(() => {
               }, 'No Concert Services Configured'),
               React.createElement('p', {
                 className: 'text-sm text-gray-500 text-center max-w-md mb-4'
-              }, 'Enable a concert service plugin (Bandsintown, Songkick, or SeatGeek) in Settings to see upcoming shows for artists you love.'),
+              }, 'Enable a concert service plugin (Bandsintown, Songkick, SeatGeek, or Ticketmaster) in Settings to see upcoming shows for artists you love.'),
               React.createElement('button', {
                 onClick: () => { navigateTo('settings'); },
                 className: 'px-4 py-2 bg-teal-500 text-white rounded-lg text-sm hover:bg-teal-600 transition-colors'
