@@ -44143,10 +44143,8 @@ useEffect(() => {
                       setConcertsLocationSuggestions([]);
                       try {
                         const pos = await getBrowserGeolocation();
-                        console.log('📍 GeoIP coords:', pos.lat, pos.lng);
                         setConcertsLocationCoords({ lat: pos.lat, lng: pos.lng });
                         const name = await reverseGeocode(pos.lat, pos.lng);
-                        console.log('📍 GeoIP resolved name:', name);
                         setConcertsLocation(name);
                       } catch (err) {
                         console.log('📍 Geolocation error:', err.message);
@@ -44395,12 +44393,7 @@ useEffect(() => {
                   const vLng = event.venue?.longitude;
                   if (vLat != null && vLng != null) {
                     const dist = haversineDistance(concertsLocationCoords.lat, concertsLocationCoords.lng, vLat, vLng);
-                    if (dist > concertsLocationRadius) {
-                      return false;
-                    } else {
-                      // DEBUG: log events passing haversine within radius
-                      if (dist > 30) console.log(`🎯 PASS haversine: "${event.artist}" at ${event.venue?.city}, ${event.venue?.region} — dist=${dist.toFixed(1)}mi, vCoords=(${vLat},${vLng}), userCoords=(${concertsLocationCoords.lat},${concertsLocationCoords.lng})`);
-                    }
+                    if (dist > concertsLocationRadius) return false;
                   } else {
                     // No venue coordinates — match on city portion of location only
                     const locCity = locationLower.split(',')[0].trim();
@@ -44409,7 +44402,6 @@ useEffect(() => {
                     const matchesCity = city && locCity.includes(city);
                     const matchesRegion = region && locCity.includes(region);
                     if (!matchesCity && !matchesRegion) return false;
-                    console.log(`🎯 PASS text fallback (no venue coords): "${event.artist}" at ${event.venue?.city}, ${event.venue?.region} — locCity="${locCity}", matchCity=${matchesCity}, matchRegion=${matchesRegion}`);
                   }
                 } else if (locationLower) {
                   // No geocoded coords — use city portion of text for matching
@@ -44431,6 +44423,16 @@ useEffect(() => {
                 }
                 return true;
               });
+
+              // DEBUG: log all filtered events once per render
+              if (concertsLocationCoords && filtered.length > 0) {
+                const summary = filtered.map(e => {
+                  const vLat = e.venue?.latitude, vLng = e.venue?.longitude;
+                  const dist = (vLat != null && vLng != null) ? haversineDistance(concertsLocationCoords.lat, concertsLocationCoords.lng, vLat, vLng).toFixed(1) : 'no-coords';
+                  return `${e.artist} @ ${e.venue?.city},${e.venue?.region} [${dist}mi] src=${e.source}`;
+                });
+                console.log(`🎯 FILTERED ${filtered.length}/${concerts.length} events:`, summary);
+              }
 
               // Group events by month
               const grouped = {};
