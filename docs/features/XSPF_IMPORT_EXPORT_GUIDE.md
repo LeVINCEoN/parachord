@@ -2,7 +2,7 @@
 
 ## ✅ What's Implemented
 
-Harmonix now has **full XSPF playlist support**:
+Parachord now has **full XSPF playlist support**:
 
 1. **Auto-load** playlists from `playlists/` folder
 2. **Import** external .xspf files
@@ -14,7 +14,7 @@ Harmonix now has **full XSPF playlist support**:
 ## 📁 Directory Structure
 
 ```
-harmonix-desktop/
+parachord/
 ├── app.js
 ├── main.js
 ├── preload.js
@@ -34,7 +34,7 @@ harmonix-desktop/
 
 1. **Create a file** in `playlists/` folder:
    ```
-   harmonix-desktop/playlists/my-mix.xspf
+   parachord/playlists/my-mix.xspf
    ```
 
 2. **Add XSPF content:**
@@ -170,28 +170,28 @@ playlists/
 ### 2. Share with Friends
 ```bash
 # Export playlist
-harmonix → Playlists → Open playlist → Export
+parachord → Playlists → Open playlist → Export
 
 # Share the .xspf file
 Send workout-energy.xspf to friend
 
 # Friend imports
-harmonix → Playlists → Import Playlist → Select file
+parachord → Playlists → Import Playlist → Select file
 ```
 
 ### 3. Backup Playlists
 ```bash
 # Copy entire folder
-cp -r harmonix-desktop/playlists ~/Backups/
+cp -r parachord/playlists ~/Backups/
 
 # Restore later
-cp -r ~/Backups/playlists harmonix-desktop/
+cp -r ~/Backups/playlists parachord/
 ```
 
 ### 4. Version Control
 ```bash
 # Track playlists in git
-cd harmonix-desktop
+cd parachord
 git add playlists/*.xspf
 git commit -m "Updated playlists"
 ```
@@ -405,7 +405,7 @@ Special characters (é, ñ, 中) work correctly.
 ### Playlist Not Appearing
 
 **Check:**
-1. File is in `harmonix-desktop/playlists/`
+1. File is in `parachord/playlists/`
 2. File ends with `.xspf`
 3. XML is valid (open in browser to test)
 4. App was restarted after adding file
@@ -479,7 +479,7 @@ Many tools can convert to XSPF:
 
 ```bash
 # Use Dropbox/iCloud/Google Drive
-ln -s ~/Dropbox/harmonix-playlists harmonix-desktop/playlists
+ln -s ~/Dropbox/parachord-playlists parachord/playlists
 
 # Now playlists sync automatically!
 ```
@@ -488,7 +488,7 @@ ln -s ~/Dropbox/harmonix-playlists harmonix-desktop/playlists
 
 ## 📊 Comparison with Other Formats
 
-| Format | Harmonix Support | Notes |
+| Format | Parachord Support | Notes |
 |--------|------------------|-------|
 | **XSPF** | ✅ Full support | Open standard, recommended |
 | **M3U** | ❌ Not supported | URL-based, not metadata |

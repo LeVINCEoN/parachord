@@ -1,8 +1,8 @@
-# Harmonix Resolver Plugin Format (.axe)
+# Parachord Resolver Plugin Format (.axe)
 
 ## File Format Specification
 
-A `.axe` (Harmonix Resolver Extension) file is a JSON file containing resolver metadata and JavaScript implementation.
+A `.axe` (Parachord Resolver Extension) file is a JSON file containing resolver metadata and JavaScript implementation.
 
 ## Structure
 
@@ -12,12 +12,12 @@ A `.axe` (Harmonix Resolver Extension) file is a JSON file containing resolver m
     "id": "spotify",
     "name": "Spotify",
     "version": "1.0.0",
-    "author": "Harmonix Team",
+    "author": "Parachord Team",
     "description": "Stream from Spotify via Spotify Connect",
     "icon": "♫",
     "color": "#1DB954",
     "homepage": "https://spotify.com",
-    "email": "support@harmonix.app"
+    "email": "support@parachord.app"
   },
   
   "capabilities": {
@@ -174,7 +174,7 @@ async function cleanup() {
 
 ## Loading .axe Files
 
-Harmonix loads .axe files from:
+Parachord loads .axe files from:
 1. `/resolvers/builtin/` - Built-in resolvers
 2. `/resolvers/user/` - User-installed resolvers
 

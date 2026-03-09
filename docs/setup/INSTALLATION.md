@@ -8,7 +8,7 @@ npm install dotenv --save
 
 ## 2. Copy Files to Your Project
 
-Copy these files to your Harmonix project root:
+Copy these files to your Parachord project root:
 - `.env` - Your actual credentials (don't commit!)
 - `.env.example` - Template for other developers
 - `.gitignore` - Protects sensitive files
