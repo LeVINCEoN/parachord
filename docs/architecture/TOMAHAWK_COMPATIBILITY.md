@@ -46,7 +46,7 @@ If the Tomahawk resolver still exists and the service API hasn't changed:
 // Tomahawk: Search logic
 var url = 'https://api.example.com/search?q=' + encodeURIComponent(query);
 
-// Harmonix: Same logic!
+// Parachord: Same logic!
 const url = 'https://api.example.com/search?q=' + encodeURIComponent(query);
 ```
 
@@ -59,7 +59,7 @@ var results = data.tracks.map(function(track) {
   };
 });
 
-// Harmonix: Same logic!
+// Parachord: Same logic!
 const results = data.tracks.map(track => ({
   artist: track.artist,
   title: track.title
@@ -86,7 +86,7 @@ var SpotifyResolver = Tomahawk.extend(TomahawkResolver, {
 Tomahawk.resolver.instance = SpotifyResolver;
 ```
 
-**Harmonix .axe:**
+**Parachord .axe:**
 ```json
 {
   "manifest": {
@@ -106,7 +106,7 @@ Tomahawk.resolver.instance = SpotifyResolver;
 
 ### ⚠️ API Calls
 
-| Tomahawk API | Harmonix Equivalent |
+| Tomahawk API | Parachord Equivalent |
 |--------------|---------------------|
 | `Tomahawk.asyncRequest(url, callback)` | `await fetch(url)` |
 | `Tomahawk.addTrackResults(results)` | `return results` |
@@ -122,7 +122,7 @@ resolve: function(qid, artist, album, title) { ... }
 search: function(qid, searchString) { ... }
 ```
 
-**Harmonix:**
+**Parachord:**
 ```javascript
 resolve: async function(artist, track, album, config) { ... }
 search: async function(query, config) { ... }
@@ -141,7 +141,7 @@ search: async function(query, config) { ... }
 }
 ```
 
-**Harmonix:**
+**Parachord:**
 ```javascript
 {
   id: "spotify-123",
@@ -169,7 +169,7 @@ resolve: function(qid, artist, album, title) {
 }
 ```
 
-**Harmonix (New):**
+**Parachord (New):**
 ```javascript
 resolve: async function(artist, track, album, config) {
     const url = API_URL + '?q=' + artist + ' ' + track;
@@ -350,4 +350,4 @@ The **core logic is compatible** - it's just a matter of:
 2. Updating API calls
 3. Testing
 
-So yes, in theory (and practice), old Tomahawk resolvers can be ported to Harmonix! 🎸
+So yes, in theory (and practice), old Tomahawk resolvers can be ported to Parachord! 🎸

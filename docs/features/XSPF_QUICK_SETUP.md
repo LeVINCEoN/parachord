@@ -4,7 +4,7 @@
 
 ### Step 1: Create the Playlists Folder
 ```bash
-cd harmonix-desktop
+cd parachord
 mkdir playlists
 ```
 
@@ -78,10 +78,10 @@ If you edited `quarantine-angst-mix.xspf` with real song titles:
 
 ```bash
 # 1. Place it in playlists folder
-cp quarantine-angst-mix.xspf harmonix-desktop/playlists/
+cp quarantine-angst-mix.xspf parachord/playlists/
 
 # 2. Restart app
-cd harmonix-desktop
+cd parachord
 npm start
 
 # 3. It will load automatically with your real songs!
@@ -115,7 +115,7 @@ npm start
 
 Your edited XSPF file with real song titles will now load properly. Just:
 
-1. Copy it to `harmonix-desktop/playlists/`
+1. Copy it to `parachord/playlists/`
 2. Restart the app
 3. Click the playlist
 4. Watch it resolve your real songs!

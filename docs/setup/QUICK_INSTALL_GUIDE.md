@@ -35,17 +35,17 @@ Your new resolver is now active! 🎉
 
 ## Example Resolvers to Install
 
-### YouTube Resolver (Future)
+### YouTube Resolver
 - Search YouTube for music videos
 - Stream directly in app
 - Access official music videos
 
-### SoundCloud Resolver (Future)
+### SoundCloud Resolver
 - Browse SoundCloud tracks
 - Stream independent artists
 - Discover new music
 
-### Tidal Resolver (Future)
+### Tidal Resolver (Planned)
 - High-fidelity audio streaming
 - Exclusive content
 - Hi-Res audio support
