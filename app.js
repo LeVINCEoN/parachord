@@ -12195,33 +12195,6 @@ ${trackListXml}
     }
   }, [addTrackToCollection, addAlbumToCollection, addArtistToCollection, addTracksToCollection]);
 
-  // Handle drop on playlists sidebar / playlists tab — import playlist from URL
-  const handlePlaylistDrop = useCallback(async (e) => {
-    e.preventDefault();
-    setPlaylistDropHighlight(false);
-
-    const url = extractUrlFromDrop(e.dataTransfer);
-    if (!url) return;
-
-    // Check if this is a playlist URL (Spotify, Apple Music, hosted XSPF)
-    const resolverId = resolverLoaderRef.current?.findResolverForUrl(url);
-    const urlType = resolverId ? resolverLoaderRef.current.getUrlType(url) : 'unknown';
-
-    // Accept playlist URLs from resolvers, or any URL that could be a hosted XSPF
-    if ((resolverId && urlType === 'playlist') || (!resolverId && isValidUrl(url))) {
-      try {
-        const result = await handleImportPlaylistFromUrl(url);
-        if (result?.updated) {
-          showToast(`Updated playlist: ${result.playlist?.title || 'Untitled'}`);
-        } else if (result?.playlist) {
-          showToast(`Imported playlist: ${result.playlist?.title || 'Untitled'}`);
-          navigateTo('playlists');
-        }
-      } catch (err) {
-        showToast(`Import failed: ${err.message}`, 'error');
-      }
-    }
-  }, [handleImportPlaylistFromUrl, showToast, navigateTo]);
 
   // Re-resolve tracks when resolver settings change (enabled/priority)
   // Note: the in-memory cache (trackSourcesCache) and UI state (trackSources) are NOT
@@ -30571,6 +30544,34 @@ Variety guidance: ${theme} Be creative and surprising — avoid defaulting to th
     } catch (error) {
       console.error('URL import error:', error);
       throw error;
+    }
+  };
+
+  // Handle drop on playlists sidebar / playlists tab — import playlist from URL
+  const handlePlaylistDrop = async (e) => {
+    e.preventDefault();
+    setPlaylistDropHighlight(false);
+
+    const url = extractUrlFromDrop(e.dataTransfer);
+    if (!url) return;
+
+    // Check if this is a playlist URL (Spotify, Apple Music, hosted XSPF)
+    const resolverId = resolverLoaderRef.current?.findResolverForUrl(url);
+    const urlType = resolverId ? resolverLoaderRef.current.getUrlType(url) : 'unknown';
+
+    // Accept playlist URLs from resolvers, or any URL that could be a hosted XSPF
+    if ((resolverId && urlType === 'playlist') || (!resolverId && isValidUrl(url))) {
+      try {
+        const result = await handleImportPlaylistFromUrl(url);
+        if (result?.updated) {
+          showToast(`Updated playlist: ${result.playlist?.title || 'Untitled'}`);
+        } else if (result?.playlist) {
+          showToast(`Imported playlist: ${result.playlist?.title || 'Untitled'}`);
+          navigateTo('playlists');
+        }
+      } catch (err) {
+        showToast(`Import failed: ${err.message}`, 'error');
+      }
     }
   };
 
