@@ -37580,10 +37580,13 @@ useEffect(() => {
                     navigateTo('playlists');
                   }
                 },
-                className: 'text-gray-400 hover:text-gray-600 transition-colors uppercase'
+                className: 'transition-colors uppercase',
+                style: { color: 'var(--text-tertiary)' },
+                onMouseEnter: (e) => { e.currentTarget.style.color = 'var(--text-secondary)'; },
+                onMouseLeave: (e) => { e.currentTarget.style.color = 'var(--text-tertiary)'; }
               }, selectedPlaylist?.isEphemeral ? 'HOME' : 'Playlists'),
-              React.createElement('span', { className: 'text-gray-300' }, '/'),
-              React.createElement('span', { className: 'text-gray-600 uppercase' },
+              React.createElement('span', { style: { color: 'var(--text-tertiary)' } }, '/'),
+              React.createElement('span', { className: 'uppercase', style: { color: 'var(--text-secondary)' } },
                 playlistEditMode ? 'Editing' : (selectedPlaylist?.weekLabel || selectedPlaylist.title || 'Playlist Details')
               )
             ),
@@ -37623,7 +37626,10 @@ useEffect(() => {
                     setPlaylistEditMode(false);
                     setEditedPlaylistData(null);
                   },
-                  className: 'flex items-center gap-1 px-3 py-1 text-xs text-gray-500 hover:text-gray-700 border border-gray-300 rounded hover:bg-gray-50 transition-colors no-drag'
+                  className: 'flex items-center gap-1 px-3 py-1 text-xs rounded transition-colors no-drag',
+                  style: { color: 'var(--text-tertiary)', border: '1px solid var(--border-default)' },
+                  onMouseEnter: (e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.backgroundColor = 'var(--hover-bg-default)'; },
+                  onMouseLeave: (e) => { e.currentTarget.style.color = 'var(--text-tertiary)'; e.currentTarget.style.backgroundColor = 'transparent'; }
                 }, 'CANCEL'),
                 // Done button
                 React.createElement('button', {
@@ -37646,7 +37652,10 @@ useEffect(() => {
                     setPlaylistEditMode(false);
                     setEditedPlaylistData(null);
                   },
-                  className: 'flex items-center gap-1 px-3 py-1 text-xs text-white bg-fuchsia-600 hover:bg-fuchsia-700 rounded transition-colors no-drag'
+                  className: 'flex items-center gap-1 px-3 py-1 text-xs text-white rounded transition-colors no-drag',
+                  style: { backgroundColor: '#7c3aed' },
+                  onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = '#6d28d9'; },
+                  onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = '#7c3aed'; }
                 }, 'DONE')
               ) : React.createElement('button', {
                 onClick: () => {
@@ -37657,7 +37666,10 @@ useEffect(() => {
                     tracks: [...playlistTracks]
                   });
                 },
-                className: 'flex items-center gap-1 px-3 py-1 text-xs text-gray-500 hover:text-gray-700 border border-gray-300 rounded hover:bg-gray-50 transition-colors no-drag'
+                className: 'flex items-center gap-1 px-3 py-1 text-xs rounded transition-colors no-drag',
+                style: { color: 'var(--text-tertiary)', border: '1px solid var(--border-default)' },
+                onMouseEnter: (e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.backgroundColor = 'var(--hover-bg-default)'; },
+                onMouseLeave: (e) => { e.currentTarget.style.color = 'var(--text-tertiary)'; e.currentTarget.style.backgroundColor = 'transparent'; }
               }, 'EDIT')),
               // Close button (hidden in edit mode since Cancel serves that purpose)
               !playlistEditMode && React.createElement('button', {
@@ -37672,10 +37684,13 @@ useEffect(() => {
                     navigateTo('playlists');
                   }
                 },
-                className: 'flex items-center gap-1 px-3 py-1 text-xs text-gray-500 hover:text-gray-700 border border-gray-300 rounded hover:bg-gray-50 transition-colors no-drag'
+                className: 'flex items-center gap-1 px-3 py-1 text-xs rounded transition-colors no-drag',
+                style: { color: 'var(--text-tertiary)', border: '1px solid var(--border-default)' },
+                onMouseEnter: (e) => { e.currentTarget.style.color = 'var(--text-secondary)'; e.currentTarget.style.backgroundColor = 'var(--hover-bg-default)'; },
+                onMouseLeave: (e) => { e.currentTarget.style.color = 'var(--text-tertiary)'; e.currentTarget.style.backgroundColor = 'transparent'; }
               },
                 'CLOSE',
-                React.createElement('span', { className: 'text-gray-400' }, '×')
+                React.createElement('span', { style: { color: 'var(--text-tertiary)' } }, '×')
               )
             )
           ),
@@ -38082,11 +38097,15 @@ useEffect(() => {
                       type: 'text',
                       value: editedPlaylistData.creator,
                       onChange: (e) => setEditedPlaylistData(prev => ({ ...prev, creator: e.target.value })),
-                      className: 'text-sm text-gray-500 bg-white border border-gray-300 rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent',
+                      className: 'text-sm rounded px-2 py-1 w-full focus:outline-none',
+                      style: { backgroundColor: 'var(--bg-inset)', color: 'var(--text-secondary)', border: '1px solid var(--border-default)' },
+                      onFocus: (e) => { e.currentTarget.style.borderColor = '#7c3aed'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(124, 58, 237, 0.15)'; },
+                      onBlur: (e) => { e.currentTarget.style.borderColor = 'var(--border-default)'; e.currentTarget.style.boxShadow = 'none'; },
                       placeholder: 'Creator name'
                     })
                   : React.createElement('p', {
-                      className: 'text-sm text-gray-500'
+                      className: 'text-sm',
+                      style: { color: 'var(--text-tertiary)' }
                     }, `Created by ${selectedPlaylist.creator || 'Unknown'}`),
                 // Source info display
                 (() => {
@@ -38112,7 +38131,8 @@ useEffect(() => {
                   // For sources with URLs, make them clickable
                   if (sourceUrl) {
                     return React.createElement('p', {
-                      className: 'text-xs text-gray-400'
+                      className: 'text-xs',
+                      style: { color: 'var(--text-tertiary)' }
                     },
                       'Source: ',
                       React.createElement('a', {
@@ -38121,14 +38141,16 @@ useEffect(() => {
                           e.preventDefault();
                           window.electron?.shell?.openExternal(sourceUrl);
                         },
-                        className: 'text-blue-500 hover:text-blue-600 hover:underline cursor-pointer',
+                        className: 'hover:underline cursor-pointer',
+                        style: { color: 'var(--accent-primary)' },
                         title: sourceUrl
                       }, sourceLabel)
                     );
                   }
 
                   return React.createElement('p', {
-                    className: 'text-xs text-gray-400'
+                    className: 'text-xs',
+                    style: { color: 'var(--text-tertiary)' }
                   }, `Source: ${sourceLabel}`);
                 })(),
                 // Edit mode: Title input
@@ -38136,16 +38158,21 @@ useEffect(() => {
                   type: 'text',
                   value: editedPlaylistData.title,
                   onChange: (e) => setEditedPlaylistData(prev => ({ ...prev, title: e.target.value })),
-                  className: 'font-bold text-gray-900 text-sm leading-tight bg-white border border-gray-300 rounded px-2 py-1 w-full focus:outline-none focus:ring-2 focus:ring-fuchsia-500 focus:border-transparent',
+                  className: 'font-bold text-sm leading-tight rounded px-2 py-1 w-full focus:outline-none',
+                  style: { backgroundColor: 'var(--bg-inset)', color: 'var(--text-primary)', border: '1px solid var(--border-default)' },
+                  onFocus: (e) => { e.currentTarget.style.borderColor = '#7c3aed'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(124, 58, 237, 0.15)'; },
+                  onBlur: (e) => { e.currentTarget.style.borderColor = 'var(--border-default)'; e.currentTarget.style.boxShadow = 'none'; },
                   placeholder: 'Playlist name'
                 }),
                 // Created date
                 selectedPlaylist.createdAt && React.createElement('p', {
-                  className: 'text-xs text-gray-400'
+                  className: 'text-xs',
+                  style: { color: 'var(--text-tertiary)' }
                 }, `Created: ${new Date(selectedPlaylist.createdAt).toLocaleDateString()}`),
                 // Last modified date
                 selectedPlaylist.lastModified && React.createElement('p', {
-                  className: 'text-xs text-gray-400'
+                  className: 'text-xs',
+                  style: { color: 'var(--text-tertiary)' }
                 }, `Modified: ${new Date(selectedPlaylist.lastModified).toLocaleDateString()}`),
                 // Delete Playlist button (only in edit mode)
                 playlistEditMode && React.createElement('button', {
@@ -38173,7 +38200,10 @@ useEffect(() => {
                       }
                     }
                   },
-                  className: 'mt-2 flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:text-red-700 border border-red-300 rounded hover:bg-red-50 transition-colors no-drag w-full justify-center'
+                  className: 'mt-2 flex items-center gap-2 px-3 py-2 text-sm rounded transition-colors no-drag w-full justify-center',
+                  style: { color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)' },
+                  onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'; e.currentTarget.style.color = '#f87171'; },
+                  onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#ef4444'; }
                 }, 'Delete Playlist')
               ),
               // Share button (outside space-y-1 metadata div for independent spacing)
