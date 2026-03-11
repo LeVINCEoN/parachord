@@ -163,42 +163,28 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: node scripts/notarize-artifacts.js
 
-      - name: Rename Mac artifacts with friendly arch labels
+      # Rename Mac DMGs with friendly arch labels for human-facing download links.
+      # IMPORTANT: Only rename the DMG (the manual download artifact). Do NOT
+      # rename the .zip or .blockmap files, and do NOT touch the YAML manifests —
+      # electron-updater identifies arm64 builds by checking for "arm64" in the
+      # filename/URL, so renaming those breaks auto-update on Apple Silicon.
+      - name: Rename Mac DMG with friendly arch label
         if: matrix.platform == 'mac'
         shell: bash
         run: |
           cd dist
           label="${{ matrix.arch_label }}"
-          # Rename binary artifacts only (not the YAML manifests electron-updater needs)
-          for f in *.dmg *.zip *.blockmap; do
+          for f in *.dmg; do
             [ -e "$f" ] || continue
-            newname="$f"
             if [ "${{ matrix.arch }}" = "arm64" ]; then
-              newname=$(echo "$f" | sed "s/-arm64/-${label}/g")
+              newname=$(echo "$f" | sed "s/-arm64/-arm64-${label}/")
             elif [ "${{ matrix.arch }}" = "x64" ]; then
-              newname=$(echo "$f" | sed \
-                "s/\.dmg\.blockmap$/-${label}.dmg.blockmap/
-                 s/\.dmg$/-${label}.dmg/
-                 s/-mac\.zip$/-${label}-mac.zip/")
+              newname=$(echo "$f" | sed "s/\.dmg$/-${label}.dmg/")
             fi
-            if [ "$f" != "$newname" ]; then
+            if [ -n "$newname" ] && [ "$f" != "$newname" ]; then
               mv "$f" "$newname"
               echo "Renamed $f -> $newname"
             fi
-          done
-          # Update filenames inside the YAML manifests so electron-updater
-          # downloads the renamed artifacts instead of 404ing.
-          for yml in latest-mac*.yml; do
-            [ -e "$yml" ] || continue
-            if [ "${{ matrix.arch }}" = "arm64" ]; then
-              sed -i '' "s/-arm64/-${label}/g" "$yml"
-            elif [ "${{ matrix.arch }}" = "x64" ]; then
-              sed -i '' \
-                -e "s/\.dmg\.blockmap/-${label}.dmg.blockmap/g" \
-                -e "s/\.dmg/-${label}.dmg/g" \
-                -e "s/-mac\.zip/-${label}-mac.zip/g" "$yml"
-            fi
-            echo "Updated references in $yml"
           done
 
       - name: Upload artifacts
