@@ -48,10 +48,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
@@ -111,7 +111,7 @@ jobs:
 
       - name: Cache node_modules
         id: cache-node-modules
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: node_modules
           key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
@@ -123,7 +123,7 @@ jobs:
       # Cache electron-builder binary downloads (NSIS, winCodeSign, electron zip)
       # to avoid transient GitHub download failures during the build step.
       - name: Cache electron-builder binaries
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~\AppData\Local\electron-builder\Cache
@@ -191,14 +191,14 @@ jobs:
       # overwrite each other when downloaded with merge-multiple.
       - name: Upload YAML manifest
         if: hashFiles('dist/*.yml') != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: manifest-${{ matrix.platform }}-${{ matrix.arch }}
           path: dist/*.yml
           retention-days: 30
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: parachord-${{ matrix.platform }}-${{ matrix.arch }}-v${{ steps.pkg.outputs.version }}
           path: |
@@ -219,7 +219,7 @@ jobs:
 
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: parachord-*
           path: artifacts
@@ -228,7 +228,7 @@ jobs:
       # Download all YAML manifests into separate subdirectories so
       # per-arch files with the same name don't overwrite each other.
       - name: Download manifests
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: manifest-*
           path: manifests
@@ -267,7 +267,7 @@ jobs:
           fi
 
       - name: Create Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: artifacts/*
           draft: false
