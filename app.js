@@ -8928,6 +8928,104 @@ const Parachord = () => {
         } catch (err) {
           console.warn('[Sync] Local playlist auto-create failed after manual sync:', err.message);
         }
+
+        // Push locally-added collection items to this provider
+        try {
+          const collection = await window.electron.collection.load();
+          let collectionChanged = false;
+
+          // Push tracks with manual source that haven't been pushed to this provider
+          const unpushedTracks = (collection.tracks || []).filter(t =>
+            t.syncSources?.manual && !t.syncSources?.[providerId]
+          );
+
+          if (unpushedTracks.length > 0) {
+            const trackIds = unpushedTracks
+              .map(t => {
+                if (providerId === 'spotify') return t.spotifyId || t.sources?.spotify?.spotifyId;
+                if (providerId === 'applemusic') return t.appleMusicId || t.sources?.applemusic?.appleMusicId;
+                return null;
+              })
+              .filter(Boolean);
+
+            if (trackIds.length > 0) {
+              const saveResult = await window.electron.sync.saveTracks(providerId, trackIds);
+              if (saveResult.success) {
+                console.log(`[Sync] Pushed ${trackIds.length} local tracks to ${providerId}`);
+                for (const track of unpushedTracks) {
+                  const hasId = providerId === 'spotify'
+                    ? (track.spotifyId || track.sources?.spotify?.spotifyId)
+                    : (track.appleMusicId || track.sources?.applemusic?.appleMusicId);
+                  if (hasId) {
+                    track.syncSources = { ...track.syncSources, [providerId]: { addedAt: track.addedAt, syncedAt: Date.now() } };
+                    collectionChanged = true;
+                  }
+                }
+              }
+            }
+          }
+
+          // Push albums
+          const unpushedAlbums = (collection.albums || []).filter(a =>
+            a.syncSources?.manual && !a.syncSources?.[providerId]
+          );
+
+          if (unpushedAlbums.length > 0) {
+            const albumIds = unpushedAlbums
+              .map(a => {
+                if (providerId === 'spotify') return a.spotifyId || a.sources?.spotify?.spotifyId;
+                if (providerId === 'applemusic') return a.appleMusicId || a.sources?.applemusic?.appleMusicId;
+                return null;
+              })
+              .filter(Boolean);
+
+            if (albumIds.length > 0) {
+              const saveResult = await window.electron.sync.saveAlbums(providerId, albumIds);
+              if (saveResult.success) {
+                console.log(`[Sync] Pushed ${albumIds.length} local albums to ${providerId}`);
+                for (const album of unpushedAlbums) {
+                  const hasId = providerId === 'spotify'
+                    ? (album.spotifyId || album.sources?.spotify?.spotifyId)
+                    : (album.appleMusicId || album.sources?.applemusic?.appleMusicId);
+                  if (hasId) {
+                    album.syncSources = { ...album.syncSources, [providerId]: { addedAt: album.addedAt, syncedAt: Date.now() } };
+                    collectionChanged = true;
+                  }
+                }
+              }
+            }
+          }
+
+          // Push artists (Spotify only)
+          if (providerId === 'spotify') {
+            const unpushedArtists = (collection.artists || []).filter(a =>
+              a.syncSources?.manual && !a.syncSources?.spotify &&
+              (a.spotifyId || a.sources?.spotify?.spotifyId)
+            );
+            if (unpushedArtists.length > 0) {
+              const artistIds = unpushedArtists.map(a => a.spotifyId || a.sources?.spotify?.spotifyId).filter(Boolean);
+              if (artistIds.length > 0) {
+                const followResult = await window.electron.sync.followArtists('spotify', artistIds);
+                if (followResult.success) {
+                  console.log(`[Sync] Followed ${artistIds.length} local artists on Spotify`);
+                  for (const artist of unpushedArtists) {
+                    if (artist.spotifyId || artist.sources?.spotify?.spotifyId) {
+                      artist.syncSources = { ...artist.syncSources, spotify: { addedAt: artist.addedAt, syncedAt: Date.now() } };
+                      collectionChanged = true;
+                    }
+                  }
+                }
+              }
+            }
+          }
+
+          if (collectionChanged) {
+            await window.electron.collection.save(collection);
+            setCollectionData(collection);
+          }
+        } catch (err) {
+          console.warn(`[Sync] Collection push failed after manual sync:`, err.message);
+        }
       })();
     } else {
       setSyncSetupModal(prev => ({
