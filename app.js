@@ -44764,7 +44764,7 @@ useEffect(() => {
                                   src: artistImg.url,
                                   alt: event.artist,
                                   className: 'w-full h-full object-cover',
-                                  style: artistImg.facePosition ? { objectPosition: `${artistImg.facePosition.x}% ${artistImg.facePosition.y}%` } : undefined,
+                                  style: artistImg.facePosition ? { objectPosition: artistImg.facePosition } : undefined,
                                   loading: 'lazy'
                                 })
                               : React.createElement('div', {
