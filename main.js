@@ -5484,6 +5484,20 @@ ipcMain.handle('sync:push-playlist', async (event, providerId, playlistExternalI
     }
   });
 
+// Helper: get auth token for a sync provider
+function getSyncProviderToken(providerId) {
+  if (providerId === 'spotify') {
+    return store.get('spotify_token');
+  } else if (providerId === 'applemusic') {
+    const developerToken = generatedMusicKitToken || process.env.MUSICKIT_DEVELOPER_TOKEN || store.get('applemusic_developer_token');
+    const userToken = store.get('applemusic_user_token');
+    if (developerToken && userToken) {
+      return JSON.stringify({ developerToken, userToken });
+    }
+  }
+  return null;
+}
+
 // Push track changes to sync provider (add to Liked Songs)
 ipcMain.handle('sync:save-tracks', async (event, providerId, trackIds) => {
   const provider = SyncEngine.getProvider(providerId);
@@ -5495,17 +5509,37 @@ ipcMain.handle('sync:save-tracks', async (event, providerId, trackIds) => {
     return { success: false, error: 'Provider does not support saving tracks' };
   }
 
-  let token;
-  if (providerId === 'spotify') {
-    token = store.get('spotify_token');
-  }
-
+  const token = getSyncProviderToken(providerId);
   if (!token) {
     return { success: false, error: 'Not authenticated' };
   }
 
   try {
     const result = await provider.saveTracks(trackIds, token);
+    return { success: true, saved: result.saved };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Save albums to sync provider library
+ipcMain.handle('sync:save-albums', async (event, providerId, albumIds) => {
+  const provider = SyncEngine.getProvider(providerId);
+  if (!provider || !provider.capabilities.albums) {
+    return { success: false, error: 'Provider does not support album syncing' };
+  }
+
+  if (!provider.saveAlbums) {
+    return { success: false, error: 'Provider does not support saving albums' };
+  }
+
+  const token = getSyncProviderToken(providerId);
+  if (!token) {
+    return { success: false, error: 'Not authenticated' };
+  }
+
+  try {
+    const result = await provider.saveAlbums(albumIds, token);
     return { success: true, saved: result.saved };
   } catch (error) {
     return { success: false, error: error.message };
@@ -5523,11 +5557,7 @@ ipcMain.handle('sync:remove-tracks', async (event, providerId, trackIds) => {
     return { success: false, error: 'Provider does not support removing tracks' };
   }
 
-  let token;
-  if (providerId === 'spotify') {
-    token = store.get('spotify_token');
-  }
-
+  const token = getSyncProviderToken(providerId);
   if (!token) {
     return { success: false, error: 'Not authenticated' };
   }
@@ -5551,11 +5581,7 @@ ipcMain.handle('sync:remove-albums', async (event, providerId, albumIds) => {
     return { success: false, error: 'Provider does not support removing albums' };
   }
 
-  let token;
-  if (providerId === 'spotify') {
-    token = store.get('spotify_token');
-  }
-
+  const token = getSyncProviderToken(providerId);
   if (!token) {
     return { success: false, error: 'Not authenticated' };
   }
@@ -5579,11 +5605,7 @@ ipcMain.handle('sync:follow-artists', async (event, providerId, artistIds) => {
     return { success: false, error: 'Provider does not support following artists' };
   }
 
-  let token;
-  if (providerId === 'spotify') {
-    token = store.get('spotify_token');
-  }
-
+  const token = getSyncProviderToken(providerId);
   if (!token) {
     return { success: false, error: 'Not authenticated' };
   }
@@ -5607,11 +5629,7 @@ ipcMain.handle('sync:unfollow-artists', async (event, providerId, artistIds) => 
     return { success: false, error: 'Provider does not support unfollowing artists' };
   }
 
-  let token;
-  if (providerId === 'spotify') {
-    token = store.get('spotify_token');
-  }
-
+  const token = getSyncProviderToken(providerId);
   if (!token) {
     return { success: false, error: 'Not authenticated' };
   }

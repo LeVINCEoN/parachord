@@ -5557,6 +5557,124 @@ const Parachord = () => {
               } catch (err) {
                 console.warn(`[Sync] Local playlist sync failed for ${providerId}:`, err.message);
               }
+
+              // Push locally-added collection items to this provider
+              try {
+                const collection = await window.electron.collection.load();
+                let collectionChanged = false;
+
+                // Push tracks that have manual source but not this provider
+                const unpushedTracks = (collection.tracks || []).filter(t =>
+                  t.syncSources?.manual && !t.syncSources?.[providerId] &&
+                  (t.spotifyId || t.appleMusicId || t.sources?.spotify?.spotifyId || t.sources?.applemusic?.appleMusicId)
+                );
+
+                if (unpushedTracks.length > 0) {
+                  // Get provider-specific IDs
+                  if (providerId === 'spotify') {
+                    const spotifyIds = unpushedTracks
+                      .map(t => t.spotifyId || t.sources?.spotify?.spotifyId)
+                      .filter(Boolean);
+                    if (spotifyIds.length > 0) {
+                      const saveResult = await window.electron.sync.saveTracks('spotify', spotifyIds);
+                      if (saveResult.success) {
+                        console.log(`[Sync] Pushed ${spotifyIds.length} local tracks to Spotify`);
+                        // Update syncSources on pushed tracks
+                        for (const track of unpushedTracks) {
+                          if (track.spotifyId || track.sources?.spotify?.spotifyId) {
+                            track.syncSources = { ...track.syncSources, [providerId]: { addedAt: track.addedAt, syncedAt: Date.now() } };
+                            collectionChanged = true;
+                          }
+                        }
+                      }
+                    }
+                  } else if (providerId === 'applemusic') {
+                    const amIds = unpushedTracks
+                      .map(t => t.appleMusicId || t.sources?.applemusic?.appleMusicId)
+                      .filter(Boolean);
+                    if (amIds.length > 0) {
+                      const saveResult = await window.electron.sync.saveTracks('applemusic', amIds);
+                      if (saveResult.success) {
+                        console.log(`[Sync] Pushed ${amIds.length} local tracks to Apple Music`);
+                        for (const track of unpushedTracks) {
+                          if (track.appleMusicId || track.sources?.applemusic?.appleMusicId) {
+                            track.syncSources = { ...track.syncSources, [providerId]: { addedAt: track.addedAt, syncedAt: Date.now() } };
+                            collectionChanged = true;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+
+                // Push albums
+                const unpushedAlbums = (collection.albums || []).filter(a =>
+                  a.syncSources?.manual && !a.syncSources?.[providerId] &&
+                  (a.spotifyId || a.appleMusicId || a.sources?.spotify?.spotifyId || a.sources?.applemusic?.appleMusicId)
+                );
+
+                if (unpushedAlbums.length > 0) {
+                  if (providerId === 'spotify') {
+                    const spotifyIds = unpushedAlbums.map(a => a.spotifyId || a.sources?.spotify?.spotifyId).filter(Boolean);
+                    if (spotifyIds.length > 0) {
+                      const saveResult = await window.electron.sync.saveAlbums('spotify', spotifyIds);
+                      if (saveResult.success) {
+                        console.log(`[Sync] Pushed ${spotifyIds.length} local albums to Spotify`);
+                        for (const album of unpushedAlbums) {
+                          if (album.spotifyId || album.sources?.spotify?.spotifyId) {
+                            album.syncSources = { ...album.syncSources, [providerId]: { addedAt: album.addedAt, syncedAt: Date.now() } };
+                            collectionChanged = true;
+                          }
+                        }
+                      }
+                    }
+                  } else if (providerId === 'applemusic') {
+                    const amIds = unpushedAlbums.map(a => a.appleMusicId || a.sources?.applemusic?.appleMusicId).filter(Boolean);
+                    if (amIds.length > 0) {
+                      const saveResult = await window.electron.sync.saveAlbums('applemusic', amIds);
+                      if (saveResult.success) {
+                        console.log(`[Sync] Pushed ${amIds.length} local albums to Apple Music`);
+                        for (const album of unpushedAlbums) {
+                          if (album.appleMusicId || album.sources?.applemusic?.appleMusicId) {
+                            album.syncSources = { ...album.syncSources, [providerId]: { addedAt: album.addedAt, syncedAt: Date.now() } };
+                            collectionChanged = true;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+
+                // Push artists (Spotify only — Apple Music doesn't support following)
+                if (providerId === 'spotify') {
+                  const unpushedArtists = (collection.artists || []).filter(a =>
+                    a.syncSources?.manual && !a.syncSources?.spotify &&
+                    (a.spotifyId || a.sources?.spotify?.spotifyId)
+                  );
+                  if (unpushedArtists.length > 0) {
+                    const spotifyIds = unpushedArtists.map(a => a.spotifyId || a.sources?.spotify?.spotifyId).filter(Boolean);
+                    if (spotifyIds.length > 0) {
+                      const followResult = await window.electron.sync.followArtists('spotify', spotifyIds);
+                      if (followResult.success) {
+                        console.log(`[Sync] Followed ${spotifyIds.length} local artists on Spotify`);
+                        for (const artist of unpushedArtists) {
+                          if (artist.spotifyId || artist.sources?.spotify?.spotifyId) {
+                            artist.syncSources = { ...artist.syncSources, spotify: { addedAt: artist.addedAt, syncedAt: Date.now() } };
+                            collectionChanged = true;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+
+                if (collectionChanged) {
+                  await window.electron.collection.save(collection);
+                  setCollectionData(collection);
+                }
+              } catch (err) {
+                console.warn(`[Sync] Background collection push failed for ${providerId}:`, err.message);
+              }
               } else {
                 console.warn(`[Sync] Background sync for ${providerId} returned unsuccessful:`, result.error);
               }
@@ -11911,6 +12029,25 @@ ${trackListXml}
       showSidebarBadge('collection');
       return newData;
     });
+
+    // Push to connected sync providers (fire-and-forget)
+    const syncSettings = resolverSyncSettingsRef.current;
+    if (syncSettings && window.electron?.sync) {
+      // Spotify
+      if (syncSettings.spotify?.enabled && (track.spotifyId || track.sources?.spotify?.spotifyId)) {
+        const spotifyId = track.spotifyId || track.sources?.spotify?.spotifyId;
+        window.electron.sync.saveTracks('spotify', [spotifyId])
+          .then(r => r.success && console.log(`[Sync] Saved "${track.title}" to Spotify Liked Songs`))
+          .catch(err => console.warn('[Sync] Failed to save track to Spotify:', err.message));
+      }
+      // Apple Music
+      if (syncSettings.applemusic?.enabled && (track.appleMusicId || track.sources?.applemusic?.appleMusicId)) {
+        const appleMusicId = track.appleMusicId || track.sources?.applemusic?.appleMusicId;
+        window.electron.sync.saveTracks('applemusic', [appleMusicId])
+          .then(r => r.success && console.log(`[Sync] Saved "${track.title}" to Apple Music Library`))
+          .catch(err => console.warn('[Sync] Failed to save track to Apple Music:', err.message));
+      }
+    }
   }, [saveCollection, showToast, showSidebarBadge]);
 
   // Remove track from collection
@@ -11937,17 +12074,18 @@ ${trackListXml}
 
       const existingTrack = prev.tracks[existingIndex];
 
-      // If track was synced from Spotify, also remove from Spotify
-      if (existingTrack.syncSources?.spotify && existingTrack.spotifyId) {
-        window.electron?.sync?.removeTracks('spotify', [existingTrack.spotifyId])
-          .then(result => {
-            if (result.success) {
-              console.log(`✅ Removed ${track.title} from Spotify Liked Songs`);
-            } else {
-              console.error(`❌ Failed to remove from Spotify: ${result.error}`);
-            }
-          })
-          .catch(err => console.error('Error removing from Spotify:', err));
+      // Remove from connected sync providers
+      const syncSettings = resolverSyncSettingsRef.current;
+      if (window.electron?.sync) {
+        // Spotify: remove if synced from or pushed to Spotify
+        if ((existingTrack.syncSources?.spotify || syncSettings?.spotify?.enabled) && existingTrack.spotifyId) {
+          window.electron.sync.removeTracks('spotify', [existingTrack.spotifyId])
+            .then(result => {
+              if (result.success) console.log(`[Sync] Removed "${track.title}" from Spotify Liked Songs`);
+            })
+            .catch(err => console.warn('[Sync] Failed to remove track from Spotify:', err.message));
+        }
+        // Apple Music: API doesn't support removal, but log for awareness
       }
 
       const newTracks = prev.tracks.filter(t => t.id !== matchId);
@@ -11987,6 +12125,23 @@ ${trackListXml}
       showSidebarBadge('collection');
       return newData;
     });
+
+    // Push to connected sync providers (fire-and-forget)
+    const syncSettings = resolverSyncSettingsRef.current;
+    if (syncSettings && window.electron?.sync) {
+      if (syncSettings.spotify?.enabled && (album.spotifyId || album.sources?.spotify?.spotifyId)) {
+        const spotifyId = album.spotifyId || album.sources?.spotify?.spotifyId;
+        window.electron.sync.saveAlbums('spotify', [spotifyId])
+          .then(r => r.success && console.log(`[Sync] Saved "${album.title}" to Spotify Saved Albums`))
+          .catch(err => console.warn('[Sync] Failed to save album to Spotify:', err.message));
+      }
+      if (syncSettings.applemusic?.enabled && (album.appleMusicId || album.sources?.applemusic?.appleMusicId)) {
+        const appleMusicId = album.appleMusicId || album.sources?.applemusic?.appleMusicId;
+        window.electron.sync.saveAlbums('applemusic', [appleMusicId])
+          .then(r => r.success && console.log(`[Sync] Saved "${album.title}" to Apple Music Library`))
+          .catch(err => console.warn('[Sync] Failed to save album to Apple Music:', err.message));
+      }
+    }
   }, [saveCollection, showToast, showSidebarBadge]);
 
   // Update album track count in collection (used when release data is loaded)
@@ -12142,6 +12297,18 @@ ${trackListXml}
       showSidebarBadge('collection');
       return newData;
     });
+
+    // Push to connected sync providers (fire-and-forget)
+    // Note: Apple Music doesn't support following artists via API
+    const syncSettings = resolverSyncSettingsRef.current;
+    if (syncSettings && window.electron?.sync) {
+      if (syncSettings.spotify?.enabled && (artist.spotifyId || artist.sources?.spotify?.spotifyId)) {
+        const spotifyId = artist.spotifyId || artist.sources?.spotify?.spotifyId;
+        window.electron.sync.followArtists('spotify', [spotifyId])
+          .then(r => r.success && console.log(`[Sync] Followed "${artist.name}" on Spotify`))
+          .catch(err => console.warn('[Sync] Failed to follow artist on Spotify:', err.message));
+      }
+    }
   }, [saveCollection, showToast, showSidebarBadge]);
 
   // Remove album from collection
@@ -12166,17 +12333,16 @@ ${trackListXml}
 
       const existingAlbum = prev.albums[existingIndex];
 
-      // If album was synced from Spotify, also remove from Spotify
-      if (existingAlbum.syncSources?.spotify && existingAlbum.spotifyId) {
-        window.electron?.sync?.removeAlbums('spotify', [existingAlbum.spotifyId])
-          .then(result => {
-            if (result.success) {
-              console.log(`✅ Removed ${album.title} from Spotify Saved Albums`);
-            } else {
-              console.error(`❌ Failed to remove from Spotify: ${result.error}`);
-            }
-          })
-          .catch(err => console.error('Error removing from Spotify:', err));
+      // Remove from connected sync providers
+      const syncSettings = resolverSyncSettingsRef.current;
+      if (window.electron?.sync) {
+        if ((existingAlbum.syncSources?.spotify || syncSettings?.spotify?.enabled) && existingAlbum.spotifyId) {
+          window.electron.sync.removeAlbums('spotify', [existingAlbum.spotifyId])
+            .then(result => {
+              if (result.success) console.log(`[Sync] Removed "${album.title}" from Spotify Saved Albums`);
+            })
+            .catch(err => console.warn('[Sync] Failed to remove album from Spotify:', err.message));
+        }
       }
 
       const newAlbums = prev.albums.filter(a => a.id !== matchId);
@@ -12200,17 +12366,16 @@ ${trackListXml}
 
       const existingArtist = prev.artists[existingIndex];
 
-      // If artist was synced from Spotify, also unfollow on Spotify
-      if (existingArtist.syncSources?.spotify && existingArtist.spotifyId) {
-        window.electron?.sync?.unfollowArtists('spotify', [existingArtist.spotifyId])
-          .then(result => {
-            if (result.success) {
-              console.log(`✅ Unfollowed ${artist.name} on Spotify`);
-            } else {
-              console.error(`❌ Failed to unfollow on Spotify: ${result.error}`);
-            }
-          })
-          .catch(err => console.error('Error unfollowing on Spotify:', err));
+      // Remove from connected sync providers
+      const syncSettings = resolverSyncSettingsRef.current;
+      if (window.electron?.sync) {
+        if ((existingArtist.syncSources?.spotify || syncSettings?.spotify?.enabled) && existingArtist.spotifyId) {
+          window.electron.sync.unfollowArtists('spotify', [existingArtist.spotifyId])
+            .then(result => {
+              if (result.success) console.log(`[Sync] Unfollowed "${artist.name}" on Spotify`);
+            })
+            .catch(err => console.warn('[Sync] Failed to unfollow artist on Spotify:', err.message));
+        }
       }
 
       const newArtists = prev.artists.filter(a => a.id !== artistId);

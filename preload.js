@@ -341,6 +341,7 @@ contextBridge.exposeInMainWorld('electron', {
     createPlaylist: (providerId, name, description, tracks) => ipcRenderer.invoke('sync:create-playlist', providerId, name, description, tracks),
     resolveTracks: (providerId, tracks) => ipcRenderer.invoke('sync:resolve-tracks', providerId, tracks),
     saveTracks: (providerId, trackIds) => ipcRenderer.invoke('sync:save-tracks', providerId, trackIds),
+    saveAlbums: (providerId, albumIds) => ipcRenderer.invoke('sync:save-albums', providerId, albumIds),
     removeTracks: (providerId, trackIds) => ipcRenderer.invoke('sync:remove-tracks', providerId, trackIds),
     removeAlbums: (providerId, albumIds) => ipcRenderer.invoke('sync:remove-albums', providerId, albumIds),
     followArtists: (providerId, artistIds) => ipcRenderer.invoke('sync:follow-artists', providerId, artistIds),

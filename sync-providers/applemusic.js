@@ -347,6 +347,86 @@ const AppleMusicSyncProvider = {
     return { success: true };
   },
 
+  /**
+   * Save tracks to user's Apple Music library
+   * @param {string[]} trackIds - Array of Apple Music catalog song IDs
+   * @param {string} token - JSON string with developerToken and userToken
+   * @returns {Object} - { success: boolean, saved: number }
+   */
+  async saveTracks(trackIds, token) {
+    if (!trackIds || trackIds.length === 0) {
+      return { success: true, saved: 0 };
+    }
+
+    const { developerToken, userToken } = JSON.parse(token);
+
+    // Apple Music allows adding multiple items via POST /me/library with ids query param
+    // Batch in groups of 25 to stay within limits
+    const batches = [];
+    for (let i = 0; i < trackIds.length; i += 25) {
+      batches.push(trackIds.slice(i, i + 25));
+    }
+
+    let totalSaved = 0;
+    for (const batch of batches) {
+      const idsParam = batch.map(id => `ids[songs]=${id}`).join('&');
+      const response = await fetch(`${APPLE_MUSIC_API_BASE}/me/library?${idsParam}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${developerToken}`,
+          'Music-User-Token': userToken
+        }
+      });
+      if (!response.ok && response.status !== 202) {
+        console.warn(`[AppleMusic] Failed to save tracks batch: ${response.status}`);
+      } else {
+        totalSaved += batch.length;
+      }
+      await new Promise(resolve => setTimeout(resolve, 150));
+    }
+
+    return { success: true, saved: totalSaved };
+  },
+
+  /**
+   * Save albums to user's Apple Music library
+   * @param {string[]} albumIds - Array of Apple Music catalog album IDs
+   * @param {string} token - JSON string with developerToken and userToken
+   * @returns {Object} - { success: boolean, saved: number }
+   */
+  async saveAlbums(albumIds, token) {
+    if (!albumIds || albumIds.length === 0) {
+      return { success: true, saved: 0 };
+    }
+
+    const { developerToken, userToken } = JSON.parse(token);
+
+    const batches = [];
+    for (let i = 0; i < albumIds.length; i += 25) {
+      batches.push(albumIds.slice(i, i + 25));
+    }
+
+    let totalSaved = 0;
+    for (const batch of batches) {
+      const idsParam = batch.map(id => `ids[albums]=${id}`).join('&');
+      const response = await fetch(`${APPLE_MUSIC_API_BASE}/me/library?${idsParam}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${developerToken}`,
+          'Music-User-Token': userToken
+        }
+      });
+      if (!response.ok && response.status !== 202) {
+        console.warn(`[AppleMusic] Failed to save albums batch: ${response.status}`);
+      } else {
+        totalSaved += batch.length;
+      }
+      await new Promise(resolve => setTimeout(resolve, 150));
+    }
+
+    return { success: true, saved: totalSaved };
+  },
+
   // Resolve local tracks to Apple Music catalog IDs by searching
   async resolveTracks(tracks, token) {
     const { developerToken, userToken } = JSON.parse(token);

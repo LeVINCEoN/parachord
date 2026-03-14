@@ -548,6 +548,37 @@ const SpotifySyncProvider = {
   },
 
   /**
+   * Save albums to user's Spotify library
+   * @param {string[]} albumIds - Array of Spotify album IDs
+   * @param {string} token - Access token
+   * @returns {Object} - { success: boolean, saved: number }
+   */
+  async saveAlbums(albumIds, token) {
+    if (!albumIds || albumIds.length === 0) {
+      return { success: true, saved: 0 };
+    }
+
+    const uris = albumIds.map(id => id.startsWith('spotify:') ? id : `spotify:album:${id}`);
+
+    const batches = [];
+    for (let i = 0; i < uris.length; i += 50) {
+      batches.push(uris.slice(i, i + 50));
+    }
+
+    let totalSaved = 0;
+    for (const batch of batches) {
+      await spotifyRequest('/me/library', token, {
+        method: 'PUT',
+        body: { uris: batch }
+      });
+      totalSaved += batch.length;
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    return { success: true, saved: totalSaved };
+  },
+
+  /**
    * Remove tracks from user's Spotify library
    * Uses the unified DELETE /me/library endpoint (Feb 2026 API update)
    * @param {string[]} trackIds - Array of Spotify track IDs (not URIs)
