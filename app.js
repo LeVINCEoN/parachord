@@ -37855,6 +37855,72 @@ useEffect(() => {
             )
           ),
 
+          // Remote deletion banner for syncedTo playlists
+          (() => {
+            const playlist = selectedPlaylist;
+            if (!playlist?.syncedTo) return null;
+            const pendingProviders = Object.entries(playlist.syncedTo)
+              .filter(([, info]) => info.pendingAction === 'remote-deleted');
+            if (pendingProviders.length === 0) return null;
+
+            return pendingProviders.map(([providerId, info]) => {
+              const providerName = providerId === 'spotify' ? 'Spotify' : providerId === 'applemusic' ? 'Apple Music' : providerId;
+              return React.createElement('div', {
+                key: `remote-deleted-${providerId}`,
+                className: `mx-4 mt-3 p-3 rounded-lg border`,
+                style: { background: 'rgba(234, 179, 8, 0.12)', borderColor: 'rgba(234, 179, 8, 0.25)' }
+              },
+                React.createElement('div', { className: 'text-sm font-medium text-yellow-700 mb-2' },
+                  `"${playlist.title}" was deleted on ${providerName}`
+                ),
+                React.createElement('div', { className: 'flex gap-2' },
+                  React.createElement('button', {
+                    className: 'text-xs px-3 py-1.5 rounded-md bg-red-100 text-red-700 hover:bg-red-200 transition-colors',
+                    onClick: async () => {
+                      // Delete locally too
+                      await window.electron.playlists.delete(playlist.id);
+                      setPlaylists(prev => prev.filter(p => p.id !== playlist.id));
+                      setSelectedPlaylist(null);
+                    }
+                  }, 'Delete locally too'),
+                  React.createElement('button', {
+                    className: 'text-xs px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors',
+                    onClick: async () => {
+                      // Keep local, stop syncing to this provider
+                      const updatedSyncedTo = { ...playlist.syncedTo };
+                      delete updatedSyncedTo[providerId];
+                      const hasAnySyncedTo = Object.keys(updatedSyncedTo).length > 0;
+                      const updatedPlaylist = {
+                        ...playlist,
+                        syncedTo: hasAnySyncedTo ? updatedSyncedTo : undefined,
+                        localOnly: !hasAnySyncedTo ? true : playlist.localOnly
+                      };
+                      setSelectedPlaylist(updatedPlaylist);
+                      setPlaylists(prev => prev.map(p => p.id === playlist.id ? updatedPlaylist : p));
+                      await window.electron.playlists.save(updatedPlaylist);
+                    }
+                  }, 'Stop syncing'),
+                  React.createElement('button', {
+                    className: 'text-xs px-3 py-1.5 rounded-md bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors',
+                    onClick: async () => {
+                      // Re-create on service — clear syncedTo for this provider
+                      const updatedSyncedTo = { ...playlist.syncedTo };
+                      delete updatedSyncedTo[providerId];
+                      const updatedPlaylist = {
+                        ...playlist,
+                        syncedTo: Object.keys(updatedSyncedTo).length > 0 ? updatedSyncedTo : undefined
+                      };
+                      setSelectedPlaylist(updatedPlaylist);
+                      setPlaylists(prev => prev.map(p => p.id === playlist.id ? updatedPlaylist : p));
+                      await window.electron.playlists.save(updatedPlaylist);
+                      showToast(`Will re-create "${playlist.title}" on ${providerName} during next sync`);
+                    }
+                  }, 'Re-create')
+                )
+              );
+            });
+          })(),
+
           // Playlist sync banner (shown when playlist needs sync - push, pull, or conflict)
           (() => {
             const playlist = selectedPlaylist;
@@ -38313,6 +38379,36 @@ useEffect(() => {
                     style: { color: 'var(--text-tertiary)' }
                   }, `Source: ${sourceLabel}`);
                 })(),
+                // Sync status for syncedTo playlists
+                selectedPlaylist?.syncedTo && !selectedPlaylist.syncedFrom && React.createElement('div', {
+                  className: 'flex items-center gap-2 mt-1'
+                },
+                  // Provider icons
+                  ...Object.keys(selectedPlaylist.syncedTo).map(pid =>
+                    React.createElement('span', {
+                      key: pid,
+                      className: `text-xs px-2 py-0.5 rounded-full ${
+                        pid === 'spotify' ? 'bg-green-100 text-green-700' : 'bg-pink-100 text-pink-700'
+                      }`,
+                      title: `Synced to ${pid === 'spotify' ? 'Spotify' : 'Apple Music'}`
+                    }, pid === 'spotify' ? 'Spotify' : 'Apple Music')
+                  ),
+                  // Local only toggle
+                  React.createElement('button', {
+                    className: `text-xs px-2 py-0.5 rounded-full transition-colors ${
+                      selectedPlaylist.localOnly
+                        ? 'bg-gray-200 text-gray-600'
+                        : 'bg-gray-100 text-gray-400 hover:bg-gray-200'
+                    }`,
+                    onClick: async () => {
+                      const updatedPlaylist = { ...selectedPlaylist, localOnly: !selectedPlaylist.localOnly };
+                      setSelectedPlaylist(updatedPlaylist);
+                      setPlaylists(prev => prev.map(p => p.id === selectedPlaylist.id ? updatedPlaylist : p));
+                      await window.electron.playlists.save(updatedPlaylist);
+                      showToast(updatedPlaylist.localOnly ? 'Playlist set to local only' : 'Playlist will sync to services');
+                    }
+                  }, selectedPlaylist.localOnly ? 'Local only' : 'Syncing')
+                ),
                 // Edit mode: Title input
                 playlistEditMode && editedPlaylistData && React.createElement('input', {
                   type: 'text',
