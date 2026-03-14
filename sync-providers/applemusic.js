@@ -345,6 +345,161 @@ const AppleMusicSyncProvider = {
       throw new Error(`Failed to delete playlist: ${response.status}`);
     }
     return { success: true };
+  },
+
+  // Resolve local tracks to Apple Music catalog IDs by searching
+  async resolveTracks(tracks, token) {
+    const { developerToken, userToken } = JSON.parse(token);
+    const resolved = [];
+    const unresolved = [];
+
+    for (const track of tracks) {
+      try {
+        const query = `${track.title} ${track.artist}`;
+        const resp = await fetch(
+          `${APPLE_MUSIC_API_BASE}/catalog/us/search?term=${encodeURIComponent(query)}&types=songs&limit=5`,
+          {
+            headers: {
+              'Authorization': `Bearer ${developerToken}`,
+              'Music-User-Token': userToken
+            }
+          }
+        );
+
+        if (!resp.ok) {
+          unresolved.push({ artist: track.artist, title: track.title });
+          await new Promise(resolve => setTimeout(resolve, 150));
+          continue;
+        }
+
+        const data = await resp.json();
+        const items = data.results?.songs?.data || [];
+
+        // Find best match — exact title + artist match (case-insensitive)
+        const match = items.find(item =>
+          item.attributes.name.toLowerCase() === track.title.toLowerCase() &&
+          item.attributes.artistName.toLowerCase() === track.artist.toLowerCase()
+        ) || items[0];
+
+        if (match) {
+          resolved.push({
+            ...track,
+            appleMusicId: match.id,
+            appleMusicCatalogId: match.id
+          });
+        } else {
+          unresolved.push({ artist: track.artist, title: track.title });
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 150));
+      } catch (error) {
+        console.error(`Failed to resolve track "${track.title}" by "${track.artist}":`, error.message);
+        unresolved.push({ artist: track.artist, title: track.title });
+      }
+    }
+
+    return { resolved, unresolved };
+  },
+
+  // Create a new playlist on Apple Music
+  async createPlaylist(name, description, token) {
+    const { developerToken, userToken } = JSON.parse(token);
+
+    const resp = await fetch(`${APPLE_MUSIC_API_BASE}/me/library/playlists`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${developerToken}`,
+        'Music-User-Token': userToken,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        attributes: {
+          name,
+          description: description || ''
+        }
+      })
+    });
+
+    if (!resp.ok) {
+      throw new Error(`Failed to create Apple Music playlist: ${resp.status}`);
+    }
+
+    const data = await resp.json();
+    const playlist = data.data?.[0];
+
+    return {
+      externalId: playlist.id,
+      snapshotId: playlist.attributes?.lastModifiedDate || new Date().toISOString()
+    };
+  },
+
+  // Replace all tracks in an Apple Music playlist
+  async updatePlaylistTracks(playlistId, tracks, token) {
+    const { developerToken, userToken } = JSON.parse(token);
+
+    // Filter to tracks with Apple Music catalog IDs
+    const catalogTracks = tracks.filter(t => t.appleMusicCatalogId || t.appleMusicId);
+
+    const body = {
+      data: catalogTracks.map(t => ({
+        id: t.appleMusicCatalogId || t.appleMusicId,
+        type: 'songs'
+      }))
+    };
+
+    const resp = await fetch(
+      `${APPLE_MUSIC_API_BASE}/me/library/playlists/${playlistId}/tracks`,
+      {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${developerToken}`,
+          'Music-User-Token': userToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      }
+    );
+
+    if (!resp.ok) {
+      throw new Error(`Failed to update Apple Music playlist tracks: ${resp.status}`);
+    }
+
+    // Fetch updated snapshot
+    const snapshot = await this.getPlaylistSnapshot(playlistId, token);
+
+    return { success: true, snapshotId: snapshot };
+  },
+
+  // Update playlist name and description on Apple Music
+  async updatePlaylistDetails(playlistId, metadata, token) {
+    const { developerToken, userToken } = JSON.parse(token);
+
+    const attributes = {};
+    if (metadata.name) attributes.name = metadata.name;
+    if (metadata.description !== undefined) attributes.description = metadata.description || '';
+
+    if (Object.keys(attributes).length === 0) {
+      return { success: true };
+    }
+
+    const resp = await fetch(
+      `${APPLE_MUSIC_API_BASE}/me/library/playlists/${playlistId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${developerToken}`,
+          'Music-User-Token': userToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ attributes })
+      }
+    );
+
+    if (!resp.ok) {
+      throw new Error(`Failed to update Apple Music playlist details: ${resp.status}`);
+    }
+
+    return { success: true };
   }
 };
 
