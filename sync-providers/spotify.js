@@ -684,6 +684,66 @@ const SpotifySyncProvider = {
       method: 'DELETE'
     });
     return { success: true };
+  },
+
+  // Resolve local tracks to Spotify URIs by searching
+  async resolveTracks(tracks, token) {
+    const resolved = [];
+    const unresolved = [];
+
+    for (const track of tracks) {
+      try {
+        const query = `track:"${track.title}" artist:"${track.artist}"`;
+        const result = await spotifyRequest(
+          `/search?q=${encodeURIComponent(query)}&type=track&limit=5`,
+          token
+        );
+
+        const items = result.tracks?.items || [];
+        // Find best match — exact title + artist match (case-insensitive)
+        const match = items.find(item =>
+          item.name.toLowerCase() === track.title.toLowerCase() &&
+          item.artists.some(a => a.name.toLowerCase() === track.artist.toLowerCase())
+        ) || items[0]; // Fall back to top result
+
+        if (match) {
+          resolved.push({
+            ...track,
+            spotifyUri: match.uri
+          });
+        } else {
+          unresolved.push({ artist: track.artist, title: track.title });
+        }
+
+        // Rate limit
+        await new Promise(resolve => setTimeout(resolve, 100));
+      } catch (error) {
+        console.error(`Failed to resolve track "${track.title}" by "${track.artist}":`, error.message);
+        unresolved.push({ artist: track.artist, title: track.title });
+      }
+    }
+
+    return { resolved, unresolved };
+  },
+
+  // Create a new playlist on Spotify
+  async createPlaylist(name, description, token) {
+    // Get current user ID
+    const user = await spotifyRequest('/me', token);
+
+    const playlist = await spotifyRequest(`/users/${user.id}/playlists`, token, {
+      method: 'POST',
+      body: {
+        name,
+        description: description || '',
+        public: false
+      }
+    });
+
+    return {
+      externalId: playlist.id,
+      snapshotId: playlist.snapshot_id
+    };
   }
 };
 
