@@ -1,4 +1,4 @@
-# Parachord v0.9.0-beta.3
+# Parachord v0.9.0-beta.4
 
 **Release date:** 2026-03-15
 
