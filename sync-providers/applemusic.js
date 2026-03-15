@@ -434,6 +434,13 @@ const AppleMusicSyncProvider = {
     const unresolved = [];
 
     for (const track of tracks) {
+      // Skip tracks that already have an Apple Music catalog ID
+      const existingId = track.appleMusicCatalogId || track.appleMusicId || track.sources?.applemusic?.appleMusicId;
+      if (existingId) {
+        resolved.push({ ...track, appleMusicCatalogId: existingId, appleMusicId: existingId });
+        continue;
+      }
+
       try {
         const query = `${track.title} ${track.artist}`;
         const resp = await fetch(

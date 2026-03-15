@@ -722,6 +722,13 @@ const SpotifySyncProvider = {
     const unresolved = [];
 
     for (const track of tracks) {
+      // Skip tracks that already have a Spotify URI or ID
+      const existingUri = track.spotifyUri || (track.spotifyId ? `spotify:track:${track.spotifyId}` : null);
+      if (existingUri) {
+        resolved.push({ ...track, spotifyUri: existingUri });
+        continue;
+      }
+
       try {
         const query = `track:"${track.title}" artist:"${track.artist}"`;
         const result = await spotifyRequest(
