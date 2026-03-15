@@ -5222,6 +5222,18 @@ ipcMain.handle('sync:start', async (event, providerId, options = {}) => {
         }
       }
 
+      // Clear syncedFrom on local playlists whose remote counterpart no longer
+      // exists (e.g. deleted on the provider). This turns them into local-only
+      // playlists so the post-sync push logic will re-create them on the provider.
+      const remoteExternalIds = new Set(remotePlaylists.map(p => p.externalId));
+      for (let j = 0; j < currentPlaylists.length; j++) {
+        const p = currentPlaylists[j];
+        if (p.syncedFrom?.resolver === providerId && !remoteExternalIds.has(p.syncedFrom.externalId)) {
+          console.log(`[Sync] Playlist "${p.title}" no longer on ${providerId}, clearing syncedFrom so it can be re-pushed`);
+          currentPlaylists[j] = { ...p, syncedFrom: null };
+        }
+      }
+
       // Save playlists (including any that succeeded before a failure)
       store.set('local_playlists', currentPlaylists);
       results.playlists = { added: playlistsAdded, updated: playlistsUpdated, failed: playlistsFailed };
