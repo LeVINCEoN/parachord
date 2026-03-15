@@ -20,12 +20,88 @@ console.log('=========================');
 
 const { app, BrowserWindow, ipcMain, globalShortcut, shell, protocol, Menu, nativeTheme } = require('electron');
 const path = require('path');
+const fs = require('fs');
 
 // Preserve the userData path before changing app.name, since Electron
 // derives the userData directory from app.name. Without this, changing
 // the name would move the data directory and lose all user settings.
 app.setPath('userData', path.join(app.getPath('appData'), 'parachord-desktop'));
 app.name = 'Parachord';
+
+// Widevine CDM: load Chrome's CDM on non-macOS platforms so MusicKit JS
+// can play full DRM-protected streams (macOS uses native MusicKit instead).
+// Note: Linux works out of the box; Windows requires VMP signing (Castlabs fork)
+// so this is primarily useful on Linux for now.
+if (process.platform !== 'darwin') {
+  const localAppData = process.env.LOCALAPPDATA || '';
+  const programFiles = process.env.PROGRAMFILES || '';
+  const home = process.env.HOME || '';
+
+  const cdmSearchPaths = process.platform === 'win32'
+    ? [
+        // Chrome
+        path.join(localAppData, 'Google', 'Chrome', 'User Data', 'WidevineCdm'),
+        path.join(programFiles, 'Google', 'Chrome', 'Application', 'WidevineCdm'),
+        // Edge
+        path.join(localAppData, 'Microsoft', 'Edge', 'User Data', 'WidevineCdm'),
+        // Brave
+        path.join(localAppData, 'BraveSoftware', 'Brave-Browser', 'User Data', 'WidevineCdm'),
+        // Vivaldi
+        path.join(localAppData, 'Vivaldi', 'User Data', 'WidevineCdm'),
+        // Opera
+        path.join(localAppData, 'Opera Software', 'Opera Stable', 'WidevineCdm'),
+        // Dia (The Browser Company)
+        path.join(localAppData, 'Dia', 'User Data', 'WidevineCdm'),
+        path.join(localAppData, 'TheBrowserCompany', 'Dia', 'User Data', 'WidevineCdm'),
+      ]
+    : [
+        // Chrome
+        '/opt/google/chrome/WidevineCdm',
+        // Chromium
+        '/usr/lib/chromium/WidevineCdm',
+        // Edge
+        '/opt/microsoft/msedge/WidevineCdm',
+        // Brave
+        '/opt/brave.com/brave/WidevineCdm',
+        // Vivaldi
+        '/opt/vivaldi/WidevineCdm',
+        // Shared / user-local
+        path.join(home, '.local', 'lib', 'WidevineCdm'),
+      ];
+
+  const cdmLib = process.platform === 'win32' ? 'widevinecdm.dll' : 'libwidevinecdm.so';
+  let cdmFound = false;
+
+  for (const searchPath of cdmSearchPaths) {
+    try {
+      if (!fs.existsSync(searchPath)) continue;
+
+      // CDM structure: <searchPath>/<version>/_platform_specific/<arch>/<lib>
+      const versions = fs.readdirSync(searchPath).filter(d => /^\d/.test(d)).sort().reverse();
+      for (const version of versions) {
+        const arch = process.platform === 'win32'
+          ? (process.arch === 'x64' ? 'win_x64' : 'win_x86')
+          : (process.arch === 'x64' ? 'linux_x64' : `linux_${process.arch}`);
+        const cdmPath = path.join(searchPath, version, '_platform_specific', arch, cdmLib);
+
+        if (fs.existsSync(cdmPath)) {
+          console.log(`[Widevine] Found CDM v${version} at: ${cdmPath}`);
+          app.commandLine.appendSwitch('widevine-cdm-path', cdmPath);
+          app.commandLine.appendSwitch('widevine-cdm-version', version);
+          cdmFound = true;
+          break;
+        }
+      }
+      if (cdmFound) break;
+    } catch (e) {
+      // Ignore permission errors etc.
+    }
+  }
+
+  if (!cdmFound) {
+    console.log('[Widevine] CDM not found — install a Chromium-based browser (Chrome, Edge, Brave, etc.) for full Apple Music playback via MusicKit JS');
+  }
+}
 
 // electron-updater is optional - may not be available in development
 let autoUpdater = null;
@@ -34,7 +110,6 @@ try {
 } catch (err) {
   console.log('Auto-updater not available:', err.message);
 }
-const fs = require('fs');
 const Store = require('electron-store');
 const express = require('express');
 const WebSocket = require('ws');
