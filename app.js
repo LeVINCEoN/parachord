@@ -4979,9 +4979,9 @@ const Parachord = () => {
   const [progress, setProgress] = useState(0);
   const seekingRef = useRef(false); // True while user is dragging the progress slider
   const seekTimeoutRef = useRef(null); // Debounce timeout for clearing seeking state
-  const [volume, setVolume] = useState(70);
+  const [volume, setVolume] = useState(30);
   const [isMuted, setIsMuted] = useState(false);
-  const preMuteVolumeRef = useRef(70); // Remember volume before muting
+  const preMuteVolumeRef = useRef(30); // Remember volume before muting
   const isMutedRef = useRef(false); // Ref for mute state to avoid stale closures
   const spotifyVolumeTimeoutRef = useRef(null); // Debounce Spotify volume API calls
 
@@ -6661,7 +6661,7 @@ const Parachord = () => {
   // Refs to keep current values available in event handlers (avoids stale closure issues)
   const currentQueueRef = useRef([]);
   const currentTrackRef = useRef(null);
-  const volumeRef = useRef(70);
+  const volumeRef = useRef(30);
   const handleNextRef = useRef(null);
   const handlePreviousRef = useRef(null);
   const handlePlayPauseRef = useRef(null);
@@ -6804,7 +6804,14 @@ const Parachord = () => {
   useEffect(() => { shuffleModeRef.current = shuffleMode; }, [shuffleMode]);
   useEffect(() => { spinoffSourceTrackRef.current = spinoffSourceTrack; }, [spinoffSourceTrack]);
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
-  useEffect(() => { volumeRef.current = volume; window._parachordVolume = isMutedRef.current ? 0 : volume; }, [volume]);
+  useEffect(() => {
+    volumeRef.current = volume;
+    window._parachordVolume = isMutedRef.current ? 0 : volume;
+    // Persist volume to disk so it survives restarts
+    if (cacheLoaded && window.electron?.store) {
+      window.electron.store.set('saved_volume', volume);
+    }
+  }, [volume]);
   useEffect(() => { listenAlongFriendRef.current = listenAlongFriend; }, [listenAlongFriend]);
   useEffect(() => { friendsRef.current = friends; }, [friends]);
   useEffect(() => { pinnedFriendIdsRef.current = pinnedFriendIds; }, [pinnedFriendIds]);
@@ -18723,7 +18730,7 @@ ${trackListXml}
         // Resolver settings & user preferences
         'active_resolvers', 'resolver_order', 'meta_service_configs',
         'applemusic_developer_token', 'friends', 'pinnedFriendIds',
-        'autoPinnedFriendIds', 'resolver_volume_offsets', 'skip_external_prompt',
+        'autoPinnedFriendIds', 'resolver_volume_offsets', 'saved_volume', 'skip_external_prompt',
         'auto_launch_spotify', 'skip_unsaved_friend_warning', 'remember_queue',
         'show_discovery_badges', 'playlists_view_mode', 'ai_include_history',
         'recommendation_blocklist', 'resolver_blocklist', 'ai_chat_histories',
@@ -19087,6 +19094,7 @@ ${trackListXml}
       const savedPinnedFriendIds = d['pinnedFriendIds'];
       const savedAutoPinnedFriendIds = d['autoPinnedFriendIds'];
       const savedVolumeOffsets = d['resolver_volume_offsets'];
+      const savedVolume = d['saved_volume'];
       const savedSkipExternalPrompt = d['skip_external_prompt'];
       const savedAutoLaunchSpotify = d['auto_launch_spotify'];
       const savedSkipUnsavedFriendWarning = d['skip_unsaved_friend_warning'];
@@ -19222,6 +19230,14 @@ ${trackListXml}
       if (savedVolumeOffsets) {
         setResolverVolumeOffsets(prev => ({ ...prev, ...savedVolumeOffsets }));
         console.log('📦 Loaded volume normalization offsets');
+      }
+
+      // Restore saved volume level
+      if (savedVolume !== undefined && savedVolume !== null && typeof savedVolume === 'number') {
+        const clampedVolume = Math.max(0, Math.min(100, savedVolume));
+        setVolume(clampedVolume);
+        preMuteVolumeRef.current = clampedVolume;
+        console.log(`🔊 Restored saved volume: ${clampedVolume}%`);
       }
 
       // Load skip external prompt preference
@@ -19420,6 +19436,9 @@ ${trackListXml}
 
       // Save volume normalization offsets (use ref to avoid stale closure)
       await window.electron.store.set('resolver_volume_offsets', resolverVolumeOffsetsRef.current);
+
+      // Save current volume level
+      await window.electron.store.set('saved_volume', volumeRef.current);
 
       // Save new releases cache
       if (newReleasesCache.current.releases) {
@@ -32480,6 +32499,20 @@ const playOnSpotifyConnect = async (track) => {
       console.log(`📱 Using active device: "${activeDevice.name}" (${activeDevice.type})`);
     }
     
+    // If device is not active, adopt its last-known volume to avoid blasting the user
+    // (Spotify reports volume_percent even for inactive devices)
+    if (!activeDevice.is_active && activeDevice.volume_percent != null) {
+      const deviceVol = activeDevice.volume_percent;
+      const currentVol = volumeRef.current;
+      // Only adopt device volume if it's significantly lower than our internal state
+      // This prevents an unexpected loud blast on high-wattage systems
+      if (deviceVol < currentVol) {
+        console.log(`🔊 Adopting device volume ${deviceVol}% (lower than internal ${currentVol}%) to avoid loud surprise`);
+        setVolume(deviceVol);
+        preMuteVolumeRef.current = deviceVol;
+      }
+    }
+
     // If device is not active, wake it up by transferring playback
     // Use play: false to avoid briefly playing the previous track
     if (!activeDevice.is_active) {
@@ -50428,7 +50461,7 @@ useEffect(() => {
               const activeResolverId = determineResolverIdFromTrack(currentTrackRef.current);
               if (isMuted) {
                 // Unmute: restore previous volume
-                const restoredVolume = preMuteVolumeRef.current || 70;
+                const restoredVolume = preMuteVolumeRef.current || 30;
                 setIsMuted(false);
                 setVolume(restoredVolume);
                 if ((activeResolverId === 'localfiles' || activeResolverId === 'soundcloud') && audioRef.current) {
