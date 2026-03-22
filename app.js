@@ -7970,6 +7970,17 @@ const Parachord = () => {
     }
   };
 
+  // Look up an artist MBID from the MBID mapper cache (any previously resolved track by that artist)
+  const getArtistMbidFromMapperCache = (artistName) => {
+    const normArtist = artistName.toLowerCase().trim();
+    for (const [key, entry] of Object.entries(mbidMapperCache.current)) {
+      if (key.startsWith(normArtist + '|') && entry.result?.artist_credit_mbids?.length > 0) {
+        return entry.result.artist_credit_mbids[0];
+      }
+    }
+    return null;
+  };
+
   // Cache for playlist cover art (playlistId -> { covers: [url1, url2, url3, url4], timestamp })
   const playlistCoverCache = useRef({});
 
@@ -20228,9 +20239,34 @@ ${trackListXml}
         });
       };
 
-      const searchResponse = await fetchWithRetry(
-        `https://musicbrainz.org/ws/2/artist?query=${encodeURIComponent(artistName)}&fmt=json&limit=5`
-      );
+      // Fast path: try MBID mapper cache or live lookup to skip the slow MB artist search
+      let mapperArtistMbid = getArtistMbidFromMapperCache(artistName);
+      if (!mapperArtistMbid && currentTrackRef.current?.artist?.toLowerCase().trim() === artistName.toLowerCase().trim()) {
+        // We're navigating to the current track's artist — use the track to do a mapper lookup
+        const mapperResult = await lookupMbidMapper(
+          currentTrackRef.current.artist, currentTrackRef.current.title, currentTrackRef.current.album
+        );
+        if (mapperResult?.artist_credit_mbids?.length > 0) {
+          mapperArtistMbid = mapperResult.artist_credit_mbids[0];
+        }
+      }
+
+      let searchResponse;
+      if (mapperArtistMbid) {
+        // Direct MBID lookup (~2x faster than fuzzy search, no matching needed)
+        searchResponse = await fetchWithRetry(
+          `https://musicbrainz.org/ws/2/artist/${mapperArtistMbid}?fmt=json`
+        );
+        if (!searchResponse.ok) {
+          console.warn('MBID mapper artist ID lookup failed, falling back to search');
+          mapperArtistMbid = null;
+        }
+      }
+      if (!mapperArtistMbid) {
+        searchResponse = await fetchWithRetry(
+          `https://musicbrainz.org/ws/2/artist?query=${encodeURIComponent(artistName)}&fmt=json&limit=5`
+        );
+      }
 
       if (!searchResponse.ok) {
         console.error('Artist search failed:', searchResponse.status);
@@ -20244,15 +20280,17 @@ ${trackListXml}
         setLoadingArtist(false);
         return;
       }
-      
-      const searchData = await searchResponse.json();
-      
+
+      const searchData = mapperArtistMbid
+        ? { artists: [await searchResponse.json()] } // Direct lookup returns artist object, wrap to match search format
+        : await searchResponse.json();
+
       // Validate MusicBrainz match quality — weak matches get the same fallback treatment
       // MusicBrainz scores are relative (100 = best match found, not necessarily correct),
       // so we must also verify the name is actually similar to avoid wrong-artist matches
       // (e.g. "Jack Jose" → "José José" with score 100)
       const mbCandidate = searchData.artists?.[0];
-      const mbScore = mbCandidate?.score || 0;
+      const mbScore = mapperArtistMbid ? 100 : (mbCandidate?.score || 0);
       const normalizeName = s => s?.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
         .toLowerCase().replace(/[^a-z0-9]/g, '') || '';
       const mbNorm = normalizeName(mbCandidate?.name);
@@ -25122,6 +25160,14 @@ ${tracks}
         let madeApiCall = false;
 
         if (!mbid) {
+          // Fast path: check MBID mapper cache for any previously resolved track by this artist
+          mbid = getArtistMbidFromMapperCache(artist.name);
+          if (mbid) {
+            console.log(`🎯 Fresh Drops: got MBID for "${artist.name}" from mapper cache (skipping MB search)`);
+          }
+        }
+
+        if (!mbid) {
           const searchResponse = await fetchWithTimeout(
             `https://musicbrainz.org/ws/2/artist?query=${encodeURIComponent(artist.name)}&fmt=json&limit=1`,
             { headers: mbHeaders }
@@ -29333,21 +29379,33 @@ Variety guidance: ${theme} Be creative and surprising — avoid defaulting to th
     setPlaybarArtistBio(null);
 
     (async () => {
-      // First, search for the artist to get their MBID
       try {
-        const searchResponse = await fetch(
-          `https://musicbrainz.org/ws/2/artist?query=${encodeURIComponent(currentTrack.artist)}&fmt=json&limit=1`,
-          { headers: { 'User-Agent': 'Parachord/1.0.0 (https://parachord.app)' }}
-        );
-        if (searchResponse.ok) {
-          const searchData = await searchResponse.json();
-          const mbid = searchData.artists?.[0]?.id;
+        let mbid = null;
 
-          // Fetch bio using the existing function
-          const bioData = await getArtistBio(currentTrack.artist, mbid);
-          if (bioData) {
-            setPlaybarArtistBio({ ...bioData, artistName: currentTrack.artist });
+        // Fast path: use MBID Mapper if we have a track title (~4ms vs ~500ms+ for MB search)
+        if (currentTrack.title) {
+          const mapperResult = await lookupMbidMapper(currentTrack.artist, currentTrack.title, currentTrack.album);
+          if (mapperResult?.artist_credit_mbids?.length > 0) {
+            mbid = mapperResult.artist_credit_mbids[0];
           }
+        }
+
+        // Fallback: MusicBrainz artist search if mapper didn't return an MBID
+        if (!mbid) {
+          const searchResponse = await fetch(
+            `https://musicbrainz.org/ws/2/artist?query=${encodeURIComponent(currentTrack.artist)}&fmt=json&limit=1`,
+            { headers: { 'User-Agent': 'Parachord/1.0.0 (https://parachord.app)' }}
+          );
+          if (searchResponse.ok) {
+            const searchData = await searchResponse.json();
+            mbid = searchData.artists?.[0]?.id;
+          }
+        }
+
+        // Fetch bio using the existing function
+        const bioData = await getArtistBio(currentTrack.artist, mbid);
+        if (bioData) {
+          setPlaybarArtistBio({ ...bioData, artistName: currentTrack.artist });
         }
       } catch (error) {
         console.error('Error fetching playbar artist bio:', error);
