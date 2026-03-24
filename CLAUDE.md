@@ -122,11 +122,16 @@ We use the [ListenBrainz MBID Mapper v2.0](https://mapper.listenbrainz.org) to r
 - **Cannot replace discography fetches** — only maps recordings, not release-groups
 - **Cannot replace open-ended search** — user queries still need MusicBrainz `/ws/2/` search endpoints
 
-### Where We Use It (Electron app)
-1. **Playbar artist bio** — mapper resolves artist MBID from current track in ~4ms instead of MB artist search (~500ms+)
-2. **Artist page loading** — when navigating from current track's artist, uses cached/live mapper MBID for direct `/ws/2/artist/{id}` lookup instead of fuzzy search
-3. **Fresh Drops (new releases)** — checks mapper cache for artist MBIDs before hitting rate-limited MB search (saves 1100ms per cache hit)
-4. **Track resolution fallback** — when all resolvers fail to find a match, retries with mapper's canonical artist/recording names
+### Where We Use It
+1. **handlePlay** — mapper fires in parallel with resolver searches; enriches track with `mbid`, `artistMbids`, `releaseMbid`; canonical name fallback retries resolution when all resolvers fail (confidence ≥ 0.7)
+2. **Search results** — MusicBrainz `recording.id` stored as `mbid` directly; background mapper lookups warm cache for future use
+3. **Album tracks** — `recording.id` and artist-credit IDs extracted from MB release data
+4. **Queue additions** — background batch enrichment via `enrichTracksWithMbids()`
+5. **Playlist loading** — all 3 load paths (XSPF, ListenBrainz, direct) fire background enrichment
+6. **Background resolution** — mapper runs alongside resolver searches
+7. **Artist page** — `getArtistMbidFromMapperCache()` shortcuts MB artist search (~0ms vs ~500ms)
+8. **Fresh Drops** — mapper cache checked before rate-limited MB artist search (saves ~1100ms per hit)
+9. **Scrobblers** — ListenBrainz sends `recording_mbid`, `artist_mbids`, `release_mbid` in `additional_info`; Last.fm/Libre.fm sends `mbid` parameter
 
 ### Cache Strategy
 - **Key**: `"artist_lowercase|title_lowercase"` → `{ result, timestamp }`
@@ -135,14 +140,14 @@ We use the [ListenBrainz MBID Mapper v2.0](https://mapper.listenbrainz.org) to r
 - **Persisted**: saved/loaded via `electron.store` key `cache_mbid_mapper`
 - **Helper**: `getArtistMbidFromMapperCache(artistName)` scans cache for any track by that artist
 
-### Integration Pattern for Android
-When implementing in the Android app, the same strategy applies:
-1. **Cache aggressively** — MBIDs don't change. Use a Room/SQLite table with `artist|title` as key, 90-day TTL
-2. **Fire in parallel** — mapper calls should run concurrently with resolver searches, not block them
-3. **Use for artist MBID shortcutting** — any time you need an artist MBID and have a track title available, prefer the mapper (~4ms) over MB artist search (~500ms + rate limit risk)
-4. **Canonical name retry** — when resolver string matching fails, retry with mapper's `artist_credit_name` + `recording_name` as the search query
-5. **Don't use for album-only lookups** — the mapper requires a recording name; album lookups still need MB `/ws/2/release-group` search
-6. **Don't depend on for ISRC** — the mapper doesn't return ISRCs. Spotify deprecated `external_ids` (including ISRC) in Feb 2026 (partially reverted in March 2026), making ISRC-based cross-service matching unreliable
+### Track MBID Fields
+Tracks are enriched with these fields throughout the app:
+- `track.mbid` — MusicBrainz recording ID
+- `track.artistMbids` — array of MusicBrainz artist IDs
+- `track.releaseMbid` — MusicBrainz release ID
+
+### Fresh Drops Artist Limit (50 artists)
+`gatherNewReleasesArtists()` caps at 50 artists per fetch, shuffled across sources (collection, library, history). This limit exists because of the MusicBrainz release-groups fetch (`GET /ws/2/release-group?artist={mbid}`), which is rate-limited at 1 req/sec regardless of mapper cache. The mapper only eliminates the *artist search* call (~1100ms each), not the release-groups call. At 50 artists with full mapper cache coverage, Fresh Drops still takes ~55s; doubling to 100 would mean ~110s. The shuffle+accumulate design covers the full library over multiple sessions while keeping each load time reasonable.
 
 ### MusicBrainz API Calls That Benefit
 | Use case | Before | After (with mapper) |
@@ -150,12 +155,12 @@ When implementing in the Android app, the same strategy applies:
 | Artist MBID from track context | `/ws/2/artist?query=...` search (~500ms, rate limited) | Mapper cache hit (~0ms) or live call (~4ms) |
 | Artist page initial load | Fuzzy search + validation | Direct `/ws/2/artist/{mbid}` lookup |
 | Fresh Drops batch (50 artists) | 50 × 1100ms = ~55s worst case | Cache hits skip MB search entirely |
-| Playbar bio MBID resolution | MB artist search per track change | Mapper with MB fallback |
+| handlePlay canonical fallback | No fallback for metadata mismatches | Mapper canonical names retry resolution |
 
 ### MusicBrainz API Calls That Don't Benefit
 - Discography fetch (`/ws/2/release-group?artist={mbid}`) — still needs MB, mapper has no release-group data
 - Release details (`/ws/2/release/{id}?inc=recordings`) — need full tracklist, mapper only maps single recordings
-- Album art (`/ws/2/release?query=...`) — need release ID for Cover Art Archive, mapper's `release_mbid` could help but only when we have a track name
+- Album art (`/ws/2/release?query=...`) — need release ID for Cover Art Archive
 - Global search (artist/album/track) — open-ended queries need MB's fuzzy search, not mapper's exact lookup
 
 ## Common Patterns

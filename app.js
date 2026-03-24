@@ -7278,6 +7278,9 @@ const Parachord = () => {
   const resolveTracksInBackground = async (tracks) => {
     console.log(`🔍 Background resolution: resolving ${tracks.length} tracks across all sources...`);
 
+    // Background-enrich all tracks with MBIDs in parallel (non-blocking)
+    enrichTracksWithMbids(tracks);
+
     // Use refs to avoid stale closure issues
     const currentResolvers = loadedResolversRef.current;
     const currentActiveResolvers = activeResolversRef.current;
@@ -7948,9 +7951,60 @@ const Parachord = () => {
   // Cache for artist extended info from MusicBrainz (mbid -> { info, timestamp })
   const artistExtendedInfoCache = useRef({});
 
-  // Cache for MBID Mapper lookups (artist|title -> { recording_mbid, artist_credit_mbids, confidence, timestamp })
+  // Cache for MBID Mapper lookups (artist|title -> { result: { recording_mbid, artist_credit_mbids, ... }, timestamp })
   // Uses ListenBrainz MBID Mapper v2.0 for fast metadata-to-MBID resolution (~4ms)
   const mbidMapperCache = useRef({});
+
+  // Cache for playlist cover art (playlistId -> { covers: [url1, url2, url3, url4], timestamp })
+  const playlistCoverCache = useRef({});
+
+  // API keys loaded from environment via IPC (fallback)
+  const lastfmApiKey = useRef(null);
+
+  // Helper to get effective Last.fm API key: user-configured > environment/fallback
+  const getLastfmApiKey = () => {
+    // User-configured key takes priority
+    const userKey = metaServiceConfigs.lastfm?.apiKey;
+    if (userKey) return userKey;
+    // Fall back to environment-loaded key
+    return lastfmApiKey.current;
+  };
+
+  // Wrapper for Last.fm API fetches that detects rate limiting and suggests BYOK
+  const lastfmRateLimitShown = useRef(0);
+  const lastfmFetch = async (url, options) => {
+    const response = await fetch(url, options);
+    if (response.status === 429) {
+      const now = Date.now();
+      // Debounce: show toast at most once per 5 minutes
+      if (now - lastfmRateLimitShown.current > 5 * 60 * 1000) {
+        lastfmRateLimitShown.current = now;
+        const isUsingOwnKey = !!metaServiceConfigs.lastfm?.apiKey;
+        if (!isUsingOwnKey) {
+          showToast('Last.fm rate limit hit. Add your own API key in Settings to avoid this.', 'error');
+        } else {
+          showToast('Last.fm rate limit hit. Try again in a moment.', 'error');
+        }
+      }
+    }
+    return response;
+  };
+
+  // Cache TTLs (in milliseconds)
+  const CACHE_TTL = {
+    albumArt: 90 * 24 * 60 * 60 * 1000,    // 90 days
+    artistData: 30 * 24 * 60 * 60 * 1000,  // 30 days
+    trackSources: 7 * 24 * 60 * 60 * 1000, // 7 days (track availability changes)
+    persistedSources: 30 * 24 * 60 * 60 * 1000, // 30 days (persisted to collection/playlists)
+    artistImage: 90 * 24 * 60 * 60 * 1000, // 90 days
+    artistExtendedInfo: 30 * 24 * 60 * 60 * 1000, // 30 days (band info rarely changes)
+    playlistCover: 30 * 24 * 60 * 60 * 1000, // 30 days
+    recommendations: 60 * 60 * 1000,        // 1 hour (recommendations change based on listening)
+    charts: 24 * 60 * 60 * 1000,            // 24 hours (charts update daily)
+    newReleases: 6 * 60 * 60 * 1000,        // 6 hours (new releases don't change that often)
+    concerts: 24 * 60 * 60 * 1000,             // 24 hours (concert listings don't change that often)
+    mbidMapper: 90 * 24 * 60 * 60 * 1000       // 90 days (MBIDs are permanent identifiers)
+  };
 
   // MBID Mapper v2.0: fast fuzzy lookup of MusicBrainz IDs from artist + recording name
   // Returns { recording_mbid, artist_credit_mbids, release_mbid, confidence } or null
@@ -8003,55 +8057,91 @@ const Parachord = () => {
     return null;
   };
 
-  // Cache for playlist cover art (playlistId -> { covers: [url1, url2, url3, url4], timestamp })
-  const playlistCoverCache = useRef({});
-
-  // API keys loaded from environment via IPC (fallback)
-  const lastfmApiKey = useRef(null);
-
-  // Helper to get effective Last.fm API key: user-configured > environment/fallback
-  const getLastfmApiKey = () => {
-    // User-configured key takes priority
-    const userKey = metaServiceConfigs.lastfm?.apiKey;
-    if (userKey) return userKey;
-    // Fall back to environment-loaded key
-    return lastfmApiKey.current;
-  };
-
-  // Wrapper for Last.fm API fetches that detects rate limiting and suggests BYOK
-  const lastfmRateLimitShown = useRef(0);
-  const lastfmFetch = async (url, options) => {
-    const response = await fetch(url, options);
-    if (response.status === 429) {
-      const now = Date.now();
-      // Debounce: show toast at most once per 5 minutes
-      if (now - lastfmRateLimitShown.current > 5 * 60 * 1000) {
-        lastfmRateLimitShown.current = now;
-        const isUsingOwnKey = !!metaServiceConfigs.lastfm?.apiKey;
-        if (!isUsingOwnKey) {
-          showToast('Last.fm rate limit hit. Add your own API key in Settings to avoid this.', 'error');
-        } else {
-          showToast('Last.fm rate limit hit. Try again in a moment.', 'error');
-        }
-      }
+  // Enrich a track object with MBID metadata from the mapper (mutates track in-place)
+  const enrichTrackWithMbid = async (track) => {
+    if (!track.artist || !track.title) return;
+    if (track.mbid) return; // Already enriched
+    const result = await lookupMbidMapper(track.artist, track.title, track.album);
+    if (result && result.recording_mbid) {
+      track.mbid = result.recording_mbid;
+      track.artistMbids = result.artist_credit_mbids;
+      if (result.release_mbid) track.releaseMbid = result.release_mbid;
     }
-    return response;
   };
 
-  // Cache TTLs (in milliseconds)
-  const CACHE_TTL = {
-    albumArt: 90 * 24 * 60 * 60 * 1000,    // 90 days
-    artistData: 30 * 24 * 60 * 60 * 1000,  // 30 days
-    trackSources: 7 * 24 * 60 * 60 * 1000, // 7 days (track availability changes)
-    persistedSources: 30 * 24 * 60 * 60 * 1000, // 30 days (persisted to collection/playlists)
-    artistImage: 90 * 24 * 60 * 60 * 1000, // 90 days
-    artistExtendedInfo: 30 * 24 * 60 * 60 * 1000, // 30 days (band info rarely changes)
-    playlistCover: 30 * 24 * 60 * 60 * 1000, // 30 days
-    mbidMapper: 90 * 24 * 60 * 60 * 1000,   // 90 days (MBIDs are permanent identifiers)
-    recommendations: 60 * 60 * 1000,        // 1 hour (recommendations change based on listening)
-    charts: 24 * 60 * 60 * 1000,            // 24 hours (charts update daily)
-    newReleases: 6 * 60 * 60 * 1000,        // 6 hours (new releases don't change that often)
-    concerts: 24 * 60 * 60 * 1000              // 24 hours (concert listings don't change that often)
+  // Batch-enrich multiple tracks with MBIDs in the background (fire-and-forget)
+  const enrichTracksWithMbids = (tracks) => {
+    if (!tracks || tracks.length === 0) return;
+    // Fire all lookups in parallel, don't block
+    Promise.all(tracks.map(track => enrichTrackWithMbid(track).catch(() => {}))).catch(() => {});
+  };
+
+  // Fetch album art for a track using its releaseMbid from MBID mapper (fast path, no MusicBrainz search needed)
+  // Returns the art URL or null. Also caches in albumArtCache for future getCachedAlbumArt() hits.
+  const fetchArtworkViaMbid = async (track) => {
+    if (!track.releaseMbid) return null;
+    const releaseId = track.releaseMbid;
+
+    // Check if we already have art cached for this release
+    if (albumArtCache.current[releaseId]?.url) {
+      return albumArtCache.current[releaseId].url;
+    }
+
+    try {
+      const caaResponse = await fetch(
+        `https://coverartarchive.org/release/${releaseId}/front-250`,
+        { redirect: 'follow' }
+      );
+      if (caaResponse.ok) {
+        const artUrl = caaResponse.url;
+        const cacheEntry = { url: artUrl, timestamp: Date.now() };
+        albumArtCache.current[releaseId] = cacheEntry;
+        // Also store in albumToReleaseIdCache for getCachedAlbumArt() lookups by artist+album
+        if (track.artist && track.album) {
+          const lookupKey = `${track.artist}-${track.album}`.toLowerCase();
+          if (!albumToReleaseIdCache.current[lookupKey]) {
+            albumToReleaseIdCache.current[lookupKey] = { releaseId, releaseGroupId: null };
+          }
+        }
+        return artUrl;
+      }
+    } catch (error) {
+      // CAA lookup failed, not critical
+    }
+    return null;
+  };
+
+  // Enrich local file tracks with MBIDs, then fetch artwork for those missing it.
+  // Two-phase: first MBID enrichment (fast, ~4ms each), then artwork fetch for artless tracks.
+  const enrichLocalTracksWithArtwork = async (tracks) => {
+    if (!tracks || tracks.length === 0) return;
+
+    // Phase 1: MBID enrichment (all in parallel)
+    await Promise.all(tracks.map(track => enrichTrackWithMbid(track).catch(() => {})));
+
+    // Phase 2: Fetch artwork for tracks that lack albumArt but got a releaseMbid
+    const artlessTracks = tracks.filter(t => !t.albumArt && t.releaseMbid);
+    if (artlessTracks.length === 0) return;
+
+    console.log(`🎨 Fetching artwork for ${artlessTracks.length} local tracks via MBID...`);
+    let fetched = 0;
+
+    // Process in batches of 5 to avoid hammering CAA
+    for (let i = 0; i < artlessTracks.length; i += 5) {
+      const batch = artlessTracks.slice(i, i + 5);
+      await Promise.all(batch.map(track =>
+        fetchArtworkViaMbid(track).then(url => {
+          if (url) {
+            track.albumArt = url;
+            fetched++;
+          }
+        }).catch(() => {})
+      ));
+    }
+
+    if (fetched > 0) {
+      console.log(`🎨 Fetched artwork for ${fetched}/${artlessTracks.length} local tracks`);
+    }
   };
 
   // Cache for recommendations data (tracks from API)
@@ -10818,6 +10908,8 @@ ${trackListXml}
           if (localTracks && localTracks.length > 0) {
             console.log(`📚 Loaded ${localTracks.length} local tracks into library`);
             setLibrary(localTracks);
+            // Background-enrich local library tracks with MBIDs, then fetch artwork for artless tracks
+            enrichLocalTracksWithArtwork(localTracks).catch(() => {});
           } else {
             console.log('📚 No local files found - library is empty');
             setLibrary([]);
@@ -13535,7 +13627,6 @@ ${trackListXml}
           trackOrSource.mbid = mbidResult.recording_mbid;
           trackOrSource.artistMbids = mbidResult.artist_credit_mbids;
           if (mbidResult.release_mbid) trackOrSource.releaseMbid = mbidResult.release_mbid;
-          // Use canonical names from MusicBrainz for display consistency
           if (mbidResult.confidence >= 0.9) {
             console.log(`🎯 MBID Mapper: "${trackOrSource.title}" → ${mbidResult.recording_mbid} (confidence: ${mbidResult.confidence})`);
           }
@@ -13560,10 +13651,11 @@ ${trackListXml}
         if (availableResolvers.length === 0 && mbidResult && mbidResult.confidence >= 0.7) {
           const canonicalArtist = mbidResult.artist_credit_name;
           const canonicalTitle = mbidResult.recording_name;
-          const origArtistNorm = normalizeStr(trackOrSource.artist);
-          const origTitleNorm = normalizeStr(trackOrSource.title);
+          const origArtistNorm = (trackOrSource.artist || '').toLowerCase().trim();
+          const origTitleNorm = (trackOrSource.title || '').toLowerCase().trim();
           // Only retry if canonical names actually differ from what we searched
-          if (normalizeStr(canonicalArtist) !== origArtistNorm || normalizeStr(canonicalTitle) !== origTitleNorm) {
+          if ((canonicalArtist || '').toLowerCase().trim() !== origArtistNorm ||
+              (canonicalTitle || '').toLowerCase().trim() !== origTitleNorm) {
             console.log(`🔄 MBID Mapper: retrying with canonical names "${canonicalArtist} - ${canonicalTitle}"`);
             const retryPromises = enabledResolvers.map(async (resolver) => {
               try {
@@ -13592,17 +13684,17 @@ ${trackListXml}
                   };
                 }
               } catch (error) {
-                console.error(`  ❌ ${resolver.name || resolver.id} MBID retry error:`, error);
+                // Silently fail canonical retry
               }
             });
             await Promise.all(retryPromises);
-
-            if (playbackGenerationRef.current !== thisGeneration) return;
-
             if (Object.keys(freshSources).length > 0) {
               trackOrSource.sources = freshSources;
               if (trackOrSource.id) {
-                setTrackSources(prev => ({ ...prev, [trackOrSource.id]: freshSources }));
+                setTrackSources(prev => ({
+                  ...prev,
+                  [trackOrSource.id]: freshSources
+                }));
               }
             }
             availableResolvers = Object.keys(trackOrSource.sources).filter(id => !trackOrSource.sources[id]?.noMatch);
@@ -13893,6 +13985,39 @@ ${trackListXml}
         if (audioDuration && !isNaN(audioDuration) && isFinite(audioDuration) && audioDuration > 0) {
           console.log('🎵 Setting duration from audio element:', audioDuration);
           setCurrentTrack(prev => prev ? { ...prev, duration: audioDuration } : prev);
+        }
+
+        // Revalidate artwork for local files missing album art at playback time
+        // Fast path: use releaseMbid from MBID enrichment to fetch from Cover Art Archive
+        // Fallback: full getAlbumArt() flow (MusicBrainz search -> CAA -> resolvers)
+        if (!trackToSet.albumArt && trackToSet.artist && trackToSet.album) {
+          const myGen = thisGeneration;
+          (async () => {
+            try {
+              // First try MBID fast path - enrich if needed, then fetch art via releaseMbid
+              let artUrl = null;
+              if (!trackToSet.releaseMbid && !trackToSet.mbid) {
+                await enrichTrackWithMbid(trackToSet);
+              }
+              if (trackToSet.releaseMbid) {
+                artUrl = await fetchArtworkViaMbid(trackToSet);
+              }
+              // Fallback to full getAlbumArt flow if MBID path didn't yield art
+              if (!artUrl) {
+                artUrl = await getAlbumArt(trackToSet.artist, trackToSet.album);
+              }
+              if (artUrl && playbackGenerationRef.current === myGen) {
+                setCurrentTrack(prev => {
+                  if (prev && prev.artist === trackToSet.artist && prev.title === trackToSet.title && !prev.albumArt) {
+                    return { ...prev, albumArt: artUrl };
+                  }
+                  return prev;
+                });
+              }
+            } catch (e) {
+              // Artwork revalidation is non-critical
+            }
+          })();
         }
       } catch (error) {
         console.error('❌ Local file playback failed:', error);
@@ -17846,6 +17971,9 @@ ${trackListXml}
 
     // Queue track resolution is now handled by ResolutionScheduler via queue context visibility
 
+    // Background-enrich queued tracks with MBIDs (so they're ready by playback/scrobble time)
+    enrichTracksWithMbids(taggedTracks);
+
     // If nothing is playing, auto-start the first track (unless skipAutoPlay is set)
     if (nothingPlaying && taggedTracks.length > 0 && !skipAutoPlay) {
       const firstTrack = taggedTracks[0];
@@ -17875,6 +18003,8 @@ ${trackListXml}
           isLocal: true,
           sources: { localFiles: { filePath: track.filePath, confidence: 1 } }
         }));
+        // Background-enrich local file tracks with MBIDs
+        enrichTracksWithMbids(localTracks);
       } catch (error) {
         console.error('Local files search error:', error);
       }
@@ -18069,6 +18199,8 @@ ${trackListXml}
   const resolveRecording = async (recording) => {
     const track = {
       id: recording.id,
+      mbid: recording.id,
+      artistMbids: recording['artist-credit']?.map(ac => ac.artist?.id).filter(Boolean) || [],
       title: recording.title,
       artist: recording['artist-credit']?.[0]?.name || 'Unknown',
       duration: Math.floor((recording.length || 180000) / 1000), // Convert ms to seconds
@@ -18507,8 +18639,12 @@ ${trackListXml}
             const recordings = data.recordings || [];
 
             // Create all tracks as unresolved initially (resolve on-demand when played)
+            // recording.id IS the MusicBrainz recording MBID — store it as mbid for downstream enrichment
             let tracks = recordings.map(recording => ({
               id: recording.id,
+              mbid: recording.id,
+              artistMbids: recording['artist-credit']?.map(ac => ac.artist?.id).filter(Boolean) || [],
+              releaseMbid: recording.releases?.[0]?.id || null,
               title: recording.title,
               artist: recording['artist-credit']?.[0]?.name || 'Unknown',
               duration: Math.floor((recording.length || 180000) / 1000),
@@ -18536,6 +18672,9 @@ ${trackListXml}
               tracks,
               timestamp: Date.now()
             };
+
+            // Background-enrich tracks with MBID mapper data (populates cache for future lookups)
+            enrichTracksWithMbids(tracks);
 
             // Defer Fuse.js re-ranking to idle time for smoother UI
             const scheduleRerank = window.requestIdleCallback || ((cb) => setTimeout(cb, 16));
@@ -18871,7 +19010,7 @@ ${trackListXml}
       // Single IPC roundtrip for ALL keys (caches + settings + preferences)
       const allKeys = [
         // Caches
-        'cache_album_art', 'cache_artist_data', 'cache_track_sources', 'cache_artist_images',
+        'cache_album_art', 'cache_artist_data', 'cache_track_sources', 'cache_artist_images', 'cache_mbid_mapper',
         'cache_album_release_ids', 'cache_playlist_covers', 'cache_charts', 'cache_new_releases',
         'cache_concerts', 'cache_ai_suggestions', 'cache_mbid_mapper', 'last_active_view',
         // Resolver settings & user preferences
@@ -18902,6 +19041,7 @@ ${trackListXml}
       const playlistCoverData = d['cache_playlist_covers'];
       const chartsData = d['cache_charts'];
       const newReleasesData = d['cache_new_releases'];
+      const mbidMapperData = d['cache_mbid_mapper'];
 
       const now = Date.now();
 
@@ -18949,11 +19089,10 @@ ${trackListXml}
         console.log(`📦 Loaded ${validEntries.length} artist image entries from cache`);
       }
 
-      // Load MBID Mapper cache
-      const mbidMapperData = d['cache_mbid_mapper'];
+      // Load MBID mapper cache
       if (mbidMapperData) {
         const validEntries = Object.entries(mbidMapperData).filter(
-          ([_, entry]) => entry.timestamp && (now - entry.timestamp) < CACHE_TTL.mbidMapper
+          ([_, entry]) => entry && entry.timestamp && (now - entry.timestamp) < CACHE_TTL.mbidMapper
         );
         mbidMapperCache.current = Object.fromEntries(validEntries);
         console.log(`📦 Loaded ${validEntries.length} MBID mapper entries from cache`);
@@ -19594,6 +19733,9 @@ ${trackListXml}
 
       // Save playlist cover cache
       await window.electron.store.set('cache_playlist_covers', playlistCoverCache.current);
+
+      // Save MBID mapper cache
+      await window.electron.store.set('cache_mbid_mapper', mbidMapperCache.current);
 
       // Save charts cache
       await window.electron.store.set('cache_charts', chartsCache.current);
@@ -20247,6 +20389,16 @@ ${trackListXml}
 
     console.log('🌐 Fetching fresh artist data from MusicBrainz...');
 
+    // Try MBID mapper cache first for fast artist MBID shortcut (~0ms vs ~500ms+ for MB search)
+    const cachedArtistMbid = getArtistMbidFromMapperCache(artistName);
+    if (!cachedArtistMbid) {
+      // Fire a mapper lookup in the background using current track if available
+      const ct = currentTrackRef.current;
+      if (ct && ct.artist?.toLowerCase() === artistName.toLowerCase() && ct.title) {
+        lookupMbidMapper(ct.artist, ct.title, ct.album).catch(() => null);
+      }
+    }
+
     try {
       // Step 1: Search for artist by name to get MBID
       // Helper function to fetch with retry on rate limit and network errors
@@ -20750,6 +20902,8 @@ ${trackListXml}
                 title: track.title || track.recording?.title || 'Unknown Track',
                 length: track.length,
                 recording: track.recording,
+                mbid: track.recording?.id || null,
+                artistMbids: track.recording?.['artist-credit']?.map(ac => ac.artist?.id).filter(Boolean) || [],
                 mediumIndex: mediumIndex + 1,
                 mediumTitle: medium.title
               });
@@ -25205,6 +25359,22 @@ ${tracks}
         const cacheKey = artist.name.trim().toLowerCase();
         let mbid = artistDataCache.current[cacheKey]?.artist?.mbid;
         let madeApiCall = false;
+
+        // Check MBID mapper cache before hitting rate-limited MusicBrainz search
+        // Each mapper cache hit saves ~1100ms (skips MB artist search + rate limit delay)
+        if (!mbid) {
+          const mapperMbid = getArtistMbidFromMapperCache(artist.name);
+          if (mapperMbid) {
+            mbid = mapperMbid;
+            console.log(`✨ MBID mapper cache hit for "${artist.name}" → ${mbid} (saved ~1100ms)`);
+            // Cache it in artistDataCache too for future non-mapper lookups
+            artistDataCache.current[cacheKey] = {
+              ...(artistDataCache.current[cacheKey] || {}),
+              artist: { ...(artistDataCache.current[cacheKey]?.artist || {}), name: artist.name, mbid },
+              timestamp: Date.now()
+            };
+          }
+        }
 
         if (!mbid) {
           // Fast path: check MBID mapper cache for any previously resolved track by this artist
@@ -30708,6 +30878,9 @@ Variety guidance: ${theme} Be creative and surprising — avoid defaulting to th
 
         // Resolution handled by scheduler via IntersectionObserver
         console.log(`✅ Loaded ${tracksWithIds.length} tracks (resolution via scheduler)`);
+
+        // Background-enrich playlist tracks with MBIDs
+        enrichTracksWithMbids(tracksWithIds);
       }
     } else if (playlist.isEphemeral && playlist.listenbrainzId && (!playlist.tracks || playlist.tracks.length === 0)) {
       // Handle ephemeral ListenBrainz playlists - load tracks from API
@@ -30747,6 +30920,9 @@ Variety guidance: ${theme} Be creative and surprising — avoid defaulting to th
         });
 
         console.log(`✅ Loaded ${tracksWithIds.length} tracks from ListenBrainz`);
+
+        // Background-enrich ListenBrainz playlist tracks with MBIDs
+        enrichTracksWithMbids(tracksWithIds);
       } else {
         console.log('⚠️ No tracks found in ListenBrainz playlist');
         setPlaylistTracks([]);
@@ -30785,6 +30961,9 @@ Variety guidance: ${theme} Be creative and surprising — avoid defaulting to th
 
       // Resolution handled by scheduler via IntersectionObserver
       console.log(`✅ Loaded ${tracksWithIds.length} tracks (resolution via scheduler)`);
+
+      // Background-enrich playlist tracks with MBIDs
+      enrichTracksWithMbids(tracksWithIds);
     } else {
       // No tracks to display
       console.log('⚠️ Playlist has no tracks');
@@ -31947,115 +32126,111 @@ Variety guidance: ${theme} Be creative and surprising — avoid defaulting to th
 
     try {
 
-    // Try MusicKit JS first (works cross-platform, requires developer token)
+    // Determine available auth methods
     const musicKitWeb = window.getMusicKitWeb ? window.getMusicKitWeb() : null;
     let developerToken = localStorage.getItem('musickit_developer_token') || '';
     if (!developerToken && window.electron?.config?.get) {
       try { developerToken = await window.electron.config.get('MUSICKIT_DEVELOPER_TOKEN') || ''; } catch (e) {}
     }
 
-    if (musicKitWeb && developerToken) {
+    const hasNativeMusicKit = window.electron?.musicKit && await window.electron.musicKit.isAvailable().catch(() => false);
+    const hasMusicKitWeb = !!(musicKitWeb && developerToken);
+
+    // On macOS, prefer native MusicKit auth — the MusicKit JS popup runs inside
+    // an Electron BrowserWindow that cannot surface macOS system sheets (Touch ID,
+    // passkeys), causing the auth flow to stall when the user picks passkey login.
+    // Native MusicKit delegates to the OS which handles all auth methods natively.
+    const tryNativeFirst = hasNativeMusicKit;
+
+    // MusicKit JS auth helper (used as primary on non-macOS, fallback on macOS)
+    const tryMusicKitJsAuth = async () => {
+      if (!hasMusicKitWeb) return false;
       try {
         console.log('[AppleMusic] Trying MusicKit JS authorization...');
-
-        // Configure MusicKit JS if not already configured
         const status = musicKitWeb.getAuthStatus();
         if (!status.configured) {
           await musicKitWeb.configure(developerToken, 'Parachord', '1.0.0');
         }
-
-        // Request authorization (Apple ID sign-in)
         const authResult = await musicKitWeb.authorize();
         console.log('[AppleMusic] MusicKit JS auth result:', authResult);
+        if (!authResult.authorized) return false;
 
-        if (authResult.authorized) {
-          console.log('🍎 MusicKit JS authorized successfully');
-          setAppleMusicConnected(true);
+        console.log('🍎 MusicKit JS authorized successfully');
+        setAppleMusicConnected(true);
 
-          // Store the music user token for session persistence and sync
-          if (authResult.userToken) {
-            localStorage.setItem('musickit_user_token', authResult.userToken);
-            if (window.electron?.store) {
-              await window.electron.store.set('applemusic_user_token', authResult.userToken);
-            }
-            console.log('🍎 Music user token stored');
-          }
-
-          // Save auth state
+        if (authResult.userToken) {
+          localStorage.setItem('musickit_user_token', authResult.userToken);
           if (window.electron?.store) {
-            await window.electron.store.set('applemusic_authorized', true);
+            await window.electron.store.set('applemusic_user_token', authResult.userToken);
           }
-
-          // Automatically enable Apple Music resolver after successful auth
-          setActiveResolvers(prev => {
-            if (!prev.includes('applemusic')) {
-              return [...prev, 'applemusic'];
-            }
-            return prev;
-          });
-          setResolverOrder(prev => {
-            if (!prev.includes('applemusic')) {
-              return insertInCanonicalOrder(prev, 'applemusic');
-            }
-            return prev;
-          });
-
-          showToast('Apple Music connected successfully', 'success');
-
-          // If library sync was previously enabled for Apple Music, trigger an
-          // immediate sync now that we have a valid token (same rationale as Spotify).
-          if (window.electron?.sync?.start) {
-            window.electron.syncSettings?.load().then(syncSettings => {
-              if (syncSettings?.applemusic?.enabled) {
-                console.log('[Sync] Apple Music re-authenticated with sync enabled, triggering immediate sync');
-                window.electron.sync.start('applemusic', { settings: syncSettings.applemusic }).then(result => {
-                  if (result?.success && result.collection) {
-                    const incoming = {
-                      tracks: result.collection.tracks || [],
-                      albums: result.collection.albums || [],
-                      artists: result.collection.artists || []
-                    };
-                    setCollectionData(prev => {
-                      const netLoss = (prev.tracks?.length || 0) - incoming.tracks.length;
-                      const lossRatio = prev.tracks?.length > 0 ? netLoss / prev.tracks.length : 0;
-                      if (netLoss > 50 && lossRatio > 0.1) {
-                        console.warn(`[Sync] Skipping UI update after re-auth: likely incomplete API response`);
-                        return prev;
-                      }
-                      return incoming;
-                    });
-                  }
-                }).catch(err => console.error('[Sync] Post-auth Apple Music sync failed:', err));
-              }
-            }).catch(() => {});
-          }
-
-          return;
+          console.log('🍎 Music user token stored');
         }
+
+        if (window.electron?.store) {
+          await window.electron.store.set('applemusic_authorized', true);
+        }
+
+        setActiveResolvers(prev => {
+          if (!prev.includes('applemusic')) {
+            return [...prev, 'applemusic'];
+          }
+          return prev;
+        });
+        setResolverOrder(prev => {
+          if (!prev.includes('applemusic')) {
+            return insertInCanonicalOrder(prev, 'applemusic');
+          }
+          return prev;
+        });
+
+        showToast('Apple Music connected successfully', 'success');
+
+        if (window.electron?.sync?.start) {
+          window.electron.syncSettings?.load().then(syncSettings => {
+            if (syncSettings?.applemusic?.enabled) {
+              console.log('[Sync] Apple Music re-authenticated with sync enabled, triggering immediate sync');
+              window.electron.sync.start('applemusic', { settings: syncSettings.applemusic }).then(result => {
+                if (result?.success && result.collection) {
+                  const incoming = {
+                    tracks: result.collection.tracks || [],
+                    albums: result.collection.albums || [],
+                    artists: result.collection.artists || []
+                  };
+                  setCollectionData(prev => {
+                    const netLoss = (prev.tracks?.length || 0) - incoming.tracks.length;
+                    const lossRatio = prev.tracks?.length > 0 ? netLoss / prev.tracks.length : 0;
+                    if (netLoss > 50 && lossRatio > 0.1) {
+                      console.warn(`[Sync] Skipping UI update after re-auth: likely incomplete API response`);
+                      return prev;
+                    }
+                    return incoming;
+                  });
+                }
+              }).catch(err => console.error('[Sync] Post-auth Apple Music sync failed:', err));
+            }
+          }).catch(() => {});
+        }
+
+        return true;
       } catch (error) {
         console.log('[AppleMusic] MusicKit JS auth failed:', error.message);
-        // Fall through to native MusicKit
+        return false;
       }
+    };
+
+    if (!tryNativeFirst) {
+      // Non-macOS: try MusicKit JS first, then show error if unavailable
+      if (await tryMusicKitJsAuth()) return;
     }
 
-    // Fall back to native MusicKit (macOS only)
-    if (!window.electron?.musicKit) {
+    // Native MusicKit path (macOS) — or fallback after MusicKit JS failure
+    if (!hasNativeMusicKit) {
       showConfirmDialog({
         type: 'error',
         title: 'MusicKit Not Available',
         message: developerToken
           ? 'MusicKit JS authorization failed. Please check your developer token.'
           : 'MusicKit requires either a developer token (Settings → Resolvers → Apple Music) or macOS native integration.'
-      });
-      return;
-    }
-
-    const isAvailable = await window.electron.musicKit.isAvailable();
-    if (!isAvailable) {
-      showConfirmDialog({
-        type: 'error',
-        title: 'MusicKit Not Available',
-        message: 'Native MusicKit is only available on macOS. For cross-platform support, add your MusicKit developer token in Settings → Resolvers → Apple Music.'
       });
       return;
     }
