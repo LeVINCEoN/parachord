@@ -5326,12 +5326,25 @@ ipcMain.handle('sync:start', async (event, providerId, options = {}) => {
       // Clear syncedFrom on local playlists whose remote counterpart no longer
       // exists (e.g. deleted on the provider). This turns them into local-only
       // playlists so the post-sync push logic will re-create them on the provider.
+      //
+      // Safety: only clear syncedFrom when the remote fetch looks complete.
+      // If the API returned far fewer playlists than we have locally synced from
+      // this provider, the response was likely truncated (rate limit, pagination
+      // failure) and clearing syncedFrom would cause mass duplicate creation.
       const remoteExternalIds = new Set(remotePlaylists.map(p => p.externalId));
-      for (let j = 0; j < currentPlaylists.length; j++) {
-        const p = currentPlaylists[j];
-        if (p.syncedFrom?.resolver === providerId && !remoteExternalIds.has(p.syncedFrom.externalId)) {
-          console.log(`[Sync] Playlist "${p.title}" no longer on ${providerId}, clearing syncedFrom so it can be re-pushed`);
-          currentPlaylists[j] = { ...p, syncedFrom: null };
+      const localSyncedFromProvider = currentPlaylists.filter(p => p.syncedFrom?.resolver === providerId);
+      const missingCount = localSyncedFromProvider.filter(p => !remoteExternalIds.has(p.syncedFrom.externalId)).length;
+      const tooManyMissing = localSyncedFromProvider.length > 0 && missingCount > 3 && (missingCount / localSyncedFromProvider.length) > 0.3;
+
+      if (tooManyMissing) {
+        console.warn(`[Sync] Skipping syncedFrom clearing: ${missingCount}/${localSyncedFromProvider.length} playlists missing from ${providerId} remote response (likely incomplete API response)`);
+      } else {
+        for (let j = 0; j < currentPlaylists.length; j++) {
+          const p = currentPlaylists[j];
+          if (p.syncedFrom?.resolver === providerId && !remoteExternalIds.has(p.syncedFrom.externalId)) {
+            console.log(`[Sync] Playlist "${p.title}" no longer on ${providerId}, clearing syncedFrom so it can be re-pushed`);
+            currentPlaylists[j] = { ...p, syncedFrom: null };
+          }
         }
       }
 
@@ -5560,11 +5573,18 @@ ipcMain.handle('sync:push-playlist', async (event, providerId, playlistExternalI
       const { externalId, snapshotId } = await provider.createPlaylist(name, description, token);
       console.log(`[Sync] Created playlist "${name}" on ${providerId}: ${externalId}`);
 
-      // Step 3: Add tracks
+      // Step 3: Add tracks — if this fails, the playlist was still created on the
+      // provider so we must return success with the externalId.  Otherwise syncedTo
+      // is never set and the next sync cycle creates another duplicate.
       let finalSnapshotId = snapshotId;
       if (resolved.length > 0 && provider.updatePlaylistTracks) {
-        const updateResult = await provider.updatePlaylistTracks(externalId, resolved, token);
-        finalSnapshotId = updateResult.snapshotId || snapshotId;
+        try {
+          const updateResult = await provider.updatePlaylistTracks(externalId, resolved, token);
+          finalSnapshotId = updateResult.snapshotId || snapshotId;
+        } catch (trackError) {
+          console.warn(`[Sync] Playlist "${name}" created on ${providerId} but failed to add tracks: ${trackError.message}`);
+          unresolved = tracks.map(t => ({ artist: t.artist, title: t.title }));
+        }
       }
 
       return {

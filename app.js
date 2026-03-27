@@ -5463,6 +5463,12 @@ const Parachord = () => {
                   if (playlist.localOnly) continue;
                   if (playlist.syncedFrom) continue;
 
+                  // Skip playlists whose ID indicates they originated from this provider
+                  // (e.g. "applemusic-p.XXXXX"). Even if syncedFrom was cleared due to
+                  // an incomplete API response, we must not re-create these on the same
+                  // provider — that would produce duplicates.
+                  if (playlist.id?.startsWith(`${providerId}-`)) continue;
+
                   // Skip playlists with pending actions
                   if (playlist.syncedTo?.[providerId]?.pendingAction) continue;
 
@@ -9060,6 +9066,7 @@ const Parachord = () => {
 
           for (const playlist of allPlaylists) {
             if (playlist.localOnly || playlist.syncedFrom) continue;
+            if (playlist.id?.startsWith(`${providerId}-`)) continue;
             if (playlist.syncedTo?.[providerId]) continue;
 
             console.log(`[Sync] Creating playlist "${playlist.title}" on ${providerId}`);
