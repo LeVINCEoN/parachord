@@ -5632,6 +5632,141 @@ ipcMain.handle('sync:push-playlist', async (event, providerId, playlistExternalI
     }
   });
 
+  // Clean up duplicate playlists on a sync provider
+  // Groups remote playlists by name and deletes duplicates, keeping the best one
+  // (most tracks, or most recently modified as tiebreaker)
+  ipcMain.handle('sync:cleanup-duplicate-playlists', async (event, providerId) => {
+    const provider = SyncEngine.getProvider(providerId);
+    if (!provider || !provider.capabilities.playlists) {
+      return { success: false, error: 'Provider does not support playlists' };
+    }
+    if (!provider.deletePlaylist) {
+      return { success: false, error: 'Provider does not support playlist deletion' };
+    }
+
+    let token;
+    let refreshTokenCb = null;
+    if (providerId === 'spotify') {
+      token = await ensureValidSpotifyToken();
+      refreshTokenCb = async () => {
+        const newToken = await ensureValidSpotifyToken(true);
+        if (newToken) token = newToken;
+        return newToken;
+      };
+    } else if (providerId === 'applemusic') {
+      if (!generatedMusicKitToken) {
+        await musicKitTokenReady;
+      }
+      const developerToken = generatedMusicKitToken || process.env.MUSICKIT_DEVELOPER_TOKEN || store.get('applemusic_developer_token');
+      const userToken = store.get('applemusic_user_token');
+      if (developerToken && userToken) {
+        token = JSON.stringify({ developerToken, userToken });
+      }
+    }
+
+    if (!token) {
+      return { success: false, error: 'Not authenticated' };
+    }
+
+    try {
+      // Fetch all remote playlists
+      const { playlists } = await provider.fetchPlaylists(token, null, refreshTokenCb);
+      if (!playlists || playlists.length === 0) {
+        return { success: true, deleted: 0, groups: [] };
+      }
+
+      // Only consider user-owned playlists (don't delete followed/collaborative ones)
+      const ownedPlaylists = playlists.filter(p => p.isOwnedByUser !== false);
+
+      // Group by normalized name
+      const groups = {};
+      for (const playlist of ownedPlaylists) {
+        const key = (playlist.name || '').trim().toLowerCase();
+        if (!groups[key]) groups[key] = [];
+        groups[key].push(playlist);
+      }
+
+      // Find groups with duplicates
+      const duplicateGroups = Object.entries(groups).filter(([, items]) => items.length > 1);
+      if (duplicateGroups.length === 0) {
+        return { success: true, deleted: 0, groups: [] };
+      }
+
+      let totalDeleted = 0;
+      const deletedGroups = [];
+
+      for (const [name, items] of duplicateGroups) {
+        // Sort: most tracks first, then most recently modified
+        items.sort((a, b) => {
+          if ((b.trackCount || 0) !== (a.trackCount || 0)) {
+            return (b.trackCount || 0) - (a.trackCount || 0);
+          }
+          // Compare snapshotId (lastModifiedDate for Apple Music)
+          return (b.snapshotId || '').localeCompare(a.snapshotId || '');
+        });
+
+        const keeper = items[0];
+        const toDelete = items.slice(1);
+
+        for (const dup of toDelete) {
+          try {
+            await provider.deletePlaylist(dup.externalId, token);
+            totalDeleted++;
+            console.log(`[Sync Cleanup] Deleted duplicate "${dup.name}" (${dup.externalId}, ${dup.trackCount || 0} tracks) — keeping ${keeper.externalId} (${keeper.trackCount || 0} tracks)`);
+            // Rate limit delay between deletions
+            if (provider.getRateLimitDelay) {
+              await new Promise(r => setTimeout(r, provider.getRateLimitDelay()));
+            }
+          } catch (err) {
+            console.warn(`[Sync Cleanup] Failed to delete "${dup.name}" (${dup.externalId}): ${err.message}`);
+          }
+        }
+
+        deletedGroups.push({
+          name: keeper.name,
+          kept: { externalId: keeper.externalId, trackCount: keeper.trackCount || 0 },
+          deleted: toDelete.length
+        });
+      }
+
+      // Also clean up local playlist references that point to deleted external IDs
+      const deletedExternalIds = new Set();
+      for (const [, items] of duplicateGroups) {
+        for (const dup of items.slice(1)) {
+          deletedExternalIds.add(dup.externalId);
+        }
+      }
+      if (deletedExternalIds.size > 0) {
+        const localPlaylists = store.get('local_playlists') || [];
+        let localCleaned = 0;
+        const updatedLocal = localPlaylists.map(p => {
+          // Clean syncedTo references pointing to deleted playlists
+          if (p.syncedTo?.[providerId] && deletedExternalIds.has(p.syncedTo[providerId].externalId)) {
+            const newSyncedTo = { ...p.syncedTo };
+            delete newSyncedTo[providerId];
+            localCleaned++;
+            return { ...p, syncedTo: Object.keys(newSyncedTo).length > 0 ? newSyncedTo : undefined };
+          }
+          // Clean syncedFrom references pointing to deleted playlists
+          if (p.syncedFrom?.resolver === providerId && deletedExternalIds.has(p.syncedFrom.externalId)) {
+            localCleaned++;
+            return { ...p, syncedFrom: null };
+          }
+          return p;
+        });
+        if (localCleaned > 0) {
+          store.set('local_playlists', updatedLocal);
+          console.log(`[Sync Cleanup] Cleaned ${localCleaned} local playlist references to deleted duplicates`);
+        }
+      }
+
+      return { success: true, deleted: totalDeleted, groups: deletedGroups };
+    } catch (error) {
+      console.error(`[Sync Cleanup] Error: ${error.message}`);
+      return { success: false, error: error.message };
+    }
+  });
+
 // Helper: get auth token for a sync provider
 function getSyncProviderToken(providerId) {
   if (providerId === 'spotify') {

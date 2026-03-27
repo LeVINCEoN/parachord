@@ -5386,6 +5386,32 @@ const Parachord = () => {
     providerId: null
   });
 
+  // Duplicate playlist cleanup state
+  const [cleanupDuplicatesState, setCleanupDuplicatesState] = useState({
+    loading: false,
+    providerId: null
+  });
+
+  const handleCleanupDuplicatePlaylists = async (providerId) => {
+    setCleanupDuplicatesState({ loading: true, providerId });
+    try {
+      const result = await window.electron.sync.cleanupDuplicatePlaylists(providerId);
+      if (result.success) {
+        if (result.deleted === 0) {
+          showToast('No duplicate playlists found', 'info');
+        } else {
+          const names = result.groups.map(g => `"${g.name}" (${g.deleted} removed)`).join(', ');
+          showToast(`Cleaned up ${result.deleted} duplicate playlist${result.deleted > 1 ? 's' : ''}: ${names}`, 'success');
+        }
+      } else {
+        showToast(`Cleanup failed: ${result.error}`, 'error');
+      }
+    } catch (err) {
+      showToast(`Cleanup failed: ${err.message}`, 'error');
+    }
+    setCleanupDuplicatesState({ loading: false, providerId: null });
+  };
+
   // First-run tutorial state
   const [firstRunTutorial, setFirstRunTutorial] = useState({
     open: false,
@@ -52848,6 +52874,26 @@ useEffect(() => {
                       onMouseEnter: (e) => { e.currentTarget.style.backgroundColor = 'var(--hover-bg-subtle)'; },
                       onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = 'var(--hover-bg-default)'; }
                     }, 'Manage Sync'),
+                    React.createElement('button', {
+                      onClick: () => handleCleanupDuplicatePlaylists(selectedResolver.id),
+                      disabled: cleanupDuplicatesState.loading && cleanupDuplicatesState.providerId === selectedResolver.id,
+                      style: {
+                        padding: '8px 14px',
+                        backgroundColor: 'var(--hover-bg-default)',
+                        color: 'var(--text-primary)',
+                        fontSize: '13px',
+                        fontWeight: '500',
+                        borderRadius: '8px',
+                        border: '1px solid var(--border-subtle)',
+                        cursor: cleanupDuplicatesState.loading ? 'wait' : 'pointer',
+                        transition: 'background-color 150ms ease',
+                        opacity: cleanupDuplicatesState.loading ? 0.6 : 1
+                      },
+                      onMouseEnter: (e) => { if (!cleanupDuplicatesState.loading) e.currentTarget.style.backgroundColor = 'var(--hover-bg-subtle)'; },
+                      onMouseLeave: (e) => { e.currentTarget.style.backgroundColor = 'var(--hover-bg-default)'; }
+                    }, cleanupDuplicatesState.loading && cleanupDuplicatesState.providerId === selectedResolver.id
+                      ? 'Cleaning...'
+                      : 'Clean Up Duplicates'),
                     React.createElement('button', {
                       onClick: () => setStopSyncDialog({ open: true, providerId: selectedResolver.id }),
                       style: {
