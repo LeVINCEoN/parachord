@@ -24,6 +24,13 @@ const { AIChatService, createChatService } = require('./ai-chat');
  * @param {Function} params.getCurrentTrack - Function to get current track
  * @param {Function} params.getQueue - Function to get current queue
  * @param {Function} params.getIsPlaying - Function to get playback state
+ * @param {Function} params.getPlaylists - Function to get all playlists
+ * @param {Function} params.findPlaylist - Function to find playlist by name
+ * @param {Function} params.addTracksToPlaylist - Function to add tracks to a playlist
+ * @param {Function} params.removeTrackFromPlaylist - Function to remove track from playlist
+ * @param {Function} params.moveTrackInPlaylist - Function to reorder track in playlist
+ * @param {Function} params.renamePlaylist - Function to rename a playlist
+ * @param {Function} params.deletePlaylist - Function to delete a playlist
  * @returns {Object} Tool context for DJ tools
  */
 function createToolContext({
@@ -39,7 +46,14 @@ function createToolContext({
   createPlaylist,
   getCurrentTrack,
   getQueue,
-  getIsPlaying
+  getIsPlaying,
+  getPlaylists,
+  findPlaylist,
+  addTracksToPlaylist,
+  removeTrackFromPlaylist,
+  moveTrackInPlaylist,
+  renamePlaylist,
+  deletePlaylist
 }) {
   return {
     // Search for tracks across active resolvers
@@ -109,6 +123,35 @@ function createToolContext({
     // Get playback state
     getIsPlaying: () => {
       return getIsPlaying();
+    },
+
+    // Playlist management
+    getPlaylists: () => {
+      return getPlaylists ? getPlaylists() : [];
+    },
+
+    findPlaylist: (name) => {
+      return findPlaylist ? findPlaylist(name) : null;
+    },
+
+    addTracksToPlaylist: (playlistId, tracks) => {
+      if (addTracksToPlaylist) addTracksToPlaylist(playlistId, tracks);
+    },
+
+    removeTrackFromPlaylist: (playlistId, trackIndex) => {
+      if (removeTrackFromPlaylist) removeTrackFromPlaylist(playlistId, trackIndex);
+    },
+
+    moveTrackInPlaylist: (playlistId, fromIndex, toIndex) => {
+      if (moveTrackInPlaylist) moveTrackInPlaylist(playlistId, fromIndex, toIndex);
+    },
+
+    renamePlaylist: (playlistId, newName) => {
+      if (renamePlaylist) renamePlaylist(playlistId, newName);
+    },
+
+    deletePlaylist: async (playlistId) => {
+      if (deletePlaylist) return await deletePlaylist(playlistId);
     }
   };
 }
@@ -122,6 +165,7 @@ function createToolContext({
  * @param {Function} params.getIsPlaying - Get playing state
  * @param {Function} params.getShuffleMode - Get shuffle mode
  * @param {Function} params.getListeningHistory - Get listening history/stats
+ * @param {Function} [params.getPlaylists] - Get playlists summary
  * @returns {Function} Context getter
  */
 function createContextGetter({
@@ -129,7 +173,8 @@ function createContextGetter({
   getQueue,
   getIsPlaying,
   getShuffleMode,
-  getListeningHistory
+  getListeningHistory,
+  getPlaylists
 }) {
   return async () => {
     const nowPlaying = getCurrentTrack();
@@ -163,6 +208,24 @@ function createContextGetter({
         }
       } catch (e) {
         // History is optional
+      }
+    }
+
+    // Add playlists summary if available
+    if (getPlaylists) {
+      try {
+        const playlists = getPlaylists();
+        if (playlists && playlists.length > 0) {
+          context.playlists = playlists.slice(0, 20).map(p => ({
+            name: p.name || p.title,
+            trackCount: p.trackCount || (p.tracks || []).length,
+            sampleTracks: (p.tracks || []).slice(0, 3).map(t => ({
+              title: t.title, artist: t.artist
+            }))
+          }));
+        }
+      } catch (e) {
+        // Playlists are optional
       }
     }
 

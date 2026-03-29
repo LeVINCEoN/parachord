@@ -67,6 +67,13 @@ GUIDELINES:
  * @property {function(): Object|null} getCurrentTrack
  * @property {function(): Array} getQueue
  * @property {function(): boolean} getIsPlaying
+ * @property {function(): Array} getPlaylists - Get all playlists
+ * @property {function(string): Object|null} findPlaylist - Find playlist by name
+ * @property {function(string, Array): void} addTracksToPlaylist - Add tracks to playlist
+ * @property {function(string, number): void} removeTrackFromPlaylist - Remove track by index
+ * @property {function(string, number, number): void} moveTrackInPlaylist - Reorder track
+ * @property {function(string, string): void} renamePlaylist - Rename playlist
+ * @property {function(string): Promise} deletePlaylist - Delete playlist
  */
 
 /**
@@ -296,6 +303,19 @@ class AIChatService {
       }
     }
 
+    // Playlists
+    if (context.playlists && context.playlists.length > 0) {
+      lines.push('');
+      lines.push(`Playlists (${context.playlists.length}):`);
+      context.playlists.slice(0, 15).forEach(p => {
+        const samples = p.sampleTracks?.length > 0
+          ? ` (e.g. ${p.sampleTracks.map(t => `"${t.title}"`).join(', ')})`
+          : '';
+        lines.push(`  • "${p.name}" - ${p.trackCount} tracks${samples}`);
+      });
+      lines.push('  Use playlist tools to browse, add to, reorder, rename, or delete playlists.');
+    }
+
     return lines.join('\n');
   }
 
@@ -333,6 +353,20 @@ class AIChatService {
           return `Created playlist "${result.playlist?.name}"`;
         case 'shuffle':
           return `Shuffle ${result.shuffle ? 'enabled' : 'disabled'}`;
+        case 'get_playlists':
+          return `Found ${result.total} playlists`;
+        case 'get_playlist_tracks':
+          return `Loaded ${result.playlist?.trackCount} tracks from "${result.playlist?.name}"`;
+        case 'add_to_playlist':
+          return `Added ${result.added} track(s) to "${result.playlist?.name}"`;
+        case 'remove_from_playlist':
+          return `Removed "${result.removed?.title}" from "${result.playlist?.name}"`;
+        case 'reorder_playlist':
+          return `Moved track in "${result.playlist?.name}"`;
+        case 'rename_playlist':
+          return `Renamed "${result.oldName}" to "${result.newName}"`;
+        case 'delete_playlist':
+          return `Deleted playlist "${result.deleted?.name}"`;
         default:
           return `${tool} completed`;
       }

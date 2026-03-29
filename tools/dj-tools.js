@@ -24,6 +24,13 @@
  * @property {function(): Object|null} getCurrentTrack - Get current track
  * @property {function(): Array} getQueue - Get current queue
  * @property {function(): boolean} getIsPlaying - Get playback state
+ * @property {function(): Array} getPlaylists - Get all playlists
+ * @property {function(string): Object|null} findPlaylist - Find playlist by name
+ * @property {function(string, Array): void} addTracksToPlaylist - Add tracks to playlist
+ * @property {function(string, number): void} removeTrackFromPlaylist - Remove track by index
+ * @property {function(string, number, number): void} moveTrackInPlaylist - Reorder track
+ * @property {function(string, string): void} renamePlaylist - Rename playlist
+ * @property {function(string): Promise} deletePlaylist - Delete playlist
  */
 
 /**
@@ -446,6 +453,242 @@ const blockRecommendationTool = {
 };
 
 /**
+ * Get all playlists with names, IDs, and track counts
+ * @type {Tool}
+ */
+const getPlaylistsTool = {
+  name: 'get_playlists',
+  description: "Get all of the user's playlists with names, IDs, and track counts. Use when the user asks about their playlists, wants to browse them, or before modifying a playlist.",
+  parameters: { type: 'object', properties: {}, required: [] },
+  execute: async (_, context) => {
+    const playlists = context.getPlaylists();
+    return {
+      success: true,
+      playlists: playlists.map(p => ({
+        id: p.id,
+        name: p.name,
+        trackCount: p.trackCount,
+        sampleTracks: p.tracks.slice(0, 5).map(t => ({ artist: t.artist, title: t.title }))
+      })),
+      total: playlists.length
+    };
+  }
+};
+
+/**
+ * Get full track listing for a specific playlist
+ * @type {Tool}
+ */
+const getPlaylistTracksTool = {
+  name: 'get_playlist_tracks',
+  description: 'Get the full track listing for a specific playlist by name. Returns all tracks with their index positions. Use this before reordering or removing tracks.',
+  parameters: {
+    type: 'object',
+    properties: {
+      playlist_name: { type: 'string', description: 'The playlist name to look up (case-insensitive partial match)' }
+    },
+    required: ['playlist_name']
+  },
+  execute: async ({ playlist_name }, context) => {
+    const playlist = context.findPlaylist(playlist_name);
+    if (!playlist) {
+      return { success: false, error: `Could not find a playlist matching "${playlist_name}"` };
+    }
+    return {
+      success: true,
+      playlist: {
+        id: playlist.id,
+        name: playlist.title || playlist.name,
+        trackCount: (playlist.tracks || []).length,
+        tracks: (playlist.tracks || []).map((t, i) => ({
+          index: i, artist: t.artist, title: t.title, album: t.album
+        }))
+      }
+    };
+  }
+};
+
+/**
+ * Add tracks to an existing playlist
+ * @type {Tool}
+ */
+const addToPlaylistTool = {
+  name: 'add_to_playlist',
+  description: 'Add one or more tracks to an existing playlist.',
+  parameters: {
+    type: 'object',
+    properties: {
+      playlist_name: { type: 'string', description: 'Name of the playlist to add tracks to (case-insensitive partial match)' },
+      tracks: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: { artist: { type: 'string' }, title: { type: 'string' } },
+          required: ['artist', 'title']
+        },
+        description: 'Tracks to add to the playlist'
+      }
+    },
+    required: ['playlist_name', 'tracks']
+  },
+  execute: async ({ playlist_name, tracks }, context) => {
+    const playlist = context.findPlaylist(playlist_name);
+    if (!playlist) {
+      return { success: false, error: `Could not find a playlist matching "${playlist_name}"` };
+    }
+    if (!tracks || tracks.length === 0) {
+      return { success: false, error: 'No tracks specified' };
+    }
+    const tracksToAdd = tracks.map(t => ({
+      artist: t.artist, title: t.title, album: t.album || null,
+      id: `${t.artist}-${t.title}`.toLowerCase().replace(/[^a-z0-9-]/g, '')
+    }));
+    context.addTracksToPlaylist(playlist.id, tracksToAdd);
+    return {
+      success: true,
+      playlist: { name: playlist.title || playlist.name },
+      added: tracksToAdd.length,
+      newTrackCount: (playlist.tracks || []).length + tracksToAdd.length
+    };
+  }
+};
+
+/**
+ * Remove a track from a playlist
+ * @type {Tool}
+ */
+const removeFromPlaylistTool = {
+  name: 'remove_from_playlist',
+  description: 'Remove a track from a playlist. Specify either the track index (0-based) or artist/title to match.',
+  parameters: {
+    type: 'object',
+    properties: {
+      playlist_name: { type: 'string', description: 'Name of the playlist (case-insensitive partial match)' },
+      track_index: { type: 'number', description: 'Index of the track to remove (0-based)' },
+      artist: { type: 'string', description: 'Artist name to match for removal' },
+      title: { type: 'string', description: 'Track title to match for removal' }
+    },
+    required: ['playlist_name']
+  },
+  execute: async ({ playlist_name, track_index, artist, title }, context) => {
+    const playlist = context.findPlaylist(playlist_name);
+    if (!playlist) {
+      return { success: false, error: `Could not find a playlist matching "${playlist_name}"` };
+    }
+    const tracks = playlist.tracks || [];
+    let idx = -1;
+    if (track_index !== undefined && track_index !== null) {
+      idx = track_index;
+    } else if (artist || title) {
+      const fa = artist?.toLowerCase();
+      const ft = title?.toLowerCase();
+      idx = tracks.findIndex(t => {
+        const ma = fa && t.artist?.toLowerCase().includes(fa);
+        const mt = ft && t.title?.toLowerCase().includes(ft);
+        if (fa && ft) return ma && mt;
+        return ma || mt;
+      });
+    }
+    if (idx < 0 || idx >= tracks.length) {
+      return { success: false, error: 'Track not found in playlist' };
+    }
+    const removed = tracks[idx];
+    context.removeTrackFromPlaylist(playlist.id, idx);
+    return {
+      success: true,
+      removed: { artist: removed.artist, title: removed.title },
+      playlist: { name: playlist.title || playlist.name },
+      newTrackCount: tracks.length - 1
+    };
+  }
+};
+
+/**
+ * Reorder tracks within a playlist
+ * @type {Tool}
+ */
+const reorderPlaylistTool = {
+  name: 'reorder_playlist',
+  description: 'Move a track from one position to another within a playlist. Use get_playlist_tracks first to see current positions.',
+  parameters: {
+    type: 'object',
+    properties: {
+      playlist_name: { type: 'string', description: 'Name of the playlist (case-insensitive partial match)' },
+      from_index: { type: 'number', description: 'Current position of the track (0-based)' },
+      to_index: { type: 'number', description: 'New position for the track (0-based)' }
+    },
+    required: ['playlist_name', 'from_index', 'to_index']
+  },
+  execute: async ({ playlist_name, from_index, to_index }, context) => {
+    const playlist = context.findPlaylist(playlist_name);
+    if (!playlist) {
+      return { success: false, error: `Could not find a playlist matching "${playlist_name}"` };
+    }
+    const tracks = playlist.tracks || [];
+    if (from_index < 0 || from_index >= tracks.length || to_index < 0 || to_index >= tracks.length) {
+      return { success: false, error: `Invalid index. Playlist has ${tracks.length} tracks (indices 0-${tracks.length - 1}).` };
+    }
+    context.moveTrackInPlaylist(playlist.id, from_index, to_index);
+    const movedTrack = tracks[from_index];
+    return {
+      success: true,
+      moved: { artist: movedTrack.artist, title: movedTrack.title },
+      from: from_index, to: to_index,
+      playlist: { name: playlist.title || playlist.name }
+    };
+  }
+};
+
+/**
+ * Rename a playlist
+ * @type {Tool}
+ */
+const renamePlaylistTool = {
+  name: 'rename_playlist',
+  description: 'Rename an existing playlist.',
+  parameters: {
+    type: 'object',
+    properties: {
+      playlist_name: { type: 'string', description: 'Current name of the playlist (case-insensitive partial match)' },
+      new_name: { type: 'string', description: 'New name for the playlist' }
+    },
+    required: ['playlist_name', 'new_name']
+  },
+  execute: async ({ playlist_name, new_name }, context) => {
+    const playlist = context.findPlaylist(playlist_name);
+    if (!playlist) {
+      return { success: false, error: `Could not find a playlist matching "${playlist_name}"` };
+    }
+    context.renamePlaylist(playlist.id, new_name);
+    return { success: true, oldName: playlist.title || playlist.name, newName: new_name };
+  }
+};
+
+/**
+ * Delete a playlist
+ * @type {Tool}
+ */
+const deletePlaylistTool = {
+  name: 'delete_playlist',
+  description: 'Delete a playlist permanently. Always confirm with the user before calling this tool.',
+  parameters: {
+    type: 'object',
+    properties: {
+      playlist_name: { type: 'string', description: 'Name of the playlist to delete (case-insensitive partial match)' }
+    },
+    required: ['playlist_name']
+  },
+  execute: async ({ playlist_name }, context) => {
+    const playlist = context.findPlaylist(playlist_name);
+    if (!playlist) {
+      return { success: false, error: `Could not find a playlist matching "${playlist_name}"` };
+    }
+    await context.deletePlaylist(playlist.id);
+    return { success: true, deleted: { name: playlist.title || playlist.name } };
+  }
+};
+
+/**
  * All DJ tools as an array
  * @type {Tool[]}
  */
@@ -457,7 +700,14 @@ const djTools = [
   queueClearTool,
   createPlaylistTool,
   shuffleTool,
-  blockRecommendationTool
+  blockRecommendationTool,
+  getPlaylistsTool,
+  getPlaylistTracksTool,
+  addToPlaylistTool,
+  removeFromPlaylistTool,
+  reorderPlaylistTool,
+  renamePlaylistTool,
+  deletePlaylistTool
 ];
 
 /**

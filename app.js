@@ -4127,11 +4127,108 @@ const djTools = [
       properties: {},
       required: []
     }
+  },
+  {
+    name: 'get_playlists',
+    description: 'Get all of the user\'s playlists with names, IDs, and track counts. Use when the user asks about their playlists, wants to browse them, or before modifying a playlist.',
+    parameters: {
+      type: 'object',
+      properties: {},
+      required: []
+    }
+  },
+  {
+    name: 'get_playlist_tracks',
+    description: 'Get the full track listing for a specific playlist by name. Returns all tracks with their index positions. Use this before reordering or removing tracks so you can see the current state.',
+    parameters: {
+      type: 'object',
+      properties: {
+        playlist_name: { type: 'string', description: 'The playlist name to look up (case-insensitive partial match)' }
+      },
+      required: ['playlist_name']
+    }
+  },
+  {
+    name: 'add_to_playlist',
+    description: 'Add one or more tracks to an existing playlist.',
+    parameters: {
+      type: 'object',
+      properties: {
+        playlist_name: { type: 'string', description: 'Name of the playlist to add tracks to (case-insensitive partial match)' },
+        tracks: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: { artist: { type: 'string' }, title: { type: 'string' } },
+            required: ['artist', 'title']
+          },
+          description: 'Tracks to add to the playlist'
+        }
+      },
+      required: ['playlist_name', 'tracks']
+    }
+  },
+  {
+    name: 'remove_from_playlist',
+    description: 'Remove a track from a playlist. Specify either the track index (0-based, use get_playlist_tracks to see indices) or artist/title to match.',
+    parameters: {
+      type: 'object',
+      properties: {
+        playlist_name: { type: 'string', description: 'Name of the playlist (case-insensitive partial match)' },
+        track_index: { type: 'number', description: 'Index of the track to remove (0-based)' },
+        artist: { type: 'string', description: 'Artist name to match for removal (alternative to track_index)' },
+        title: { type: 'string', description: 'Track title to match for removal (alternative to track_index)' }
+      },
+      required: ['playlist_name']
+    }
+  },
+  {
+    name: 'reorder_playlist',
+    description: 'Move a track from one position to another within a playlist. Use get_playlist_tracks first to see current track positions.',
+    parameters: {
+      type: 'object',
+      properties: {
+        playlist_name: { type: 'string', description: 'Name of the playlist (case-insensitive partial match)' },
+        from_index: { type: 'number', description: 'Current position of the track (0-based)' },
+        to_index: { type: 'number', description: 'New position for the track (0-based)' }
+      },
+      required: ['playlist_name', 'from_index', 'to_index']
+    }
+  },
+  {
+    name: 'rename_playlist',
+    description: 'Rename an existing playlist.',
+    parameters: {
+      type: 'object',
+      properties: {
+        playlist_name: { type: 'string', description: 'Current name of the playlist (case-insensitive partial match)' },
+        new_name: { type: 'string', description: 'New name for the playlist' }
+      },
+      required: ['playlist_name', 'new_name']
+    }
+  },
+  {
+    name: 'delete_playlist',
+    description: 'Delete a playlist permanently. Always confirm with the user before calling this tool.',
+    parameters: {
+      type: 'object',
+      properties: {
+        playlist_name: { type: 'string', description: 'Name of the playlist to delete (case-insensitive partial match)' }
+      },
+      required: ['playlist_name']
+    }
   }
 ];
 
 // Execute a DJ tool
+const PLAYLIST_TOOLS = new Set(['get_playlists', 'get_playlist_tracks', 'add_to_playlist', 'remove_from_playlist', 'reorder_playlist', 'rename_playlist', 'delete_playlist']);
+
 const executeDjTool = async (name, args, context) => {
+  // All playlist management tools require data sharing to be enabled
+  if (PLAYLIST_TOOLS.has(name) && context.isDataSharingEnabled && !context.isDataSharingEnabled()) {
+    return { success: false, error: 'Playlist access requires the user to enable "Share my data" in chat settings.' };
+  }
+
   try {
     switch (name) {
       case 'play': {
@@ -4305,6 +4402,134 @@ const executeDjTool = async (name, args, context) => {
         }
         return { success: true, trackCount: result.trackCount };
       }
+      case 'get_playlists': {
+        const allPlaylists = context.getPlaylists();
+        return {
+          success: true,
+          playlists: allPlaylists.map(p => ({
+            id: p.id,
+            name: p.name,
+            trackCount: p.trackCount,
+            sampleTracks: (p.tracks || []).slice(0, 5).map(t => ({ artist: t.artist, title: t.title }))
+          })),
+          total: allPlaylists.length
+        };
+      }
+      case 'get_playlist_tracks': {
+        const playlist = context.findPlaylist(args.playlist_name);
+        if (!playlist) {
+          return { success: false, error: `Could not find a playlist matching "${args.playlist_name}"` };
+        }
+        return {
+          success: true,
+          playlist: {
+            id: playlist.id,
+            name: playlist.title || playlist.name,
+            trackCount: (playlist.tracks || []).length,
+            tracks: (playlist.tracks || []).map((t, i) => ({
+              index: i,
+              artist: t.artist,
+              title: t.title,
+              album: t.album
+            }))
+          }
+        };
+      }
+      case 'add_to_playlist': {
+        const playlist = context.findPlaylist(args.playlist_name);
+        if (!playlist) {
+          return { success: false, error: `Could not find a playlist matching "${args.playlist_name}"` };
+        }
+        if (!args.tracks || args.tracks.length === 0) {
+          return { success: false, error: 'No tracks specified' };
+        }
+        const tracksToAdd = args.tracks.map(t => ({
+          artist: t.artist,
+          title: t.title,
+          album: t.album || null,
+          id: `${t.artist}-${t.title}`.toLowerCase().replace(/[^a-z0-9-]/g, '')
+        }));
+        context.addTracksToPlaylist(playlist.id, tracksToAdd);
+        return {
+          success: true,
+          playlist: { name: playlist.title || playlist.name },
+          added: tracksToAdd.length,
+          newTrackCount: (playlist.tracks || []).length + tracksToAdd.length
+        };
+      }
+      case 'remove_from_playlist': {
+        const playlist = context.findPlaylist(args.playlist_name);
+        if (!playlist) {
+          return { success: false, error: `Could not find a playlist matching "${args.playlist_name}"` };
+        }
+        const tracks = playlist.tracks || [];
+        let trackIndex = -1;
+        if (args.track_index !== undefined && args.track_index !== null) {
+          trackIndex = args.track_index;
+        } else if (args.artist || args.title) {
+          const filterArtist = args.artist?.toLowerCase();
+          const filterTitle = args.title?.toLowerCase();
+          trackIndex = tracks.findIndex(t => {
+            const matchesArtist = filterArtist && t.artist?.toLowerCase().includes(filterArtist);
+            const matchesTitle = filterTitle && t.title?.toLowerCase().includes(filterTitle);
+            if (filterArtist && filterTitle) return matchesArtist && matchesTitle;
+            return matchesArtist || matchesTitle;
+          });
+        }
+        if (trackIndex < 0 || trackIndex >= tracks.length) {
+          return { success: false, error: 'Track not found in playlist' };
+        }
+        const removedTrack = tracks[trackIndex];
+        context.removeTrackFromPlaylist(playlist.id, trackIndex);
+        return {
+          success: true,
+          removed: { artist: removedTrack.artist, title: removedTrack.title },
+          playlist: { name: playlist.title || playlist.name },
+          newTrackCount: tracks.length - 1
+        };
+      }
+      case 'reorder_playlist': {
+        const playlist = context.findPlaylist(args.playlist_name);
+        if (!playlist) {
+          return { success: false, error: `Could not find a playlist matching "${args.playlist_name}"` };
+        }
+        const tracks = playlist.tracks || [];
+        if (args.from_index < 0 || args.from_index >= tracks.length || args.to_index < 0 || args.to_index >= tracks.length) {
+          return { success: false, error: `Invalid index. Playlist has ${tracks.length} tracks (indices 0-${tracks.length - 1}).` };
+        }
+        context.moveTrackInPlaylist(playlist.id, args.from_index, args.to_index);
+        const movedTrack = tracks[args.from_index];
+        return {
+          success: true,
+          moved: { artist: movedTrack.artist, title: movedTrack.title },
+          from: args.from_index,
+          to: args.to_index,
+          playlist: { name: playlist.title || playlist.name }
+        };
+      }
+      case 'rename_playlist': {
+        const playlist = context.findPlaylist(args.playlist_name);
+        if (!playlist) {
+          return { success: false, error: `Could not find a playlist matching "${args.playlist_name}"` };
+        }
+        context.renamePlaylist(playlist.id, args.new_name);
+        return {
+          success: true,
+          oldName: playlist.title || playlist.name,
+          newName: args.new_name
+        };
+      }
+      case 'delete_playlist': {
+        const playlist = context.findPlaylist(args.playlist_name);
+        if (!playlist) {
+          return { success: false, error: `Could not find a playlist matching "${args.playlist_name}"` };
+        }
+        await context.deletePlaylist(playlist.id);
+        return {
+          success: true,
+          deleted: { name: playlist.title || playlist.name }
+        };
+      }
       default:
         return { success: false, error: `Unknown tool: ${name}` };
     }
@@ -4391,6 +4616,21 @@ AVAILABLE ACTIONS (use these tools):
 - shuffle: Enable/disable shuffle mode
 - collection_radio: Start Collection Radio - shuffles and plays all tracks from user's collection
 - block_recommendation: Block an artist/album/track from future recommendations
+- get_playlists: List all user's playlists with names and track counts
+- get_playlist_tracks: Get full track listing for a specific playlist (by name)
+- add_to_playlist: Add tracks to an existing playlist
+- remove_from_playlist: Remove a track from a playlist (by index or artist/title)
+- reorder_playlist: Move a track to a different position in a playlist
+- rename_playlist: Rename a playlist
+- delete_playlist: Delete a playlist (ALWAYS confirm with user first)
+
+PLAYLIST MANAGEMENT:
+- When user asks about their playlists, use get_playlists to list them
+- When user asks what's in a playlist, use get_playlist_tracks to show the full track list
+- Before reordering or removing, ALWAYS call get_playlist_tracks first to see current positions
+- For delete_playlist, ALWAYS ask user to confirm before calling the tool
+- When adding tracks to a playlist, use add_to_playlist (not create_playlist)
+- When user says "add this to my X playlist", find the playlist and add the currently playing track or specified tracks
 
 "PLAY" vs "ADD TO QUEUE":
 - "Play X" / "Put on X" (SINGLE track) → play tool (clears queue, starts immediately)
@@ -4562,7 +4802,14 @@ class AIChatService {
           control: call.arguments?.action === 'pause' ? 'Pausing...' : call.arguments?.action === 'skip' ? 'Skipping...' : 'Controlling playback...',
           create_playlist: 'Creating playlist...',
           shuffle: call.arguments?.enabled ? 'Enabling shuffle...' : 'Disabling shuffle...',
-          collection_radio: 'Starting Collection Radio...'
+          collection_radio: 'Starting Collection Radio...',
+          get_playlists: 'Looking at playlists...',
+          get_playlist_tracks: 'Reading playlist...',
+          add_to_playlist: 'Adding to playlist...',
+          remove_from_playlist: 'Removing from playlist...',
+          reorder_playlist: 'Reordering playlist...',
+          rename_playlist: 'Renaming playlist...',
+          delete_playlist: 'Deleting playlist...'
         };
         this._reportProgress(toolLabels[call.name] || `Running ${call.name}...`);
 
@@ -4720,7 +4967,8 @@ class AIChatService {
           : '';
         lines.push(`  • "${p.name}" - ${p.trackCount} tracks${samples}`);
       });
-      lines.push('  User can ask to play from these playlists or for music similar to them.');
+      lines.push('  User can ask to play from, browse, reorder, add to, remove from, rename, or delete these playlists.');
+      lines.push('  Use get_playlist_tracks to see full contents. Use add_to_playlist, remove_from_playlist, reorder_playlist, rename_playlist, delete_playlist to manage them.');
     }
 
     // Add time context for mood-aware recommendations
@@ -4791,6 +5039,13 @@ class AIChatService {
         case 'create_playlist': return `Created playlist "${result.playlist?.name}"`;
         case 'shuffle': return `Shuffle ${result.shuffle ? 'enabled' : 'disabled'}`;
         case 'collection_radio': return `Started Collection Radio with ${result.trackCount} tracks`;
+        case 'get_playlists': return `Found ${result.total} playlists`;
+        case 'get_playlist_tracks': return `Loaded ${result.playlist?.trackCount} tracks from "${result.playlist?.name}"`;
+        case 'add_to_playlist': return `Added ${result.added} track(s) to "${result.playlist?.name}"`;
+        case 'remove_from_playlist': return `Removed "${result.removed?.title}" from "${result.playlist?.name}"`;
+        case 'reorder_playlist': return `Moved track in "${result.playlist?.name}"`;
+        case 'rename_playlist': return `Renamed "${result.oldName}" to "${result.newName}"`;
+        case 'delete_playlist': return `Deleted playlist "${result.deleted?.name}"`;
         default: return `${tool} completed`;
       }
     }).join('. ') + '.';
@@ -5090,6 +5345,7 @@ const Parachord = () => {
   const [forwardHistory, setForwardHistory] = useState([]); // Navigation history for forward button
   const [artistHistory, setArtistHistory] = useState([]); // Stack of previous artist names for back navigation
   const [playlists, setPlaylists] = useState([]);
+  const playlistsRef = useRef([]); // Ref for accessing playlists in async callbacks without stale closures
   const [playlistsLoading, setPlaylistsLoading] = useState(true); // Loading state for playlists
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const selectedPlaylistRef = useRef(null); // Ref for accessing in callbacks without stale closures
@@ -6845,6 +7101,7 @@ const Parachord = () => {
   useEffect(() => { shuffleModeRef.current = shuffleMode; }, [shuffleMode]);
   useEffect(() => { spinoffSourceTrackRef.current = spinoffSourceTrack; }, [spinoffSourceTrack]);
   useEffect(() => { isPlayingRef.current = isPlaying; }, [isPlaying]);
+  useEffect(() => { playlistsRef.current = playlists; }, [playlists]);
   useEffect(() => {
     preferredSpotifyDeviceIdRef.current = preferredSpotifyDeviceId;
     if (cacheLoaded && window.electron?.store && preferredSpotifyDeviceId) {
@@ -16802,6 +17059,7 @@ ${trackListXml}
         });
       },
       getBlocklist: () => recommendationBlocklistRef.current,
+      isDataSharingEnabled: () => aiIncludeHistoryRef.current,
       startCollectionRadio: () => {
         // Use collectionTracksRef which is kept in sync with library + collectionData.tracks
         const allTracks = collectionTracksRef.current || [];
@@ -16855,6 +17113,121 @@ ${trackListXml}
         console.log(`📻 Started Collection Station with ${uniqueTracks.length} tracks (via AI)`);
 
         return { success: true, trackCount: uniqueTracks.length };
+      },
+      // Playlist management functions
+      getPlaylists: () => {
+        return (playlistsRef.current || []).map(p => ({
+          id: p.id,
+          name: p.title || p.name,
+          trackCount: (p.tracks || []).length,
+          tracks: (p.tracks || []).map((t, i) => ({
+            index: i,
+            artist: t.artist,
+            title: t.title,
+            album: t.album
+          }))
+        }));
+      },
+      findPlaylist: (name) => {
+        const allPlaylists = playlistsRef.current || [];
+        const lower = name.toLowerCase();
+        // Exact match first
+        let match = allPlaylists.find(p => (p.title || p.name || '').toLowerCase() === lower);
+        // Partial match fallback
+        if (!match) match = allPlaylists.find(p => (p.title || p.name || '').toLowerCase().includes(lower));
+        return match;
+      },
+      addTracksToPlaylist: (playlistId, tracks) => {
+        setPlaylists(prev => prev.map(p => {
+          if (p.id === playlistId) {
+            const updatedPlaylist = {
+              ...p,
+              tracks: [...(p.tracks || []), ...tracks],
+              lastModified: Date.now()
+            };
+            savePlaylistToStore(updatedPlaylist);
+            return updatedPlaylist;
+          }
+          return p;
+        }));
+        markPlaylistAsLocallyModified(playlistId);
+      },
+      removeTrackFromPlaylist: (playlistId, trackIndex) => {
+        setPlaylists(prev => prev.map(p => {
+          if (p.id === playlistId) {
+            const newTracks = [...(p.tracks || [])];
+            newTracks.splice(trackIndex, 1);
+            const updatedPlaylist = { ...p, tracks: newTracks, lastModified: Date.now() };
+            savePlaylistToStore(updatedPlaylist);
+            return updatedPlaylist;
+          }
+          return p;
+        }));
+        markPlaylistAsLocallyModified(playlistId);
+        // Update displayed tracks if viewing this playlist
+        if (selectedPlaylistRef.current?.id === playlistId) {
+          setPlaylistTracks(prev => {
+            const newTracks = [...prev];
+            newTracks.splice(trackIndex, 1);
+            return newTracks;
+          });
+        }
+      },
+      moveTrackInPlaylist: (playlistId, fromIndex, toIndex) => {
+        setPlaylists(prev => prev.map(p => {
+          if (p.id === playlistId) {
+            const newTracks = [...(p.tracks || [])];
+            const [removed] = newTracks.splice(fromIndex, 1);
+            newTracks.splice(toIndex, 0, removed);
+            const updatedPlaylist = { ...p, tracks: newTracks, lastModified: Date.now() };
+            savePlaylistToStore(updatedPlaylist);
+            return updatedPlaylist;
+          }
+          return p;
+        }));
+        markPlaylistAsLocallyModified(playlistId);
+        // Update displayed tracks if viewing this playlist
+        if (selectedPlaylistRef.current?.id === playlistId) {
+          setPlaylistTracks(prev => {
+            const newTracks = [...prev];
+            const [removed] = newTracks.splice(fromIndex, 1);
+            newTracks.splice(toIndex, 0, removed);
+            return newTracks;
+          });
+        }
+      },
+      renamePlaylist: (playlistId, newName) => {
+        setPlaylists(prev => prev.map(p => {
+          if (p.id === playlistId) {
+            const updatedPlaylist = { ...p, title: newName, lastModified: Date.now() };
+            savePlaylistToStore(updatedPlaylist);
+            return updatedPlaylist;
+          }
+          return p;
+        }));
+        // Update selected playlist if viewing this one
+        if (selectedPlaylistRef.current?.id === playlistId) {
+          setSelectedPlaylist(prev => ({ ...prev, title: newName, lastModified: Date.now() }));
+        }
+      },
+      deletePlaylist: async (playlistId) => {
+        const result = await window.electron.playlists.delete(playlistId);
+        if (result.success) {
+          setPlaylists(prev => prev.filter(p => p.id !== playlistId));
+          delete playlistCoverCache.current[playlistId];
+          setAllPlaylistCovers(prev => {
+            const updated = { ...prev };
+            delete updated[playlistId];
+            return updated;
+          });
+          // Navigate away if viewing this playlist
+          if (selectedPlaylistRef.current?.id === playlistId) {
+            setSelectedPlaylist(null);
+            setPlaylistTracks([]);
+            navigateTo('playlists');
+          }
+        }
+        return result;
       }
     };
 
