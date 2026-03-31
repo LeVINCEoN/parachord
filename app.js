@@ -55684,14 +55684,13 @@ useEffect(() => {
               }
             },
               [
-                { step: '1', text: 'Download the extension folder from GitHub' },
-                { step: '2', text: 'Open Raycast and run "Import Extension"' },
-                { step: '3', text: 'Select the parachord-raycast folder' },
-                { step: '4', text: 'The commands will appear in Raycast' }
+                { step: '1', text: 'Install the extension from the Raycast Store' },
+                { step: '2', text: 'Make sure Parachord is running' },
+                { step: '3', text: 'The commands will appear in Raycast' }
               ].map((item, i) =>
                 React.createElement('div', {
                   key: i,
-                  style: { display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: i < 3 ? '10px' : '0' }
+                  style: { display: 'flex', alignItems: 'flex-start', gap: '12px', marginBottom: i < 2 ? '10px' : '0' }
                 },
                   React.createElement('div', {
                     style: {
@@ -55715,7 +55714,7 @@ useEffect(() => {
             // Note
             React.createElement('p', {
               style: { fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '12px', lineHeight: '1.5' }
-            }, 'Requires Raycast to be installed on your Mac. The extension will be available in the Raycast Store soon.')
+            }, 'Requires Raycast to be installed on your Mac.')
           )
         ),
         // Footer
@@ -55732,9 +55731,9 @@ useEffect(() => {
           React.createElement('button', {
             onClick: () => {
               if (window.electron?.shell?.openExternal) {
-                window.electron.shell.openExternal('https://github.com/Parachord/parachord/tree/main/raycast-extension');
+                window.electron.shell.openExternal('https://www.raycast.com/parachord/parachord');
               } else {
-                window.open('https://github.com/Parachord/parachord/tree/main/raycast-extension', '_blank');
+                window.open('https://www.raycast.com/parachord/parachord', '_blank');
               }
             },
             className: 'transition-colors',
@@ -55748,7 +55747,7 @@ useEffect(() => {
               borderRadius: '8px',
               cursor: 'pointer'
             }
-          }, 'View on GitHub'),
+          }, 'Install from Raycast Store'),
           React.createElement('button', {
             onClick: () => setRaycastInfoOpen(false),
             className: 'transition-colors',
