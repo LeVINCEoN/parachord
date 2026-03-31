@@ -52696,15 +52696,15 @@ useEffect(() => {
                 React.createElement('div', null, '2. Add both Redirect URIs:'),
                 React.createElement('div', { style: { paddingLeft: '12px', marginTop: '2px', marginBottom: '2px' } },
                   React.createElement('code', {
-                    onClick: () => navigator.clipboard.writeText('http://127.0.0.1:8888/callback'),
+                    onClick: () => { navigator.clipboard.writeText('http://127.0.0.1:8888/callback'); showToast('Copied to clipboard', 'success'); },
                     title: 'Click to copy',
-                    style: { cursor: 'pointer', backgroundColor: 'var(--hover-bg-default)', padding: '1px 4px', borderRadius: '3px', display: 'inline-block', marginBottom: '2px' }
+                    style: { cursor: 'pointer', backgroundColor: 'var(--hover-bg-default)', padding: '1px 4px', borderRadius: '3px', display: 'inline-block', marginBottom: '2px', userSelect: 'all' }
                   }, 'http://127.0.0.1:8888/callback'),
                   React.createElement('br'),
                   React.createElement('code', {
-                    onClick: () => navigator.clipboard.writeText('http://[::1]:8888/callback'),
+                    onClick: () => { navigator.clipboard.writeText('http://[::1]:8888/callback'); showToast('Copied to clipboard', 'success'); },
                     title: 'Click to copy',
-                    style: { cursor: 'pointer', backgroundColor: 'var(--hover-bg-default)', padding: '1px 4px', borderRadius: '3px', display: 'inline-block' }
+                    style: { cursor: 'pointer', backgroundColor: 'var(--hover-bg-default)', padding: '1px 4px', borderRadius: '3px', display: 'inline-block', userSelect: 'all' }
                   }, 'http://[::1]:8888/callback')
                 ),
                 React.createElement('div', null, '3. Copy your Client ID and paste it below')
