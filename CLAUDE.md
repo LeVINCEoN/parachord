@@ -163,6 +163,39 @@ Tracks are enriched with these fields throughout the app:
 - Album art (`/ws/2/release?query=...`) — need release ID for Cover Art Archive
 - Global search (artist/album/track) — open-ended queries need MB's fuzzy search, not mapper's exact lookup
 
+## Plugin (`.axe`) Marketplace System
+
+### Architecture
+- Plugins are `.axe` files (JSON) in `plugins/` directory, each with a `manifest` (id, version, etc.) and `implementation`
+- **Marketplace source**: Raw GitHub files from `Parachord/parachord-plugins` repo
+- **Manifest**: `marketplace-manifest.json` in this repo — the central catalog of all plugins with version numbers
+- **Client sync**: `main.js` fetches manifest + `.axe` files from `https://raw.githubusercontent.com/Parachord/parachord-plugins/main/`
+
+### Plugin Loading Order (main.js L3545–3634)
+1. Shipped plugins from app `plugins/` directory (bundled in ASAR for packaged builds)
+2. Cached marketplace plugins from `~/.parachord/plugins/`
+3. Version comparison: newer version always wins; same version prefers shipped over cached
+
+### How Updates Reach Users (No New Build Required)
+1. **Update the `.axe` file** in `plugins/` — bump `manifest.version`
+2. **Update `marketplace-manifest.json`** — set matching version for that plugin ID
+3. **Push to main** — the `sync-repos.yml` CI workflow automatically syncs `.axe` files and manifest to `Parachord/parachord-plugins`
+4. **User relaunches Parachord** — `syncPluginsWithMarketplace()` (app.js L1181) compares cached version against marketplace manifest version; if different, downloads the new `.axe` and fires `parachord-plugins-updated` event for hot-reload
+
+### Critical: Both Files Must Be Updated
+The client checks `cachedVersion !== marketplaceVersion` (main.js L3674). If you update the `.axe` but not the manifest (or vice versa), the update won't propagate. Always bump version in both:
+- `plugins/{id}.axe` → `manifest.version`
+- `marketplace-manifest.json` → `version` field for that plugin ID
+
+### Marketplace Sync CI (.github/workflows/sync-repos.yml)
+- Triggered on push to main when `plugins/*.axe` or `marketplace-manifest.json` change
+- Copies `.axe` files to `parachord-plugins` repo (does NOT delete community-contributed plugins)
+- Merges manifest: updates monorepo entries, preserves community-only entries
+
+### Reverse Sync (.github/workflows/reverse-sync.yml)
+- Daily at 6 AM UTC or manual dispatch
+- Pulls community contributions from `parachord-plugins` back into this repo via PR
+
 ## Common Patterns
 
 - **Refs for stale closure avoidance**: Most state values have a companion ref (e.g., `volumeRef`, `isPlayingRef`) synced via `useEffect`. Always use refs in async callbacks.
