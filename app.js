@@ -4817,6 +4817,7 @@ class AIChatService {
         toolResults.push({ tool: call.name, arguments: call.arguments, result });
         this.messages.push({
           role: 'tool',
+          name: call.name,
           tool_call_id: call.id || call.name,
           content: JSON.stringify(result)
         });
