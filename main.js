@@ -5292,33 +5292,45 @@ ipcMain.handle('sync:start', async (event, providerId, options = {}) => {
                 }
               }
 
+              // Re-read the playlist from store in case the user pulled changes
+              // while this sync was running (handlePull saves hasUpdates:false +
+              // updated snapshotId to disk, but we loaded currentPlaylists earlier).
+              const freshPlaylists = store.get('local_playlists') || [];
+              const freshPlaylist = freshPlaylists.find(p => p.id === localPlaylist.id);
+              if (freshPlaylist) {
+                currentPlaylists[idx] = freshPlaylist;
+              }
+              const current = currentPlaylists[idx];
+              // Re-check after refresh — the user may have already pulled this update
+              const stillHasUpdates = current.syncedFrom?.snapshotId !== remotePlaylist.snapshotId;
+
               // Always update/backfill metadata fields (creator, source, syncedFrom, createdAt)
               currentPlaylists[idx] = {
-                ...currentPlaylists[idx],
+                ...current,
                 // Refill tracks if they were empty
-                tracks: tracks,
+                tracks: isEmpty ? tracks : current.tracks,
                 // Backfill creator if not set
-                creator: currentPlaylists[idx].creator || remotePlaylist.ownerName || null,
+                creator: current.creator || remotePlaylist.ownerName || null,
                 // Backfill source if not set
-                source: currentPlaylists[idx].source || (remotePlaylist.isOwnedByUser ? `${providerId}-sync` : `${providerId}-import`),
+                source: current.source || (remotePlaylist.isOwnedByUser ? `${providerId}-sync` : `${providerId}-import`),
                 // Update createdAt from track data
                 createdAt: recalculatedCreatedAt,
                 // Update/backfill syncedFrom structure
                 syncedFrom: {
-                  ...currentPlaylists[idx].syncedFrom,
+                  ...current.syncedFrom,
                   resolver: providerId,
                   externalId: remotePlaylist.externalId,
-                  snapshotId: hasTrackUpdates ? currentPlaylists[idx].syncedFrom?.snapshotId : remotePlaylist.snapshotId,
+                  snapshotId: stillHasUpdates ? current.syncedFrom?.snapshotId : remotePlaylist.snapshotId,
                   ownerId: remotePlaylist.ownerId
                 },
-                hasUpdates: hasTrackUpdates ? true : currentPlaylists[idx].hasUpdates,
+                hasUpdates: stillHasUpdates ? true : current.hasUpdates,
                 syncSources: {
-                  ...currentPlaylists[idx].syncSources,
-                  [providerId]: { ...currentPlaylists[idx].syncSources?.[providerId], syncedAt: Date.now() }
+                  ...current.syncSources,
+                  [providerId]: { ...current.syncSources?.[providerId], syncedAt: Date.now() }
                 }
               };
 
-              if (hasTrackUpdates || (isEmpty && tracks.length > 0)) {
+              if (stillHasUpdates || (isEmpty && tracks.length > 0)) {
                 playlistsUpdated++;
               }
             }
