@@ -5292,33 +5292,45 @@ ipcMain.handle('sync:start', async (event, providerId, options = {}) => {
                 }
               }
 
+              // Re-read the playlist from store in case the user pulled changes
+              // while this sync was running (handlePull saves hasUpdates:false +
+              // updated snapshotId to disk, but we loaded currentPlaylists earlier).
+              const freshPlaylists = store.get('local_playlists') || [];
+              const freshPlaylist = freshPlaylists.find(p => p.id === localPlaylist.id);
+              if (freshPlaylist) {
+                currentPlaylists[idx] = freshPlaylist;
+              }
+              const current = currentPlaylists[idx];
+              // Re-check after refresh — the user may have already pulled this update
+              const stillHasUpdates = current.syncedFrom?.snapshotId !== remotePlaylist.snapshotId;
+
               // Always update/backfill metadata fields (creator, source, syncedFrom, createdAt)
               currentPlaylists[idx] = {
-                ...currentPlaylists[idx],
+                ...current,
                 // Refill tracks if they were empty
-                tracks: tracks,
+                tracks: isEmpty ? tracks : current.tracks,
                 // Backfill creator if not set
-                creator: currentPlaylists[idx].creator || remotePlaylist.ownerName || null,
+                creator: current.creator || remotePlaylist.ownerName || null,
                 // Backfill source if not set
-                source: currentPlaylists[idx].source || (remotePlaylist.isOwnedByUser ? `${providerId}-sync` : `${providerId}-import`),
+                source: current.source || (remotePlaylist.isOwnedByUser ? `${providerId}-sync` : `${providerId}-import`),
                 // Update createdAt from track data
                 createdAt: recalculatedCreatedAt,
                 // Update/backfill syncedFrom structure
                 syncedFrom: {
-                  ...currentPlaylists[idx].syncedFrom,
+                  ...current.syncedFrom,
                   resolver: providerId,
                   externalId: remotePlaylist.externalId,
-                  snapshotId: hasTrackUpdates ? currentPlaylists[idx].syncedFrom?.snapshotId : remotePlaylist.snapshotId,
+                  snapshotId: stillHasUpdates ? current.syncedFrom?.snapshotId : remotePlaylist.snapshotId,
                   ownerId: remotePlaylist.ownerId
                 },
-                hasUpdates: hasTrackUpdates ? true : currentPlaylists[idx].hasUpdates,
+                hasUpdates: stillHasUpdates ? true : current.hasUpdates,
                 syncSources: {
-                  ...currentPlaylists[idx].syncSources,
-                  [providerId]: { ...currentPlaylists[idx].syncSources?.[providerId], syncedAt: Date.now() }
+                  ...current.syncSources,
+                  [providerId]: { ...current.syncSources?.[providerId], syncedAt: Date.now() }
                 }
               };
 
-              if (hasTrackUpdates || (isEmpty && tracks.length > 0)) {
+              if (stillHasUpdates || (isEmpty && tracks.length > 0)) {
                 playlistsUpdated++;
               }
             }
@@ -5471,6 +5483,30 @@ ipcMain.handle('sync:fetch-playlist-tracks', async (event, providerId, playlistE
     return { success: false, error: 'Not authenticated' };
   }
 
+  // For Spotify, check that the token has the scopes needed for playlist access.
+  if (providerId === 'spotify') {
+    const grantedScopes = store.get('spotify_token_scopes');
+    if (grantedScopes) {
+      const requiredScopes = ['playlist-read-private'];
+      const missing = requiredScopes.filter(s => !grantedScopes.includes(s));
+      if (missing.length > 0) {
+        console.log(`[Sync] Token missing required scopes for playlist pull: ${missing.join(', ')}. Prompting re-auth.`);
+        return {
+          success: false,
+          error: 'Missing permissions. Please disconnect and reconnect Spotify to grant the required permissions.',
+          errorCode: 'missing_scopes'
+        };
+      }
+    } else {
+      console.log('[Sync] No stored scopes found (legacy auth). Prompting re-auth.');
+      return {
+        success: false,
+        error: 'Your Spotify connection needs to be refreshed. Please disconnect and reconnect Spotify in Settings.',
+        errorCode: 'missing_scopes'
+      };
+    }
+  }
+
   try {
     const tracks = await provider.fetchPlaylistTracks(playlistExternalId, token, null, refreshTokenCb);
     // Also fetch the current snapshot ID
@@ -5494,7 +5530,7 @@ ipcMain.handle('sync:push-playlist', async (event, providerId, playlistExternalI
 
   let token;
   if (providerId === 'spotify') {
-    token = store.get('spotify_token');
+    token = await ensureValidSpotifyToken();
   } else if (providerId === 'applemusic') {
     if (!generatedMusicKitToken) {
       await musicKitTokenReady;
@@ -5508,6 +5544,30 @@ ipcMain.handle('sync:push-playlist', async (event, providerId, playlistExternalI
 
   if (!token) {
     return { success: false, error: 'Not authenticated' };
+  }
+
+  // For Spotify, check that the token has the scopes needed for playlist modification.
+  if (providerId === 'spotify') {
+    const grantedScopes = store.get('spotify_token_scopes');
+    if (grantedScopes) {
+      const requiredScopes = ['playlist-modify-public', 'playlist-modify-private'];
+      const hasAny = requiredScopes.some(s => grantedScopes.includes(s));
+      if (!hasAny) {
+        console.log(`[Sync] Token missing required scopes for playlist push. Prompting re-auth.`);
+        return {
+          success: false,
+          error: 'Missing permissions. Please disconnect and reconnect Spotify to grant the required permissions.',
+          errorCode: 'missing_scopes'
+        };
+      }
+    } else {
+      console.log('[Sync] No stored scopes found (legacy auth). Prompting re-auth.');
+      return {
+        success: false,
+        error: 'Your Spotify connection needs to be refreshed. Please disconnect and reconnect Spotify in Settings.',
+        errorCode: 'missing_scopes'
+      };
+    }
   }
 
   try {
