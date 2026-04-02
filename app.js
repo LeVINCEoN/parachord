@@ -38728,22 +38728,22 @@ useEffect(() => {
                 };
                 const result = await window.electron.sync.pushPlaylist(provider, externalId, playlist.tracks, metadata);
                 if (result?.success) {
-                  const updatedPlaylist = {
-                    ...playlist,
+                  const applyPush = prev => ({
+                    ...prev,
                     locallyModified: false,
                     hasUpdates: false,
                     syncedFrom: {
-                      ...playlist.syncedFrom,
+                      ...prev.syncedFrom,
                       snapshotId: result.snapshotId
                     },
                     syncSources: {
-                      ...playlist.syncSources,
-                      [provider]: { ...playlist.syncSources?.[provider], syncedAt: Date.now() }
+                      ...prev.syncSources,
+                      [provider]: { ...prev.syncSources?.[provider], syncedAt: Date.now() }
                     }
-                  };
-                  setSelectedPlaylist(updatedPlaylist);
-                  setPlaylists(prev => prev.map(p => p.id === playlist.id ? updatedPlaylist : p));
-                  await savePlaylistToStore(updatedPlaylist);
+                  });
+                  setSelectedPlaylist(applyPush);
+                  setPlaylists(prev => prev.map(p => p.id === playlist.id ? applyPush(p) : p));
+                  await savePlaylistToStore(applyPush(playlist));
                 } else {
                   console.error('Failed to push playlist:', result?.error);
                   alert(`Failed to push changes: ${result?.error || 'Unknown error'}`);
@@ -38762,25 +38762,27 @@ useEffect(() => {
               try {
                 const result = await window.electron.sync.fetchPlaylistTracks(provider, externalId);
                 if (result?.success && result.tracks) {
-                  const updatedPlaylist = {
-                    ...playlist,
+                  const applyPull = prev => ({
+                    ...prev,
                     tracks: result.tracks,
                     hasUpdates: false,
                     locallyModified: false,
                     syncedFrom: {
-                      ...playlist.syncedFrom,
+                      ...prev.syncedFrom,
                       snapshotId: result.snapshotId
                     },
                     syncSources: {
-                      ...playlist.syncSources,
-                      [provider]: { ...playlist.syncSources?.[provider], syncedAt: Date.now() }
+                      ...prev.syncSources,
+                      [provider]: { ...prev.syncSources?.[provider], syncedAt: Date.now() }
                     },
                     lastModified: Date.now()
-                  };
-                  setSelectedPlaylist(updatedPlaylist);
+                  });
+                  setSelectedPlaylist(applyPull);
                   setPlaylistTracks(result.tracks);
-                  setPlaylists(prev => prev.map(p => p.id === playlist.id ? updatedPlaylist : p));
-                  await savePlaylistToStore(updatedPlaylist);
+                  setPlaylists(prev => prev.map(p => p.id === playlist.id ? applyPull(p) : p));
+                  // Save to disk using the updated playlist from the latest state
+                  const playlistToSave = applyPull(playlist);
+                  await savePlaylistToStore(playlistToSave);
                   showToast(`Pulled ${result.tracks.length} tracks from ${providerName}`);
                 } else {
                   console.error('Failed to pull playlist:', result?.error);
