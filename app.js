@@ -7083,6 +7083,7 @@ const Parachord = () => {
   const flushPlaylistSourcesRef = useRef(null); // Ref to access flush function from beforeunload
 
   const [selectedResolver, setSelectedResolver] = useState(null); // Resolver detail modal
+  const [dynamicModelOptions, setDynamicModelOptions] = useState({}); // { [resolverId]: { loading, options: [{value,label}], error } }
 
   // Close add-to-playlist sort dropdown when clicking outside
   useEffect(() => {
@@ -7326,6 +7327,17 @@ const Parachord = () => {
       window.electron.localFiles.getWatchFolders().then(setWatchFolders);
     }
   }, [selectedResolver]);
+
+  // Fetch dynamic models when a resolver with dynamic-select is selected
+  useEffect(() => {
+    if (selectedResolver) {
+      const resolver = metaServices.find(s => s.id === selectedResolver.id) || selectedResolver;
+      const modelSetting = resolver.settings?.configurable?.model || resolver.configurable?.model;
+      if (modelSetting?.type === 'dynamic-select' && resolver.listModels) {
+        fetchDynamicModels(resolver, metaServiceConfigs[resolver.id]);
+      }
+    }
+  }, [selectedResolver?.id]);
 
   // Listen for local files scan progress and library changes
   useEffect(() => {
@@ -32908,6 +32920,33 @@ Variety guidance: ${theme} Be creative and surprising — avoid defaulting to th
     }
   };
 
+  // Fetch models dynamically for plugins with dynamic-select model setting
+  const fetchDynamicModels = async (resolver, config) => {
+    const modelSetting = resolver.settings?.configurable?.model || resolver.configurable?.model;
+    if (modelSetting?.type !== 'dynamic-select') return;
+    if (!resolver.listModels) return;
+
+    const resolverId = resolver.id;
+    setDynamicModelOptions(prev => ({
+      ...prev,
+      [resolverId]: { loading: true, options: [], error: null }
+    }));
+
+    try {
+      const options = await resolver.listModels(config || metaServiceConfigs[resolverId] || {});
+      setDynamicModelOptions(prev => ({
+        ...prev,
+        [resolverId]: { loading: false, options: options || [], error: null }
+      }));
+    } catch (error) {
+      console.error(`Failed to fetch models for ${resolverId}:`, error);
+      setDynamicModelOptions(prev => ({
+        ...prev,
+        [resolverId]: { loading: false, options: [], error: error.message }
+      }));
+    }
+  };
+
   // Last.fm specific helpers
   const connectLastfm = async (username, apiKey, apiSecret) => {
     if (!username?.trim()) {
@@ -54792,6 +54831,13 @@ useEffect(() => {
                     [authFieldKey]: e.target.value,
                     enabled: !!e.target.value
                   });
+                  // Re-fetch dynamic models after API key change
+                  setTimeout(() => {
+                    const resolver = metaServices.find(s => s.id === selectedResolver.id) || selectedResolver;
+                    if (resolver.listModels) {
+                      fetchDynamicModels(resolver, { ...metaServiceConfigs[selectedResolver.id], [authFieldKey]: e.target.value });
+                    }
+                  }, 100);
                 },
                 placeholder: authFieldSettings.placeholder || (selectedResolver.id === 'chatgpt' ? 'sk-...' : selectedResolver.id === 'gemini' ? 'AIza...' : selectedResolver.id === 'claude' ? 'sk-ant-...' : ''),
                 style: {
@@ -54826,51 +54872,81 @@ useEffect(() => {
                 }
               }, 'Get your API key →')
             ),
-            // Model selector - use options from plugin settings if available
+            // Model selector - supports both static and dynamic-select
             selectedResolver.settings?.configurable?.model && React.createElement('div', { style: { marginBottom: '16px' } },
-              React.createElement('label', {
-                style: {
-                  display: 'block',
-                  fontSize: '12px',
-                  fontWeight: '500',
-                  color: 'var(--text-primary)',
-                  marginBottom: '6px'
+              React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' } },
+                React.createElement('label', {
+                  style: {
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    color: 'var(--text-primary)'
+                  }
+                }, selectedResolver.settings?.configurable?.model?.label || 'Model'),
+                // Refresh button for dynamic-select
+                selectedResolver.settings?.configurable?.model?.type === 'dynamic-select' && React.createElement('button', {
+                  onClick: () => {
+                    const resolver = metaServices.find(s => s.id === selectedResolver.id) || selectedResolver;
+                    fetchDynamicModels(resolver, metaServiceConfigs[selectedResolver.id]);
+                  },
+                  title: 'Refresh models',
+                  style: {
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    color: 'var(--text-secondary)',
+                    fontSize: '12px',
+                    padding: '2px 4px',
+                    borderRadius: '4px'
+                  }
+                }, '\u21BB')
+              ),
+              (() => {
+                const modelSetting = selectedResolver.settings?.configurable?.model;
+                const isDynamic = modelSetting?.type === 'dynamic-select';
+                const dynamicState = isDynamic ? dynamicModelOptions[selectedResolver.id] : null;
+                const isLoading = dynamicState?.loading;
+
+                // Determine which options to show
+                let options;
+                if (isDynamic && dynamicState?.options?.length > 0) {
+                  options = dynamicState.options;
+                } else if (isDynamic && modelSetting?.fallbackOptions) {
+                  options = modelSetting.fallbackOptions;
+                } else if (modelSetting?.options) {
+                  options = modelSetting.options;
+                } else {
+                  options = [];
                 }
-              }, selectedResolver.settings?.configurable?.model?.label || 'Model'),
-              React.createElement('select', {
-                value: metaServiceConfigs[selectedResolver.id]?.model || selectedResolver.settings?.configurable?.model?.default || '',
-                onChange: (e) => {
-                  saveMetaServiceConfig(selectedResolver.id, {
-                    ...metaServiceConfigs[selectedResolver.id],
-                    model: e.target.value
-                  });
+
+                return React.createElement('select', {
+                  value: metaServiceConfigs[selectedResolver.id]?.model || modelSetting?.default || '',
+                  onChange: (e) => {
+                    saveMetaServiceConfig(selectedResolver.id, {
+                      ...metaServiceConfigs[selectedResolver.id],
+                      model: e.target.value
+                    });
+                  },
+                  disabled: isLoading,
+                  style: {
+                    width: '100%',
+                    padding: '10px 12px',
+                    fontSize: '13px',
+                    color: 'var(--text-primary)',
+                    backgroundColor: 'var(--card-bg)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '8px',
+                    outline: 'none',
+                    cursor: isLoading ? 'wait' : 'pointer',
+                    opacity: isLoading ? 0.6 : 1
+                  }
                 },
-                style: {
-                  width: '100%',
-                  padding: '10px 12px',
-                  fontSize: '13px',
-                  color: 'var(--text-primary)',
-                  backgroundColor: 'var(--card-bg)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: '8px',
-                  outline: 'none',
-                  cursor: 'pointer'
-                }
-              },
-                // Use options from plugin settings, or fall back to hardcoded for backward compat
-                selectedResolver.settings?.configurable?.model?.options
-                  ? selectedResolver.settings.configurable.model.options.map(opt =>
-                      React.createElement('option', { key: opt.value, value: opt.value }, opt.label)
-                    )
-                  : selectedResolver.id === 'chatgpt' ? [
-                      React.createElement('option', { key: 'gpt-4o-mini', value: 'gpt-4o-mini' }, 'GPT-4o Mini (Recommended)'),
-                      React.createElement('option', { key: 'gpt-4o', value: 'gpt-4o' }, 'GPT-4o'),
-                      React.createElement('option', { key: 'gpt-3.5-turbo', value: 'gpt-3.5-turbo' }, 'GPT-3.5 Turbo')
-                    ] : selectedResolver.id === 'gemini' ? [
-                      React.createElement('option', { key: 'gemini-2.5-flash', value: 'gemini-2.5-flash' }, 'Gemini 2.5 Flash (Recommended)'),
-                      React.createElement('option', { key: 'gemini-2.5-pro', value: 'gemini-2.5-pro' }, 'Gemini 2.5 Pro')
-                    ] : []
-              )
+                  isLoading
+                    ? React.createElement('option', { value: '' }, 'Loading models...')
+                    : options.map(opt =>
+                        React.createElement('option', { key: opt.value, value: opt.value }, opt.label)
+                      )
+                );
+              })()
             ),
             // Connection status
             metaServiceConfigs[selectedResolver.id]?.[authFieldKey] && React.createElement('div', {
@@ -54957,6 +55033,13 @@ useEffect(() => {
                     endpoint: e.target.value,
                     enabled: true
                   });
+                  // Re-fetch dynamic models after endpoint change
+                  setTimeout(() => {
+                    const resolver = metaServices.find(s => s.id === selectedResolver.id) || selectedResolver;
+                    if (resolver.listModels) {
+                      fetchDynamicModels(resolver, { ...metaServiceConfigs[selectedResolver.id], endpoint: e.target.value });
+                    }
+                  }, 100);
                 },
                 placeholder: 'http://localhost:11434',
                 style: {
@@ -54971,45 +55054,93 @@ useEffect(() => {
                 }
               }),
             ),
-            // Model selector for Ollama
+            // Model selector for Ollama - supports dynamic-select
             React.createElement('div', { style: { marginBottom: '16px' } },
-              React.createElement('label', {
-                style: {
-                  display: 'block',
-                  fontSize: '12px',
-                  fontWeight: '500',
-                  color: 'var(--text-primary)',
-                  marginBottom: '6px'
+              React.createElement('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' } },
+                React.createElement('label', {
+                  style: {
+                    fontSize: '12px',
+                    fontWeight: '500',
+                    color: 'var(--text-primary)'
+                  }
+                }, 'Model'),
+                // Refresh button for dynamic model fetching
+                (() => {
+                  const resolver = metaServices.find(s => s.id === selectedResolver.id) || selectedResolver;
+                  const modelSetting = resolver.settings?.configurable?.model || resolver.configurable?.model;
+                  return (modelSetting?.type === 'dynamic-select') && React.createElement('button', {
+                    onClick: () => {
+                      fetchDynamicModels(resolver, metaServiceConfigs[selectedResolver.id]);
+                    },
+                    title: 'Refresh models',
+                    style: {
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      color: 'var(--text-secondary)',
+                      fontSize: '12px',
+                      padding: '2px 4px',
+                      borderRadius: '4px'
+                    }
+                  }, '\u21BB');
+                })()
+              ),
+              (() => {
+                const resolver = metaServices.find(s => s.id === selectedResolver.id) || selectedResolver;
+                const modelSetting = resolver.settings?.configurable?.model || resolver.configurable?.model;
+                const isDynamic = modelSetting?.type === 'dynamic-select';
+                const dynamicState = isDynamic ? dynamicModelOptions[selectedResolver.id] : null;
+                const isLoading = dynamicState?.loading;
+
+                let options;
+                if (isDynamic && dynamicState?.options?.length > 0) {
+                  options = dynamicState.options;
+                } else if (isDynamic && modelSetting?.fallbackOptions) {
+                  options = modelSetting.fallbackOptions;
+                } else if (modelSetting?.options) {
+                  options = modelSetting.options;
+                } else {
+                  // Legacy hardcoded fallback for Ollama
+                  options = [
+                    { value: 'llama3.1', label: 'Llama 3.1 (8B)' },
+                    { value: 'llama3.1:70b', label: 'Llama 3.1 (70B)' },
+                    { value: 'llama3.2', label: 'Llama 3.2 (3B)' },
+                    { value: 'mistral', label: 'Mistral (7B)' },
+                    { value: 'mixtral', label: 'Mixtral (8x7B)' },
+                    { value: 'qwen2.5', label: 'Qwen 2.5 (7B)' },
+                    { value: 'gemma2', label: 'Gemma 2 (9B)' }
+                  ];
                 }
-              }, 'Model'),
-              React.createElement('select', {
-                value: metaServiceConfigs[selectedResolver.id]?.model || 'llama3.1',
-                onChange: (e) => {
-                  saveMetaServiceConfig(selectedResolver.id, {
-                    ...metaServiceConfigs[selectedResolver.id],
-                    model: e.target.value
-                  });
+
+                return React.createElement('select', {
+                  value: metaServiceConfigs[selectedResolver.id]?.model || modelSetting?.default || 'llama3.1',
+                  onChange: (e) => {
+                    saveMetaServiceConfig(selectedResolver.id, {
+                      ...metaServiceConfigs[selectedResolver.id],
+                      model: e.target.value
+                    });
+                  },
+                  disabled: isLoading,
+                  style: {
+                    width: '100%',
+                    padding: '10px 12px',
+                    fontSize: '13px',
+                    color: 'var(--text-primary)',
+                    backgroundColor: 'var(--card-bg)',
+                    border: '1px solid var(--border-subtle)',
+                    borderRadius: '8px',
+                    outline: 'none',
+                    cursor: isLoading ? 'wait' : 'pointer',
+                    opacity: isLoading ? 0.6 : 1
+                  }
                 },
-                style: {
-                  width: '100%',
-                  padding: '10px 12px',
-                  fontSize: '13px',
-                  color: 'var(--text-primary)',
-                  backgroundColor: 'var(--card-bg)',
-                  border: '1px solid var(--border-subtle)',
-                  borderRadius: '8px',
-                  outline: 'none',
-                  cursor: 'pointer'
-                }
-              },
-                React.createElement('option', { value: 'llama3.1' }, 'Llama 3.1 (8B)'),
-                React.createElement('option', { value: 'llama3.1:70b' }, 'Llama 3.1 (70B)'),
-                React.createElement('option', { value: 'llama3.2' }, 'Llama 3.2 (3B)'),
-                React.createElement('option', { value: 'mistral' }, 'Mistral (7B)'),
-                React.createElement('option', { value: 'mixtral' }, 'Mixtral (8x7B)'),
-                React.createElement('option', { value: 'qwen2.5' }, 'Qwen 2.5 (7B)'),
-                React.createElement('option', { value: 'gemma2' }, 'Gemma 2 (9B)')
-              )
+                  isLoading
+                    ? React.createElement('option', { value: '' }, 'Loading models...')
+                    : options.map(opt =>
+                        React.createElement('option', { key: opt.value, value: opt.value }, opt.label)
+                      )
+                );
+              })()
             ),
             // Enable toggle
             React.createElement('div', { className: 'flex items-center justify-between' },
