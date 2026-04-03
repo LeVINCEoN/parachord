@@ -1,6 +1,46 @@
-# Parachord v0.9.0-beta.6 (unreleased)
+# Parachord v0.9.0-beta.7 (unreleased)
 
 **Release date:** TBD
+
+---
+
+## Dynamic Model Fetching for AI Plugins
+
+AI plugin model dropdowns now auto-populate from each provider's API instead of shipping hardcoded model lists that go stale.
+
+- **Ollama** — fetches installed models from the local server (`/api/tags`); no more outdated Qwen 2.5 / Gemma 2 entries
+- **ChatGPT** — fetches available models from OpenAI's API, filtered by a blocklist to exclude non-chat models (embeddings, DALL-E, Whisper, TTS, etc.)
+- **Gemini** — fetches models filtered by `generateContent` capability
+- **Claude** — stays curated (Anthropic has no list-models endpoint)
+- **Fallback options** — if the fetch fails or no API key is configured, a small curated list is shown
+- **Refresh button** — manual re-fetch via ↻ button next to the model label
+- **Auto-fetch** — models load automatically when opening plugin settings or after saving an API key/endpoint
+
+## Shuffleupagus AI Chat Improvements
+
+- **Share prompt button** — hover over any of your chat messages to copy a shareable link (`parachord.com/go?uri=parachord://chat?prompt=...`) that works in GitHub Discussions, social media, and anywhere else
+- **Queue deduplication** — if the AI model returns multiple `queue_add` calls in one response, they're merged into a single call to prevent adding N× the requested tracks
+
+## Bug Fixes
+
+- Fixed Gemini plugin using deprecated model IDs (`gemini-2.0-flash-001-001`) — updated to 2.5 series (#733)
+- Fixed Gemini tool calls failing with "function_response.name cannot be empty" — tool result messages now include the function name (#734)
+- Fixed Edit ID3 Tags missing from context menu for multi-source local files
+- Fixed playlist sync pull button silently failing
+- Fixed sync banner persisting after pull/push
+- Fixed background sync overwriting pulled playlist state on disk
+- Fixed Spotify redirect URIs not selectable in setup steps (#738)
+
+## Other Changes
+
+- Removed score sort option from Critical Darlings
+- Raycast extension: updated install directions for store launch
+
+---
+
+# Parachord v0.9.0-beta.6
+
+**Release date:** 2026-04-01
 
 ---
 
