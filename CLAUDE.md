@@ -196,6 +196,24 @@ The client checks `cachedVersion !== marketplaceVersion` (main.js L3674). If you
 - Daily at 6 AM UTC or manual dispatch
 - Pulls community contributions from `parachord-plugins` back into this repo via PR
 
+### Dynamic Model Selection
+- AI plugins (Ollama, ChatGPT, Gemini) use `type: "dynamic-select"` in their model setting
+- Each plugin implements a `listModels(config)` function that fetches available models from the provider's API
+- **Ollama**: `GET {endpoint}/api/tags` — returns locally installed models
+- **ChatGPT**: `GET /v1/models` with blocklist filter (excludes `dall-e`, `whisper`, `tts`, `text-embedding`, `babbage`, `davinci`, `canary`, `moderation`, `embedding`, plus `realtime`/`audio`/`transcri`)
+- **Gemini**: `GET /v1beta/models?key=` filtered by `supportedGenerationMethods.includes('generateContent')`
+- **Claude**: No list endpoint — stays curated with static `type: "select"`
+- App-side: `dynamicModelOptions` state tracks loading/options/error per resolver; `fetchDynamicModels()` called on settings panel open and after API key/endpoint changes
+- `fallbackOptions` in the plugin manifest shown when fetch fails or no API key configured yet
+- Refresh button (↻) next to model label for manual re-fetch
+
+### AI Chat (Shuffleupagus)
+- `AIChatService` (L4700s): Manages conversation, tool calls, and provider communication
+- Tool results must include `name` field (not just `tool_call_id`) — Gemini API requires `function_response.name`
+- `handleToolCalls` (L4779): Deduplicates multiple `queue_add` calls in same response (merges tracks into one call) — prevents models from adding N×requested tracks
+- Share button on user messages copies `https://parachord.com/go?uri=parachord://chat?prompt=...` to clipboard
+- `parachord.com/go` is a static redirect page (GitHub Pages) that handles `parachord://` protocol links from contexts that strip custom schemes (e.g., GitHub Discussions)
+
 ## Common Patterns
 
 - **Refs for stale closure avoidance**: Most state values have a companion ref (e.g., `volumeRef`, `isPlayingRef`) synced via `useEffect`. Always use refs in async callbacks.
