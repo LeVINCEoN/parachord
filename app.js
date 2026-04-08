@@ -10779,11 +10779,19 @@ ${trackListXml}
       }
     };
 
+    // Apple Music session error (e.g. error 6: TOS not accepted, Music daemon not running)
+    // Show a one-time toast guiding the user to open Music.app
+    const handleAppleMusicSessionError = () => {
+      showToast('Apple Music can\'t play right now. Open the Music app to accept any pending terms or sign in, then try again.', 'error');
+    };
+
     window.addEventListener('musickit-track-ended', handleMusicKitTrackEnded);
     window.addEventListener('applemusic-preview-ended', handlePreviewEnded);
+    window.addEventListener('applemusic-session-error', handleAppleMusicSessionError);
     return () => {
       window.removeEventListener('musickit-track-ended', handleMusicKitTrackEnded);
       window.removeEventListener('applemusic-preview-ended', handlePreviewEnded);
+      window.removeEventListener('applemusic-session-error', handleAppleMusicSessionError);
     };
   }, []);
 
