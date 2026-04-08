@@ -19876,22 +19876,26 @@ ${trackListXml}
           }
         };
 
-        // Run all auth checks in parallel, non-blocking — resolvers update when done
+        // Run auth checks in parallel for logging only — do NOT remove resolvers
+        // on transient auth failures. The user explicitly enabled these resolvers;
+        // playback already falls back to the next source if a resolver can't play.
+        // Token refresh and reEnableResolver handle recovery without losing state.
+        resolverSettingsLoaded.current = true;
         Promise.all(dedupedActive.map(async id => {
           if (authChecks[id]) {
             try {
-              return (await authChecks[id]()) ? id : null;
+              const ok = await authChecks[id]();
+              if (!ok) console.log(`⚠️ Resolver '${id}' saved as active but auth not ready — will recover on token refresh`);
+              return ok;
             } catch {
-              console.log(`⏭️ Skipping resolver '${id}' — token check failed`);
-              return null;
+              console.log(`⚠️ Resolver '${id}' auth check failed — will recover on token refresh`);
+              return false;
             }
           }
-          return id; // No auth required
+          return true;
         })).then(results => {
-          const validActive = results.filter(Boolean);
-          setActiveResolvers(validActive);
-          resolverSettingsLoaded.current = true;
-          console.log(`📦 Loaded ${validActive.length} active resolvers from storage (${dedupedActive.length - validActive.length} skipped — no auth)`);
+          const failCount = results.filter(r => !r).length;
+          console.log(`📦 Loaded ${dedupedActive.length} active resolvers from storage${failCount ? ` (${failCount} awaiting auth)` : ''}`);
         });
       } else {
         // No saved resolvers — mark resolver settings as loaded immediately
