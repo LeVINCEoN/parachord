@@ -23858,49 +23858,63 @@ ${trackListXml}
     let albumArtUrl = null;
 
     // First try release-group endpoint
-    const artResponse = await fetch(
-      `https://coverartarchive.org/release-group/${release.id}`,
-      {
-        headers: { 'User-Agent': 'Parachord/1.0.0 (https://github.com/harmonix)' }
-      }
-    );
+    try {
+      const artResponse = await fetch(
+        `https://coverartarchive.org/release-group/${release.id}`,
+        {
+          headers: { 'User-Agent': 'Parachord/1.0.0 (https://github.com/harmonix)' }
+        }
+      );
 
-    if (artResponse.ok) {
-      const artData = await artResponse.json();
-      const frontCover = artData.images.find(img => img.front);
-      if (frontCover && frontCover.thumbnails && frontCover.thumbnails['250']) {
-        albumArtUrl = frontCover.thumbnails['250'];
+      if (artResponse.ok) {
+        const artData = await artResponse.json();
+        const frontCover = artData.images.find(img => img.front);
+        if (frontCover && frontCover.thumbnails && frontCover.thumbnails['250']) {
+          albumArtUrl = frontCover.thumbnails['250'];
+        }
       }
+    } catch (e) {
+      // Fall through to release endpoint
     }
 
     // If release-group has no art, try getting a specific release and its art
     if (!albumArtUrl) {
-      // Get the first release in this release-group
-      const releaseResponse = await fetch(
-        `https://musicbrainz.org/ws/2/release?release-group=${release.id}&status=official&fmt=json&limit=1`,
-        { headers: { 'User-Agent': 'Parachord/1.0.0 (https://github.com/harmonix)' } }
-      );
+      try {
+        // Get the first release in this release-group
+        const releaseResponse = await fetch(
+          `https://musicbrainz.org/ws/2/release?release-group=${release.id}&status=official&fmt=json&limit=1`,
+          { headers: { 'User-Agent': 'Parachord/1.0.0 (https://github.com/harmonix)' } }
+        );
 
-      if (releaseResponse.ok) {
-        const releaseData = await releaseResponse.json();
-        if (releaseData.releases && releaseData.releases.length > 0) {
-          const specificReleaseId = releaseData.releases[0].id;
+        if (releaseResponse.ok) {
+          const releaseData = await releaseResponse.json();
+          if (releaseData.releases && releaseData.releases.length > 0) {
+            const specificReleaseId = releaseData.releases[0].id;
 
-          // Try fetching art from the specific release
-          const releaseArtResponse = await fetch(
-            `https://coverartarchive.org/release/${specificReleaseId}`,
-            { headers: { 'User-Agent': 'Parachord/1.0.0 (https://github.com/harmonix)' } }
-          );
+            // Try fetching art from the specific release
+            const releaseArtResponse = await fetch(
+              `https://coverartarchive.org/release/${specificReleaseId}`,
+              { headers: { 'User-Agent': 'Parachord/1.0.0 (https://github.com/harmonix)' } }
+            );
 
-          if (releaseArtResponse.ok) {
-            const releaseArtData = await releaseArtResponse.json();
-            const frontCover = releaseArtData.images.find(img => img.front);
-            if (frontCover && frontCover.thumbnails && frontCover.thumbnails['250']) {
-              albumArtUrl = frontCover.thumbnails['250'];
+            if (releaseArtResponse.ok) {
+              const releaseArtData = await releaseArtResponse.json();
+              const frontCover = releaseArtData.images.find(img => img.front);
+              if (frontCover && frontCover.thumbnails && frontCover.thumbnails['250']) {
+                albumArtUrl = frontCover.thumbnails['250'];
+              }
             }
           }
         }
+      } catch (e) {
+        // Fall through to resolver fallback
       }
+    }
+
+    // If Cover Art Archive has no art, fall back to resolver search (iTunes, Spotify, etc.)
+    const artistName = release.artist || currentArtist?.name;
+    if (!albumArtUrl && artistName && release.title) {
+      albumArtUrl = await getAlbumArtFromResolvers(artistName, release.title);
     }
 
     return albumArtUrl;
