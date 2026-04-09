@@ -719,7 +719,8 @@ function createWindow() {
       nodeIntegration: false,
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js'),
-      webviewTag: false  // Disabled for security — use BrowserView or iframes instead
+      webviewTag: false,  // Disabled for security — use BrowserView or iframes instead
+      backgroundThrottling: false  // Prevent renderer throttle/suspension when backgrounded (music player needs this)
     },
     show: false
   });
@@ -765,13 +766,28 @@ function createWindow() {
     }
   }, 5000);
 
-  // Detect renderer crashes and page load failures
+  // Detect renderer crashes and page load failures — auto-recover
   mainWindow.webContents.on('render-process-gone', (event, details) => {
     console.error('💥 Renderer process gone:', details.reason, details.exitCode);
+    // Auto-reload on crash (but not on intentional kill/OOM which may recur)
+    if (details.reason === 'crashed' || details.reason === 'abnormal-exit') {
+      console.log('🔄 Auto-reloading after renderer crash...');
+      setTimeout(() => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.loadFile('index.html');
+        }
+      }, 1000);
+    }
   });
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription, validatedURL) => {
     console.error('❌ Page failed to load:', errorCode, errorDescription, validatedURL);
     showWindow(); // Show the window so the user sees something
+  });
+  mainWindow.on('unresponsive', () => {
+    console.warn('⚠️ Window became unresponsive — reloading...');
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.reload();
+    }
   });
 
   // Open DevTools in development
