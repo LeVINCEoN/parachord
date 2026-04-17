@@ -4693,6 +4693,127 @@ ipcMain.handle('sync-links:remove', async (event, localPlaylistId, providerId) =
   return { success: true };
 });
 
+// Relink orphaned local playlists to matching remotes by name.
+//
+// A local playlist is "orphaned" for a provider when:
+//   - it has tracks and isn't localOnly
+//   - syncedTo[provider] is missing
+//   - syncedFrom for that provider is also missing
+//   - the sync_playlist_links map has no entry either
+//
+// When an orphan has an unambiguous 1:1 name match against a user-owned
+// remote, we set syncedTo and the link-map entry. When either side has
+// multiple candidates, we refuse to pick automatically and surface the
+// case in `ambiguous`.
+//
+// Does NOT mark playlists as locallyModified — relinking is pure
+// bookkeeping, not a user intent to push track changes.
+//
+// Returns { linked: [...], ambiguous: [...], orphanCount }. Mutates store
+// on-disk state (local_playlists, sync_playlist_links).
+function relinkOrphansFor(providerId, ownedRemote) {
+  const localPlaylists = store.get('local_playlists') || [];
+  const links = getSyncLinks();
+  const normalize = s => (s || '').trim().toLowerCase();
+
+  const remoteByName = new Map();
+  for (const r of ownedRemote || []) {
+    const key = normalize(r.name);
+    if (!remoteByName.has(key)) remoteByName.set(key, []);
+    remoteByName.get(key).push(r);
+  }
+
+  const isLinked = (p) =>
+    p.syncedTo?.[providerId]?.externalId ||
+    (p.syncedFrom?.resolver === providerId && p.syncedFrom?.externalId) ||
+    links[p.id]?.[providerId]?.externalId;
+
+  const orphans = localPlaylists.filter(p =>
+    !p.localOnly &&
+    !isLinked(p) &&
+    (p.tracks?.length || 0) > 0
+  );
+
+  const orphansByName = new Map();
+  for (const o of orphans) {
+    const key = normalize(o.title);
+    if (!orphansByName.has(key)) orphansByName.set(key, []);
+    orphansByName.get(key).push(o);
+  }
+
+  const linked = [];
+  const ambiguous = [];
+
+  for (const [key, orphanList] of orphansByName) {
+    const remoteMatches = remoteByName.get(key) || [];
+    if (remoteMatches.length === 0) continue; // no remote match — create path will handle
+
+    if (orphanList.length > 1) {
+      ambiguous.push({
+        name: orphanList[0].title,
+        localIds: orphanList.map(o => o.id),
+        remoteExternalIds: remoteMatches.map(r => r.externalId),
+        reason: 'multiple-locals'
+      });
+      continue;
+    }
+    if (remoteMatches.length > 1) {
+      ambiguous.push({
+        name: orphanList[0].title,
+        localIds: [orphanList[0].id],
+        remoteExternalIds: remoteMatches.map(r => r.externalId),
+        reason: 'multiple-remotes'
+      });
+      continue;
+    }
+
+    const orphan = orphanList[0];
+    const match = remoteMatches[0];
+    linked.push({
+      localId: orphan.id,
+      localTitle: orphan.title,
+      externalId: match.externalId,
+      remoteName: match.name,
+      trackCountLocal: orphan.tracks?.length || 0,
+      trackCountRemote: match.trackCount || 0
+    });
+  }
+
+  if (linked.length > 0) {
+    const linkedByLocalId = new Map(linked.map(l => [l.localId, l]));
+    const now = Date.now();
+    const updatedLocal = localPlaylists.map(p => {
+      const link = linkedByLocalId.get(p.id);
+      if (!link) return p;
+      const existingSyncedTo = p.syncedTo || {};
+      return {
+        ...p,
+        syncedTo: {
+          ...existingSyncedTo,
+          [providerId]: {
+            externalId: link.externalId,
+            snapshotId: null,
+            syncedAt: now,
+            unresolvedTracks: [],
+            pendingAction: null
+          }
+        }
+      };
+    });
+    store.set('local_playlists', updatedLocal);
+    for (const l of linked) {
+      setSyncLink(l.localId, providerId, l.externalId);
+    }
+    console.log(`[Sync Relink] Linked ${linked.length} orphan(s) to ${providerId}${ambiguous.length > 0 ? ` (${ambiguous.length} ambiguous)` : ''}`);
+  }
+
+  return {
+    linked,
+    ambiguous,
+    orphanCount: orphans.length
+  };
+}
+
 // Startup migration: populate sync_playlist_links from existing syncedTo data
 // on local playlists. Idempotent and safe to run on every launch — if the map
 // already has an entry, syncedTo is the newer source of truth anyway (sync
@@ -6057,6 +6178,25 @@ ipcMain.handle('sync:push-playlist', async (event, providerId, playlistExternalI
       // Only consider user-owned playlists (don't delete followed/collaborative ones)
       const ownedPlaylists = playlists.filter(p => p.isOwnedByUser !== false);
 
+      // ----------------------------------------------------------------
+      // Step 1: Relink orphaned locals first.
+      //
+      // A local playlist that should be linked to a remote but has lost
+      // its syncedTo (through old bugs, crashes, save-path regressions)
+      // looks "unlinked" to keeper selection below — we'd pick the
+      // wrong keeper based on fallback heuristics. Relinking restores
+      // those links so the keeper-selection correctly prefers the copy
+      // the user's local is actually synced with.
+      //
+      // Relink only acts on unambiguous 1:1 name matches. If a local
+      // name has multiple remote candidates (the very case cleanup is
+      // about to collapse), relink skips and marks ambiguous — keeper
+      // selection's link-awareness still falls back to fallback-sort
+      // for that group, which is the best we can do when no local
+      // reference disambiguates.
+      // ----------------------------------------------------------------
+      const relinkResult = relinkOrphansFor(providerId, ownedPlaylists);
+
       // Group by normalized name
       const groups = {};
       for (const playlist of ownedPlaylists) {
@@ -6068,15 +6208,26 @@ ipcMain.handle('sync:push-playlist', async (event, providerId, playlistExternalI
       // Find groups with duplicates
       const duplicateGroups = Object.entries(groups).filter(([, items]) => items.length > 1);
       if (duplicateGroups.length === 0) {
-        return { success: true, deleted: 0, groups: [] };
+        return {
+          success: true,
+          deleted: 0,
+          groups: [],
+          ambiguous: [],
+          relinked: relinkResult.linked,
+          relinkAmbiguous: relinkResult.ambiguous,
+          orphanCount: relinkResult.orphanCount
+        };
       }
 
       // ----------------------------------------------------------------
-      // Build a map of which externalIds in the duplicate groups are
-      // referenced by local playlists (via syncedTo, syncedFrom, OR the
-      // sync_playlist_links map). This drives keeper selection: we keep
-      // the remote that the user's locals are actually linked to, so
-      // nobody gets silently re-pointed to a different copy.
+      // Step 2: Build a map of which externalIds in the duplicate groups
+      // are referenced by local playlists (via syncedTo, syncedFrom, OR
+      // the sync_playlist_links map). This drives keeper selection: we
+      // keep the remote that the user's locals are actually linked to,
+      // so nobody gets silently re-pointed to a different copy.
+      //
+      // Note: we re-read local_playlists and links AFTER relink ran so
+      // we see the just-written links.
       // ----------------------------------------------------------------
       const groupExternalIds = new Set();
       for (const [, items] of duplicateGroups) {
@@ -6229,10 +6380,51 @@ ipcMain.handle('sync:push-playlist', async (event, providerId, playlistExternalI
         success: true,
         deleted: totalDeleted,
         groups: deletedGroups,
-        ambiguous: ambiguousGroups
+        ambiguous: ambiguousGroups,
+        relinked: relinkResult.linked,
+        relinkAmbiguous: relinkResult.ambiguous,
+        orphanCount: relinkResult.orphanCount
       };
     } catch (error) {
       console.error(`[Sync Cleanup] Error: ${error.message}`);
+      return { success: false, error: error.message };
+    }
+  });
+
+  // Standalone relink IPC — useful for testing or if we want to expose a
+  // separate UI button in the future. Internally, the cleanup handler also
+  // runs relinkOrphansFor before picking keepers, so most users won't need
+  // to call this directly.
+  ipcMain.handle('sync:relink-orphaned-playlists', async (event, providerId) => {
+    const provider = SyncEngine.getProvider(providerId);
+    if (!provider || !provider.capabilities.playlists || !provider.fetchPlaylists) {
+      return { success: false, error: 'Provider does not support playlists' };
+    }
+
+    let token;
+    let refreshTokenCb = null;
+    if (providerId === 'spotify') {
+      token = await ensureValidSpotifyToken();
+      refreshTokenCb = async () => {
+        const newToken = await ensureValidSpotifyToken(true);
+        if (newToken) token = newToken;
+        return newToken;
+      };
+    } else if (providerId === 'applemusic') {
+      if (!generatedMusicKitToken) await musicKitTokenReady;
+      const developerToken = generatedMusicKitToken || process.env.MUSICKIT_DEVELOPER_TOKEN || store.get('applemusic_developer_token');
+      const userToken = store.get('applemusic_user_token');
+      if (developerToken && userToken) token = JSON.stringify({ developerToken, userToken });
+    }
+    if (!token) return { success: false, error: 'Not authenticated' };
+
+    try {
+      const { playlists: remote } = await provider.fetchPlaylists(token, null, refreshTokenCb);
+      const ownedRemote = (remote || []).filter(p => p.isOwnedByUser !== false);
+      const result = relinkOrphansFor(providerId, ownedRemote);
+      return { success: true, ...result };
+    } catch (error) {
+      console.error(`[Sync Relink] Error: ${error.message}`);
       return { success: false, error: error.message };
     }
   });

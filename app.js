@@ -5666,19 +5666,40 @@ const Parachord = () => {
       const result = await window.electron.sync.cleanupDuplicatePlaylists(providerId);
       if (result.success) {
         const ambiguousCount = result.ambiguous?.length || 0;
-        if (result.deleted === 0 && ambiguousCount === 0) {
-          showToast('No duplicate playlists found', 'info');
-        } else if (result.deleted === 0 && ambiguousCount > 0) {
-          const ambNames = result.ambiguous.map(a => `"${a.name}"`).join(', ');
-          showToast(`Skipped ${ambiguousCount} ambiguous group${ambiguousCount > 1 ? 's' : ''}: ${ambNames}. Multiple local playlists are linked to different copies — resolve manually.`, 'warning');
-        } else {
+        const relinkedCount = result.relinked?.length || 0;
+        const parts = [];
+
+        if (relinkedCount > 0) {
+          parts.push(`Linked ${relinkedCount} orphaned playlist${relinkedCount > 1 ? 's' : ''} to existing Spotify copies`);
+        }
+        if (result.deleted > 0) {
           const names = result.groups.map(g => `"${g.name}" (${g.deleted} removed)`).join(', ');
-          let msg = `Cleaned up ${result.deleted} duplicate playlist${result.deleted > 1 ? 's' : ''}: ${names}`;
-          if (ambiguousCount > 0) {
-            const ambNames = result.ambiguous.map(a => `"${a.name}"`).join(', ');
-            msg += `. Skipped ${ambiguousCount} ambiguous: ${ambNames}`;
+          parts.push(`removed ${result.deleted} duplicate${result.deleted > 1 ? 's' : ''}: ${names}`);
+        }
+        if (ambiguousCount > 0) {
+          const ambNames = result.ambiguous.map(a => `"${a.name}"`).join(', ');
+          parts.push(`skipped ${ambiguousCount} ambiguous group${ambiguousCount > 1 ? 's' : ''} (${ambNames}) — multiple local playlists linked to different copies`);
+        }
+
+        if (parts.length === 0) {
+          showToast('No orphaned or duplicate playlists found', 'info');
+        } else {
+          const tone = ambiguousCount > 0 && result.deleted === 0 && relinkedCount === 0 ? 'warning' : 'success';
+          showToast(parts.join('. '), tone);
+        }
+
+        // Reload playlists so UI reflects newly-populated syncedTo
+        if (relinkedCount > 0) {
+          try {
+            const loaded = await window.electron.playlists.load();
+            setPlaylists(prev => {
+              const loadedUrls = new Set(loaded.map(p => p.sourceUrl).filter(Boolean));
+              const hostedOnly = prev.filter(p => p.sourceUrl && !loadedUrls.has(p.sourceUrl));
+              return [...loaded, ...hostedOnly];
+            });
+          } catch (e) {
+            console.warn('[Cleanup] Failed to reload playlists after relink:', e);
           }
-          showToast(msg, 'success');
         }
       } else {
         showToast(`Cleanup failed: ${result.error}`, 'error');
@@ -50372,7 +50393,7 @@ useEffect(() => {
                       marginBottom: '16px',
                       lineHeight: '1.6'
                     }
-                  }, 'If sync issues created duplicate playlists on a connected service, you can scan and remove them. The copy with the most tracks is kept.'),
+                  }, 'Scan a connected service for duplicate playlists and orphaned local playlists. Unambiguous local playlists get re-linked to their matching Spotify copy first, then duplicates are removed — the copy your local is already linked to is kept (or the copy with the most tracks, if none are linked).'),
                   // Cleanup buttons for each enabled sync provider
                   React.createElement('div', { style: { display: 'flex', gap: '8px', flexWrap: 'wrap' } },
                     Object.entries(syncProviderConfig)
