@@ -5697,8 +5697,14 @@ ipcMain.handle('sync:push-playlist', async (event, providerId, playlistExternalI
     }
 
     let token;
+    let refreshTokenCb = null;
     if (providerId === 'spotify') {
       token = await ensureValidSpotifyToken();
+      refreshTokenCb = async () => {
+        const newToken = await ensureValidSpotifyToken(true);
+        if (newToken) token = newToken;
+        return newToken;
+      };
     } else if (providerId === 'applemusic') {
       if (!generatedMusicKitToken) {
         await musicKitTokenReady;
@@ -5715,6 +5721,71 @@ ipcMain.handle('sync:push-playlist', async (event, providerId, playlistExternalI
     }
 
     try {
+      // Step 0: Defense-in-depth duplicate check.
+      //
+      // The renderer only decides to create when local `syncedTo[providerId]`
+      // is missing. That single source of truth is fragile: if syncedTo was
+      // never persisted (crash, partial save, pre-existing playlists from
+      // before sync tracking, any save path that stripped the field), the
+      // next sync would happily create another remote duplicate even though
+      // one already exists.
+      //
+      // To prevent this at the only gateway that actually writes to the
+      // remote, fetch the user's owned playlists and reuse any existing
+      // playlist whose name matches (case-insensitive, trimmed). The caller
+      // still receives { externalId, snapshotId } and will persist
+      // syncedTo[providerId] pointing at the matched remote — no duplicate
+      // gets created, and future syncs will see the link on disk.
+      if (provider.fetchPlaylists) {
+        try {
+          const { playlists: remotePlaylists } = await provider.fetchPlaylists(token, null, refreshTokenCb);
+          const normalized = (name || '').trim().toLowerCase();
+          const matches = (remotePlaylists || [])
+            .filter(p => p.isOwnedByUser && (p.name || '').trim().toLowerCase() === normalized);
+          if (matches.length > 0) {
+            // Prefer the most-populated match as the canonical target so the
+            // user's richest playlist wins when duplicates already exist.
+            matches.sort((a, b) => (b.trackCount || 0) - (a.trackCount || 0));
+            const existing = matches[0];
+            console.log(`[Sync] Playlist "${name}" already exists on ${providerId} (${existing.externalId}); linking instead of creating${matches.length > 1 ? ` (${matches.length} candidates)` : ''}`);
+
+            // Still resolve + push tracks so the linked remote gets the
+            // local track state, same as a fresh create would produce.
+            let resolved = tracks;
+            let unresolved = [];
+            if (provider.resolveTracks) {
+              const resolveResult = await provider.resolveTracks(tracks, token);
+              resolved = resolveResult.resolved;
+              unresolved = resolveResult.unresolved;
+            }
+
+            let snapshotId = existing.snapshotId;
+            if (resolved.length > 0 && provider.updatePlaylistTracks) {
+              try {
+                const updateResult = await provider.updatePlaylistTracks(existing.externalId, resolved, token);
+                snapshotId = updateResult.snapshotId || snapshotId;
+              } catch (trackError) {
+                console.warn(`[Sync] Linked to existing "${name}" on ${providerId} but failed to push tracks: ${trackError.message}`);
+                unresolved = tracks.map(t => ({ artist: t.artist, title: t.title }));
+              }
+            }
+
+            return {
+              success: true,
+              externalId: existing.externalId,
+              snapshotId,
+              unresolvedTracks: unresolved,
+              linkedToExisting: true
+            };
+          }
+        } catch (dedupeError) {
+          // Do NOT let a duplicate-check failure block creation — fall through
+          // to the original create path. The mutex + local syncedTo still
+          // provide protection in the happy path.
+          console.warn(`[Sync] Duplicate-check failed for "${name}" on ${providerId}, proceeding with create:`, dedupeError.message);
+        }
+      }
+
       // Step 1: Resolve tracks to provider-specific IDs
       let resolved = tracks;
       let unresolved = [];
