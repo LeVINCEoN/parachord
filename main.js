@@ -6071,28 +6071,109 @@ ipcMain.handle('sync:push-playlist', async (event, providerId, playlistExternalI
         return { success: true, deleted: 0, groups: [] };
       }
 
-      let totalDeleted = 0;
-      const deletedGroups = [];
+      // ----------------------------------------------------------------
+      // Build a map of which externalIds in the duplicate groups are
+      // referenced by local playlists (via syncedTo, syncedFrom, OR the
+      // sync_playlist_links map). This drives keeper selection: we keep
+      // the remote that the user's locals are actually linked to, so
+      // nobody gets silently re-pointed to a different copy.
+      // ----------------------------------------------------------------
+      const groupExternalIds = new Set();
+      for (const [, items] of duplicateGroups) {
+        for (const item of items) groupExternalIds.add(item.externalId);
+      }
+
+      const localPlaylists = store.get('local_playlists') || [];
+      const allLinks = getSyncLinks();
+
+      // Map: externalId -> set of localPlaylistIds referencing it.
+      // Using a Set dedupes the case where one local has both syncedTo
+      // and syncedFrom pointing at the same remote.
+      const localsByExternalId = new Map();
+      const addLink = (externalId, localId) => {
+        if (!externalId || !localId) return;
+        if (!groupExternalIds.has(externalId)) return;
+        if (!localsByExternalId.has(externalId)) localsByExternalId.set(externalId, new Set());
+        localsByExternalId.get(externalId).add(localId);
+      };
+      for (const local of localPlaylists) {
+        addLink(local.syncedTo?.[providerId]?.externalId, local.id);
+        if (local.syncedFrom?.resolver === providerId) {
+          addLink(local.syncedFrom.externalId, local.id);
+        }
+      }
+      for (const [localId, providers] of Object.entries(allLinks)) {
+        addLink(providers[providerId]?.externalId, localId);
+      }
+
+      // ----------------------------------------------------------------
+      // For each duplicate group, pick a keeper. Preference order:
+      //   1. The remote that locals are actually linked to.
+      //   2. If multiple remotes in the group have distinct locals
+      //      linked (ambiguous — two locals think they own different
+      //      copies), skip the group entirely and surface a warning.
+      //   3. Otherwise (no locals linked anywhere in the group), fall
+      //      back to most-tracks then most-recent-snapshot.
+      // ----------------------------------------------------------------
+      const cleanableGroups = [];
+      const ambiguousGroups = [];
 
       for (const [name, items] of duplicateGroups) {
-        // Sort: most tracks first, then most recently modified
-        items.sort((a, b) => {
-          if ((b.trackCount || 0) !== (a.trackCount || 0)) {
-            return (b.trackCount || 0) - (a.trackCount || 0);
-          }
-          // Compare snapshotId (lastModifiedDate for Apple Music)
-          return (b.snapshotId || '').localeCompare(a.snapshotId || '');
-        });
+        const linkedMembers = items.filter(p => localsByExternalId.has(p.externalId));
 
-        const keeper = items[0];
-        const toDelete = items.slice(1);
+        if (linkedMembers.length > 1) {
+          // Two or more remotes in this group are each referenced by at
+          // least one local. Collapsing them would silently re-point a
+          // local to a different playlist's content. Require manual
+          // resolution.
+          ambiguousGroups.push({
+            name,
+            linkedMembers: linkedMembers.map(m => ({
+              externalId: m.externalId,
+              trackCount: m.trackCount || 0,
+              localIds: [...localsByExternalId.get(m.externalId)]
+            }))
+          });
+          console.warn(`[Sync Cleanup] Skipping ambiguous group "${name}": ${linkedMembers.length} copies each have local references. User must resolve manually.`);
+          continue;
+        }
 
+        let keeper;
+        if (linkedMembers.length === 1) {
+          keeper = linkedMembers[0];
+        } else {
+          const sorted = [...items].sort((a, b) => {
+            if ((b.trackCount || 0) !== (a.trackCount || 0)) {
+              return (b.trackCount || 0) - (a.trackCount || 0);
+            }
+            return (b.snapshotId || '').localeCompare(a.snapshotId || '');
+          });
+          keeper = sorted[0];
+        }
+
+        const toDelete = items.filter(p => p.externalId !== keeper.externalId);
+        cleanableGroups.push({ name, keeper, toDelete });
+      }
+
+      // ----------------------------------------------------------------
+      // Perform deletions. The keeper selection above guarantees that
+      // no local is currently pointing at any of the toDelete ids (when
+      // a local pointed at a group member, that member became the
+      // keeper), so there's nothing to relink afterwards. We still prune
+      // the link map defensively, in case of split-brain between
+      // syncedTo and sync_playlist_links.
+      // ----------------------------------------------------------------
+      let totalDeleted = 0;
+      const deletedGroups = [];
+      const deletedExternalIds = new Set();
+
+      for (const { name, keeper, toDelete } of cleanableGroups) {
         for (const dup of toDelete) {
           try {
             await provider.deletePlaylist(dup.externalId, token, refreshTokenCb);
             totalDeleted++;
+            deletedExternalIds.add(dup.externalId);
             console.log(`[Sync Cleanup] Deleted duplicate "${dup.name}" (${dup.externalId}, ${dup.trackCount || 0} tracks) — keeping ${keeper.externalId} (${keeper.trackCount || 0} tracks)`);
-            // Rate limit delay between deletions
             if (provider.getRateLimitDelay) {
               await new Promise(r => setTimeout(r, provider.getRateLimitDelay()));
             }
@@ -6100,7 +6181,6 @@ ipcMain.handle('sync:push-playlist', async (event, providerId, playlistExternalI
             console.warn(`[Sync Cleanup] Failed to delete "${dup.name}" (${dup.externalId}): ${err.message}`);
           }
         }
-
         deletedGroups.push({
           name: keeper.name,
           kept: { externalId: keeper.externalId, trackCount: keeper.trackCount || 0 },
@@ -6108,25 +6188,18 @@ ipcMain.handle('sync:push-playlist', async (event, providerId, playlistExternalI
         });
       }
 
-      // Also clean up local playlist references that point to deleted external IDs
-      const deletedExternalIds = new Set();
-      for (const [, items] of duplicateGroups) {
-        for (const dup of items.slice(1)) {
-          deletedExternalIds.add(dup.externalId);
-        }
-      }
+      // Defensive cleanup of local refs. Keeper selection makes this a
+      // no-op in the common case, but a split-brain between syncedTo and
+      // sync_playlist_links could still leave dangling pointers.
       if (deletedExternalIds.size > 0) {
-        const localPlaylists = store.get('local_playlists') || [];
         let localCleaned = 0;
         const updatedLocal = localPlaylists.map(p => {
-          // Clean syncedTo references pointing to deleted playlists
           if (p.syncedTo?.[providerId] && deletedExternalIds.has(p.syncedTo[providerId].externalId)) {
             const newSyncedTo = { ...p.syncedTo };
             delete newSyncedTo[providerId];
             localCleaned++;
             return { ...p, syncedTo: Object.keys(newSyncedTo).length > 0 ? newSyncedTo : undefined };
           }
-          // Clean syncedFrom references pointing to deleted playlists
           if (p.syncedFrom?.resolver === providerId && deletedExternalIds.has(p.syncedFrom.externalId)) {
             localCleaned++;
             return { ...p, syncedFrom: null };
@@ -6135,15 +6208,12 @@ ipcMain.handle('sync:push-playlist', async (event, providerId, playlistExternalI
         });
         if (localCleaned > 0) {
           store.set('local_playlists', updatedLocal);
-          console.log(`[Sync Cleanup] Cleaned ${localCleaned} local playlist references to deleted duplicates`);
+          console.warn(`[Sync Cleanup] Cleaned ${localCleaned} stray local ref(s) to deleted duplicates — this should not happen under normal keeper selection, indicates syncedTo/link-map skew.`);
         }
 
-        // Also prune the durable link map so the next sync doesn't waste a
-        // validation round-trip on a known-dead externalId. The validation
-        // step would catch it anyway, but keeping the map tidy is cheap.
-        const allLinks = getSyncLinks();
         let linksCleaned = 0;
-        for (const [localId, providers] of Object.entries(allLinks)) {
+        const freshLinks = getSyncLinks();
+        for (const [localId, providers] of Object.entries(freshLinks)) {
           const link = providers[providerId];
           if (link?.externalId && deletedExternalIds.has(link.externalId)) {
             removeSyncLink(localId, providerId);
@@ -6151,11 +6221,16 @@ ipcMain.handle('sync:push-playlist', async (event, providerId, playlistExternalI
           }
         }
         if (linksCleaned > 0) {
-          console.log(`[Sync Cleanup] Pruned ${linksCleaned} stale sync-link(s) pointing at deleted duplicates`);
+          console.log(`[Sync Cleanup] Pruned ${linksCleaned} sync-link map entries pointing at deleted duplicates`);
         }
       }
 
-      return { success: true, deleted: totalDeleted, groups: deletedGroups };
+      return {
+        success: true,
+        deleted: totalDeleted,
+        groups: deletedGroups,
+        ambiguous: ambiguousGroups
+      };
     } catch (error) {
       console.error(`[Sync Cleanup] Error: ${error.message}`);
       return { success: false, error: error.message };

@@ -5665,11 +5665,20 @@ const Parachord = () => {
     try {
       const result = await window.electron.sync.cleanupDuplicatePlaylists(providerId);
       if (result.success) {
-        if (result.deleted === 0) {
+        const ambiguousCount = result.ambiguous?.length || 0;
+        if (result.deleted === 0 && ambiguousCount === 0) {
           showToast('No duplicate playlists found', 'info');
+        } else if (result.deleted === 0 && ambiguousCount > 0) {
+          const ambNames = result.ambiguous.map(a => `"${a.name}"`).join(', ');
+          showToast(`Skipped ${ambiguousCount} ambiguous group${ambiguousCount > 1 ? 's' : ''}: ${ambNames}. Multiple local playlists are linked to different copies — resolve manually.`, 'warning');
         } else {
           const names = result.groups.map(g => `"${g.name}" (${g.deleted} removed)`).join(', ');
-          showToast(`Cleaned up ${result.deleted} duplicate playlist${result.deleted > 1 ? 's' : ''}: ${names}`, 'success');
+          let msg = `Cleaned up ${result.deleted} duplicate playlist${result.deleted > 1 ? 's' : ''}: ${names}`;
+          if (ambiguousCount > 0) {
+            const ambNames = result.ambiguous.map(a => `"${a.name}"`).join(', ');
+            msg += `. Skipped ${ambiguousCount} ambiguous: ${ambNames}`;
+          }
+          showToast(msg, 'success');
         }
       } else {
         showToast(`Cleanup failed: ${result.error}`, 'error');
